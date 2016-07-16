@@ -18,20 +18,9 @@ DATA_PATH = '../machine-learning-ex1/ex1/ex1data1.txt'
 
 my_data = numpy.genfromtxt(DATA_PATH, delimiter=',').astype(numpy.float32)
 
-print(my_data)
-
 train_X= numpy.array([ i[0] for i in my_data])
 train_Y= numpy.array([ i[1] for i in my_data])
 
-
-# Training Data
-'''
-subst_x = 500.
-train_X = numpy.asarray([500.,4.4,5.5,6.71,6.93,4.168,9.779,6.182,7.59,2.167,
-                         7.042,10.791,5.313,7.997,5.654,9.27,3.1])
-train_Y = numpy.asarray([1.7,2.76,2.09,3.19,1.694,1.573,3.366,2.596,2.53,1.221,
-                         2.827,3.465,1.65,2.904,2.42,2.94,1.3])
-'''
 n_samples = train_X.shape[0]
 
 # tf Graph Input
