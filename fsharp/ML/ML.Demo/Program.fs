@@ -9,16 +9,16 @@ open MathNet.Numerics.LinearAlgebra
 
 [<EntryPoint>]
 let main argv = 
-    let inputs, outputs = readCSV @"C:\dev\ml\machine-learning-ex1\ex1\ex1data1.txt" false [|0|] 1    
+    let inputs, outputs = readCSV @"C:\dev\ml\machine-learning-ex1\ex1\ex1data2.txt" false [|0..1|] 2    
     let outputs = vector outputs
-    let inputs = matrix inputs //norm  (matrix inputs)
+    let inputs = norm  (matrix inputs)
     let model = {
         Hypothesis = linearHyp
         Loss = linearMSELoss
         Gradient = linearMSEGradient
     }
     let prms = {
-        MaxIterNumber = 10000 // Epochs number
+        MaxIterNumber = 5000 // Epochs number
         MinErrorThreshold = 0.
         Alpha = 0.01
     }
