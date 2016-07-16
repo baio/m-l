@@ -11,7 +11,7 @@ open MathNet.Numerics.LinearAlgebra
 let main argv = 
     let inputs, outputs = readCSV @"C:\dev\ml\machine-learning-ex1\ex1\ex1data2.txt" false [|0..1|] 2    
     let outputs = vector outputs
-    let inputs = norm  (matrix inputs)
+    let inputs, normPrms = norm  (matrix inputs)
     let model = {
         Hypothesis = linearHyp
         Loss = linearMSELoss
@@ -20,7 +20,7 @@ let main argv =
     let prms = {
         MaxIterNumber = 5000 // Epochs number
         MinErrorThreshold = 0.
-        Alpha = 0.01
+        Alpha = 0.01 
     }
     let train = batchGradientDescent model prms inputs outputs
     printfn "%A" train

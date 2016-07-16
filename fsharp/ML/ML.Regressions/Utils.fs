@@ -36,7 +36,7 @@ let norm (mx: float Matrix) =
     |> Matrix.mapCols (fun i vec ->
         let mean, std = colsStat.[i]
         (vec - mean) / std
-    )
+    ), colsStat
         
 
 let zeros cnt = DenseVector.zero cnt
