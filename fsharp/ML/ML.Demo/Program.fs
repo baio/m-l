@@ -2,14 +2,27 @@
 // See the 'F# Tutorial' project for more help.
 
 open ML.Utils
+open ML.Regressions.GLM
+open ML.Regressions.LinearRegression
+open ML.Regressions.BatchGradientDescent
 open MathNet.Numerics.LinearAlgebra
 
 [<EntryPoint>]
 let main argv = 
-    let mx = 
-        matrix [[1.; 2.]
-                [3.; 4.]]
-    let t = norm mx
-    printfn "%A" t
+    let inputs, outputs = readCSV @"C:\dev\ml\machine-learning-ex1\ex1\ex1data1.txt" false [|0|] 1    
+    let outputs = vector outputs
+    let inputs = matrix inputs //norm  (matrix inputs)
+    let model = {
+        Hypothesis = linearHyp
+        Loss = linearMSELoss
+        Gradient = linearMSEGradient
+    }
+    let prms = {
+        MaxIterNumber = 10000 // Epochs number
+        MinErrorThreshold = 0.
+        Alpha = 0.01
+    }
+    let train = batchGradientDescent model prms inputs outputs
+    printfn "%A" train
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code

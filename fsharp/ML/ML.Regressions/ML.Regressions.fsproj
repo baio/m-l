@@ -55,6 +55,7 @@
     <Compile Include="GLM.fs" />
     <Compile Include="BatchGradientDescent.fs" />
     <Content Include="packages.config" />
+    <Compile Include="LinearRegression.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
