@@ -18,6 +18,7 @@ let main argv =
     
     let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex1\ex1\ex1data2.txt" false [|0..1|] 2    
     let outputs = vector outputs
+    //let inputs = matrix inputs
     let inputs, normPrms = norm  (matrix inputs)
     let model = {
         Hypothesis = linearHyp
@@ -33,7 +34,7 @@ let main argv =
         MaxIterNumber = 5000 // Epochs number
         MinErrorThreshold = 0.
         Alpha = 0.01
-        BatchSize = 20 
+        BatchSize = 5
     }
 
     let perf = Benchmark.Run (fun () ->

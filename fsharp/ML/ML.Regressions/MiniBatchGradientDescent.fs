@@ -32,8 +32,6 @@ let miniBatchGradientDescent
                     (spliceRows start len x), (spliceVector start len y)
                 )
                 |> Seq.iter (fun (sx, sy) ->
-                    //printf "%A" sx
-                    //printf "%A" sy
                     let gradients = model.Gradient w sx sy
                     theta <- theta - prms.Alpha * gradients                
                 )
