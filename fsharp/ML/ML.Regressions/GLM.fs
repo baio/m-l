@@ -19,10 +19,18 @@ type GLMModel = {
     Gradient : GradientFunc   
 }
 
+type MinBatchTrainModelParams = {
+    MaxIterNumber : int
+    MinErrorThreshold : float
+    Alpha: float
+    BatchSize: int
+}
+
 type IterativeTrainModelParams = {
     MaxIterNumber : int
     MinErrorThreshold : float
     Alpha: float
 }
+
 
 type ModelTrainResult = Converged | ErrorThresholdAchieved | MaxIterCountAchieved

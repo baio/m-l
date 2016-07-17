@@ -13,6 +13,7 @@
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>ML.Regressions</Name>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,12 +55,15 @@
     <Compile Include="Utils.fs" />
     <Compile Include="GLM.fs" />
     <Compile Include="BatchGradientDescent.fs" />
+    <Compile Include="StochasticGradientDescent.fs" />
+    <Compile Include="MiniBatchGradientDescent.fs" />
     <Content Include="packages.config" />
     <Compile Include="LinearRegression.fs" />
+    <None Include="README.MD" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.3.1.2.5\lib\net40\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MathNet.Numerics">

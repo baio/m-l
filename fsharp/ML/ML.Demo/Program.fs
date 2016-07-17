@@ -5,6 +5,7 @@ open ML.Utils
 open ML.Regressions.GLM
 open ML.Regressions.LinearRegression
 open ML.Regressions.BatchGradientDescent
+open ML.Regressions.StochasticGradientDescent
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
 
@@ -23,10 +24,19 @@ let main argv =
         MinErrorThreshold = 0.
         Alpha = 0.01 
     }
+
     let perf = Benchmark.Run (fun () ->
         let train = batchGradientDescent model prms inputs outputs
-        printfn "result : %A" train
+        printfn "batch result : %A" train
     )    
-    printfn "perf : %A" perf
+    printfn "batch perf : %A" perf
+
+    let perf = Benchmark.Run (fun () ->
+        let train = stochasticGradientDescent model prms inputs outputs
+        printfn "stochastic result : %A" train
+    )    
+    printfn "stochastic perf : %A" perf
+
+
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code
