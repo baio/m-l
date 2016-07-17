@@ -27,8 +27,10 @@ let stochasticGradientDescent
                 MaxIterCountAchieved, w
             else    
                 let mutable theta = w            
-                x |> Matrix.iterRows (fun row ->
-                    let gradients = model.Gradient w x y
+                x |> Matrix.iteriRows (fun i _ ->
+                    let sx = x |> spliceRows i 1 
+                    let sy = y |> spliceVector i 1
+                    let gradients = model.Gradient w sx sy
                     theta <- theta - prms.Alpha * gradients                
                 )
                 iter theta (iterCnt + 1) error
