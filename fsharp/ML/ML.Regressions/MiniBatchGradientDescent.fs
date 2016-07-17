@@ -30,7 +30,7 @@ let miniBatchGradientDescent
                     (spliceRows start len x), (spliceVector start len y)
                 )
                 |> Seq.iter (fun (sx, sy) ->
-                    let gradients = model.Gradient w sx sy
+                    let gradients = model.Gradient theta sx sy
                     theta <- theta - prms.Alpha * gradients                
                 )
                 iter theta (iterCnt + 1) error

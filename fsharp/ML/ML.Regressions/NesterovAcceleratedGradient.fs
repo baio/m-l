@@ -23,8 +23,7 @@ let nesterovAcceleratedGradientDescent
             else if prms.EpochNumber < epochCnt then
                 // iters count achieved
                 MaxIterCountAchieved, w
-            else    
-                let accelaration = prms.Gamma * latestMomentum
+            else                    
                 let mutable theta = w
                 let mutable momentum = latestMomentum
                 genRanges prms.BatchSize x.RowCount           
@@ -32,6 +31,7 @@ let nesterovAcceleratedGradientDescent
                     (spliceRows start len x), (spliceVector start len y)
                 )
                 |> Seq.iter (fun (sx, sy) ->                    
+                    let accelaration = prms.Gamma * momentum
                     let gradients = model.Gradient (theta - accelaration) sx sy
                     momentum <- accelaration + prms.Alpha * gradients
                     theta <- theta - momentum
