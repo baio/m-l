@@ -19,6 +19,14 @@ type GLMModel = {
     Gradient : GradientFunc   
 }
 
+type AcceleratedTrainModelParams = {
+    EpochNumber : int // number of training iterations
+    Alpha: float // learning rate
+    BatchSize: int // mini batch size
+    Gamma: float // momentum term
+    MinErrorThreshold : float
+}
+
 type MiniBatchTrainModelParams = {
     MaxIterNumber : int
     MinErrorThreshold : float

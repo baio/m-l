@@ -60,6 +60,7 @@
     <Content Include="packages.config" />
     <Compile Include="LinearRegression.fs" />
     <None Include="README.MD" />
+    <Compile Include="NesterovAcceleratedGradient.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
