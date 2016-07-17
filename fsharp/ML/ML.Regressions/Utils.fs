@@ -44,3 +44,16 @@ let zeros cnt = DenseVector.zero cnt
 let ones cnt = DenseVector.init cnt (fun _ -> 1.)
 
 let appendOnes (mx: _ Matrix) = mx.InsertColumn(0, ones mx.RowCount)
+
+let genRanges rgLength seqLength =
+    seq {         
+        for i in 0..rgLength..seqLength do 
+            if i <> seqLength then
+                yield i, if i + rgLength <= seqLength then rgLength else seqLength - i
+    }
+
+let spliceRows start count (mx: _ Matrix) = 
+    mx.SubMatrix(start, count, 0, mx.ColumnCount)
+
+let spliceVector start count (vr: _ Vector) = 
+    vr.SubVector(start, count)

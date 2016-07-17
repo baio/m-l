@@ -19,7 +19,7 @@ type GLMModel = {
     Gradient : GradientFunc   
 }
 
-type MinBatchTrainModelParams = {
+type MiniBatchTrainModelParams = {
     MaxIterNumber : int
     MinErrorThreshold : float
     Alpha: float

@@ -8,7 +8,7 @@ open MathNet.Numerics.LinearAlgebra
 // fales, weights - if max number of iterations achieved
 let miniBatchGradientDescent
     (model: GLMModel)
-    (prms: MinBatchTrainModelParams)
+    (prms: MiniBatchTrainModelParams)
     (x : float Matrix)
     (y : float Vector) =
 
@@ -26,9 +26,15 @@ let miniBatchGradientDescent
                 // iters count achieved
                 MaxIterCountAchieved, w
             else    
-                let mutable theta = w            
-                x |> Matrix.iterRows (fun row ->
-                    let gradients = model.Gradient w x y
+                let mutable theta = w 
+                genRanges prms.BatchSize x.RowCount           
+                |> Seq.map (fun (start, len) -> 
+                    (spliceRows start len x), (spliceVector start len y)
+                )
+                |> Seq.iter (fun (sx, sy) ->
+                    //printf "%A" sx
+                    //printf "%A" sy
+                    let gradients = model.Gradient w sx sy
                     theta <- theta - prms.Alpha * gradients                
                 )
                 iter theta (iterCnt + 1) error
