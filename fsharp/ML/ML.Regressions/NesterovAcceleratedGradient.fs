@@ -4,8 +4,6 @@ open ML.Utils
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 
-// returns true, weights - if error threshold achieved
-// fales, weights - if max number of iterations achieved
 let nesterovAcceleratedGradientDescent
     (model: GLMModel)
     (prms: AcceleratedTrainModelParams)
