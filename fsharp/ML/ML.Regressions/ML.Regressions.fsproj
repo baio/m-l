@@ -54,13 +54,14 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="GLM.fs" />
+    <Compile Include="LinearRegression.fs" />
     <Compile Include="BatchGradientDescent.fs" />
     <Compile Include="StochasticGradientDescent.fs" />
     <Compile Include="MiniBatchGradientDescent.fs" />
-    <Content Include="packages.config" />
-    <Compile Include="LinearRegression.fs" />
-    <None Include="README.MD" />
     <Compile Include="NesterovAcceleratedGradient.fs" />
+    <Compile Include="AdagradGradientDescent.fs" />
+    <Content Include="packages.config" />
+    <None Include="README.MD" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
