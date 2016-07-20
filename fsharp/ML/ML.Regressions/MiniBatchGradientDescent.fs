@@ -1,6 +1,7 @@
 ﻿module ML.Regressions.MiniBatchGradientDescent
 
-open ML.Utils
+open ML.Core.Utils
+open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 

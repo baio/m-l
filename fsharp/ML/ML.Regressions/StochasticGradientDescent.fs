@@ -1,6 +1,6 @@
 ﻿module ML.Regressions.StochasticGradientDescent
 
-open ML.Utils
+open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 

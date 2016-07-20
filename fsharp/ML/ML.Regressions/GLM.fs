@@ -1,5 +1,6 @@
 ﻿module ML.Regressions.GLM
 
+open ML.Core.LinearAlgebra
 open MathNet.Numerics.LinearAlgebra
 // GLM 
 // http://ufldl.stanford.edu/tutorial/supervised/LinearRegression/
@@ -42,3 +43,13 @@ type IterativeTrainModelParams = {
 
 
 type ModelTrainResult = Converged | ErrorThresholdAchieved | MaxIterCountAchieved
+
+
+let predict (w: float Vector) (x: float Vector) = 
+    x |> vecCons 1. |> (*) w
+
+let predictNorm (normPrms: (float * float) list) (w: float Vector) (x: float Vector) =     
+    let mu, std = normPrms |>  List.unzip 
+    let vmu = vector mu
+    let vstd = vector std
+    (x - vmu) ./ vstd |> predict w
