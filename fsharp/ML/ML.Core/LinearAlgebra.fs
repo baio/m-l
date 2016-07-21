@@ -15,9 +15,6 @@
 
     let appendOnes (mx: _ Matrix) = mx.InsertColumn(0, ones mx.RowCount)
 
-    let vecCons (el: _) (vec: _ Vector)  = 
-        DenseVector.ofSeq(seq { 
-            yield el
-            for v in vec do yield v
-       })
+    let vecCons (el: _) (vec: _ Vector)  = Vector.insert 0 el vec
 
+    let appendOne (vec: _ Vector) = vecCons 1. vec 
