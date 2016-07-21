@@ -34,8 +34,11 @@ let wholeRegressionP (x: float Matrix) (y: float Vector) (coefficents: float Vec
     (x |> appendOnes).EnumerateColumns()
     |> Seq.mapi (fun i xcol -> regressionP xcol y (coefficents.At i))
     
-let regressionRSquared (normPrms : (Vector<float> * Vector<float>)) (x: float Matrix) (y: float Vector) (coefficents: float Vector) = 
-    (x |> appendOnes).EnumerateColumns()
-    |> Seq.mapi (fun i xcol -> regressionP xcol y (coefficents.At i))
-    
+let regressionRSquared (normX: float Matrix) (y: float Vector) (w: float Vector) =     
+    let y_m = y |> Statistics.Mean
+    let yErrSq = (y - y_m).PointwisePower(2.).Sum()    
+    let x = normX |> appendOnes 
+    let h = x * w
+    let hErrSq = (y - h).PointwisePower(2.).Sum()
+    1. - (hErrSq / yErrSq)    
     

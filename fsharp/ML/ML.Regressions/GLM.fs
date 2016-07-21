@@ -1,5 +1,6 @@
 ﻿module ML.Regressions.GLM
 
+open ML.Core.Utils
 open ML.Core.LinearAlgebra
 open MathNet.Numerics.LinearAlgebra
 // GLM 
@@ -48,8 +49,5 @@ type ModelTrainResult = Converged | ErrorThresholdAchieved | MaxIterCountAchieve
 let predict (w: float Vector) (x: float Vector) = 
     x |> vecCons 1. |> (*) w
 
-let predictNorm (normPrms: (float * float) list) (w: float Vector) (x: float Vector) =     
-    let mu, std = normPrms |>  List.unzip 
-    let vmu = vector mu
-    let vstd = vector std
-    (x - vmu) ./ vstd |> predict w
+let predictNorm (normPrms: NormParams) (w: float Vector) (x: float Vector) =     
+    (x - normPrms.Mu) ./ normPrms.Std |> predict w
