@@ -45,7 +45,7 @@ let linear() =
         MinErrorThreshold = 0.
         Alpha = 0.01
         BatchSize = 5
-        Gamma = 0.009
+        Gamma = 0.9
     }
 
     let mutable trainResults = [] 
@@ -78,7 +78,8 @@ let linear() =
     )    
     printfn "nesterov perf : %A" perf
     
-    trainResults 
-    |> List.skip 2 
+    let res = trainResults |> List.rev
+    
+    res
     |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
-    |> showLines [(*"batch"; "stochastic";*) "mini batch"; "nesterov"]
+    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov"]

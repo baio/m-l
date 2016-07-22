@@ -33,13 +33,13 @@ let nesterovAcceleratedGradientDescent
                 |> Seq.map (fun (start, len) -> 
                     (spliceRows start len x), (spliceVector start len y)
                 )
-                |> Seq.iter (fun (sx, sy) ->                    
-                    let accelaration = prms.Gamma * momentum
-                    let gradients = model.Gradient (theta - accelaration) sx sy
-                    momentum <- accelaration + prms.Alpha * gradients
+                |> Seq.iter (fun (sx, sy) ->                  
+                    let a = prms.Gamma * momentum
+                    let gradients = model.Gradient (theta - a) sx sy
+                    momentum <- a + prms.Alpha * gradients
                     theta <- theta - momentum
                 )
-                iter theta (error::errors) momentum
+                iter theta (error::errors)  momentum
 
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 
