@@ -30,9 +30,9 @@ let logistic() =
         Gradient = logisticMSEGradient
     }
     let prms = {
-        MaxIterNumber = 50000 // Epochs number
-        MinErrorThreshold = 0.001
-        Alpha = 0.09
+        MaxIterNumber = 400 // Epochs number
+        MinErrorThreshold = 0.
+        Alpha = 0.01
     }       
     
     let x = inputs |> appendOnes

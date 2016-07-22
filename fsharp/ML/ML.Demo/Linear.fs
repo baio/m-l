@@ -15,6 +15,7 @@ open MathNet.Numerics.LinearAlgebra
 open PerfUtil
 
 open ML.Statistics.Regressions
+open ML.Statistics.Charting
 
 let linear() = 
         
@@ -27,6 +28,7 @@ let linear() =
         Loss = linearMSELoss
         Gradient = linearMSEGradient
     }
+    
     let prms = {
         MaxIterNumber = 5000 // Epochs number
         MinErrorThreshold = 0.
@@ -46,26 +48,36 @@ let linear() =
         Gamma = 0.009
     }
 
+    let mutable trainResults = [] 
+
     let perf = Benchmark.Run (fun () ->
         let train = batchGradientDescent model prms inputs outputs        
+        trainResults <- train::trainResults
         printfn "batch result : %A" train
     )    
     printfn "batch perf : %A" perf
-
+    
     let perf = Benchmark.Run (fun () ->
         let train = stochasticGradientDescent model prms inputs outputs
+        trainResults <- train::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
         let train = miniBatchGradientDescent model minBatchPrms inputs outputs
+        trainResults <- train::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
         let train = nesterovAcceleratedGradientDescent model acceleratedBatchPrms inputs outputs
+        trainResults <- train::trainResults
         printfn "nesterove result : %A" train
     )    
     printfn "nesterov perf : %A" perf
+    
+    trainResults 
+    |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
+    |> showLines ["batch", "stochastic", "mini batch", "nesterov"]

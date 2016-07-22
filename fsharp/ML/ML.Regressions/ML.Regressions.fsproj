@@ -55,6 +55,7 @@
     <Compile Include="GLM.fs" />
     <Compile Include="LinearRegression.fs" />
     <Compile Include="LogisticRegression.fs" />
+    <Compile Include="GradientDescent.fs" />
     <Compile Include="BatchGradientDescent.fs" />
     <Compile Include="StochasticGradientDescent.fs" />
     <Compile Include="MiniBatchGradientDescent.fs" />

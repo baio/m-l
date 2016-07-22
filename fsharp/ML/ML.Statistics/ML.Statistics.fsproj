@@ -55,10 +55,15 @@
     <Compile Include="Gauss.fs" />
     <Compile Include="StudentT.fs" />
     <Compile Include="Regressions.fs" />
+    <Compile Include="Charting.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Charting">
+      <HintPath>..\packages\FSharp.Charting.0.90.14\lib\net40\FSharp.Charting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.3.1.2.5\lib\net40\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MathNet.Numerics">
@@ -70,9 +75,16 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ML.Core\ML.Core.fsproj">

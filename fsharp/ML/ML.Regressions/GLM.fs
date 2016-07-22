@@ -43,8 +43,11 @@ type IterativeTrainModelParams = {
 }
 
 
-type ModelTrainResult = Converged | ErrorThresholdAchieved | MaxIterCountAchieved
+type ModelTrainResultType = Converged | ErrorThresholdAchieved | MaxIterCountAchieved
 
+type ModelTrainResult = { ResultType : ModelTrainResultType; Weights: float Vector; Errors: float list }
+
+type WeightsCalculator = float Vector -> float Matrix -> float Vector -> float Vector
 
 let predict (w: float Vector) (x: float Vector) = 
     x |> vecCons 1. |> (*) w
