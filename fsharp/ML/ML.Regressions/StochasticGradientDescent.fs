@@ -34,7 +34,7 @@ let stochasticGradientDescent
                     let gradients = model.Gradient w sx sy
                     theta <- theta - prms.Alpha * gradients                
                 )
-                iter theta errors
+                iter theta (error::errors)
 
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 

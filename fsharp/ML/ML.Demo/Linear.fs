@@ -41,7 +41,7 @@ let linear() =
         BatchSize = 5
     }
     let acceleratedBatchPrms : AcceleratedTrainModelParams = {
-        EpochNumber = 50000 // Epochs number
+        EpochNumber = 5000 // Epochs number
         MinErrorThreshold = 0.
         Alpha = 0.01
         BatchSize = 5
@@ -79,5 +79,6 @@ let linear() =
     printfn "nesterov perf : %A" perf
     
     trainResults 
+    |> List.skip 2 
     |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
-    |> showLines ["batch", "stochastic", "mini batch", "nesterov"]
+    |> showLines [(*"batch"; "stochastic";*) "mini batch"; "nesterov"]

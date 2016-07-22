@@ -13,17 +13,19 @@ let miniBatchGradientDescent
 
         let x = x |> appendOnes
 
-        let rec iter w iterCnt latestError =
+        let rec iter w errors =
+            let iterCnt = errors |> List.length 
+            let latestError = if errors.Length <> 0 then errors |> List.head else 0.    
             let error = model.Loss w x y
             if latestError = error then
                 // no improvements, converged
-                Converged, w
+                { ResultType = Converged; Weights = w; Errors = errors }
             else if error <= prms.MinErrorThreshold then
                 // got minimal error threshold
-                ErrorThresholdAchieved, w
+                { ResultType = ErrorThresholdAchieved; Weights = w; Errors = errors }
             else if prms.MaxIterNumber < iterCnt then
                 // iters count achieved
-                MaxIterCountAchieved, w
+                { ResultType = MaxIterCountAchieved; Weights = w; Errors = errors }
             else    
                 let mutable theta = w 
                 genRanges prms.BatchSize x.RowCount           
@@ -34,8 +36,8 @@ let miniBatchGradientDescent
                     let gradients = model.Gradient theta sx sy
                     theta <- theta - prms.Alpha * gradients                
                 )
-                iter theta (iterCnt + 1) error
+                iter theta (error::errors)
 
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 
-        iter initialW 0 0.
+        iter initialW []

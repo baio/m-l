@@ -13,17 +13,19 @@ let nesterovAcceleratedGradientDescent
 
         let x = x |> appendOnes
 
-        let rec iter w epochCnt (latestMomentum: float Vector) latestError =
+        let rec iter w errors (latestMomentum: float Vector) =
+            let epochCnt = errors |> List.length 
+            let latestError = if errors.Length <> 0 then errors |> List.head else 0.
             let error = model.Loss w x y
             if latestError = error then
                 // no improvements, converged
-                Converged, w
+                { ResultType = Converged; Weights = w; Errors = errors }
             else if error <= prms.MinErrorThreshold then
                 // got minimal error threshold
-                ErrorThresholdAchieved, w
+                { ResultType = ErrorThresholdAchieved; Weights = w; Errors = errors }
             else if prms.EpochNumber < epochCnt then
                 // iters count achieved
-                MaxIterCountAchieved, w
+                { ResultType = MaxIterCountAchieved; Weights = w; Errors = errors }
             else                    
                 let mutable theta = w
                 let mutable momentum = latestMomentum
@@ -37,8 +39,8 @@ let nesterovAcceleratedGradientDescent
                     momentum <- accelaration + prms.Alpha * gradients
                     theta <- theta - momentum
                 )
-                iter theta (epochCnt + 1) momentum error
+                iter theta (error::errors) momentum
 
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 
-        iter initialW 0 initialW 0. 
+        iter initialW [] initialW 
