@@ -1,4 +1,5 @@
 ﻿module ML.Regressions.NesterovAcceleratedGradient
+//http://stats.stackexchange.com/questions/179915/whats-the-difference-between-momentum-based-gradient-descent-and-nesterovs-ac
 
 open ML.Core.Utils
 open ML.Core.LinearAlgebra

@@ -10,6 +10,7 @@ open ML.Regressions.BatchGradientDescent
 open ML.Regressions.StochasticGradientDescent
 open ML.Regressions.MiniBatchGradientDescent
 open ML.Regressions.NesterovAcceleratedGradient
+open ML.Regressions.AdagradGradientDescent
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
@@ -47,6 +48,13 @@ let linear() =
         BatchSize = 5
         Gamma = 0.9
     }
+    let adagradBatchPrms : AdagradTrainModelParams = {
+        EpochNumber = 5000 // Epochs number
+        MinErrorThreshold = 0.
+        Alpha = 1.
+        Epsilon = 1E-8
+        BatchSize = 5
+    }
 
     let mutable trainResults = [] 
 
@@ -77,9 +85,17 @@ let linear() =
         printfn "nesterove result : %A" train
     )    
     printfn "nesterov perf : %A" perf
+
+    let perf = Benchmark.Run (fun () ->
+        let train = adagradGradientDescent model adagradBatchPrms inputs outputs
+        trainResults <- train::trainResults
+        printfn "adagrad result : %A" train
+    )    
+    printfn "adagrad perf : %A" perf
     
     let res = trainResults |> List.rev
     
+    //[res.[3]; res.[4]]
     res
     |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
-    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov"]
+    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov"; "adagrad"]
