@@ -11,6 +11,7 @@ open ML.Regressions.StochasticGradientDescent
 open ML.Regressions.MiniBatchGradientDescent
 open ML.Regressions.NesterovAcceleratedGradient
 open ML.Regressions.AdagradGradientDescent
+open ML.Regressions.AdadeltaGradientDescent
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
@@ -55,9 +56,17 @@ let linear() =
         Epsilon = 1E-8
         BatchSize = 5
     }
+    let adadeltaBatchPrms : AdadeltaTrainModelParams = {
+        EpochNumber = 5000 // Epochs number
+        MinErrorThreshold = 0.
+        Rho = 0.95
+        Epsilon = 1E-8
+        BatchSize = 1
+    }
 
     let mutable trainResults = [] 
 
+    
     let perf = Benchmark.Run (fun () ->
         let train = batchGradientDescent model prms inputs outputs        
         trainResults <- train::trainResults
@@ -95,7 +104,19 @@ let linear() =
     
     let res = trainResults |> List.rev
     
+    let perf = Benchmark.Run (fun () ->
+        let train = adadeltaGradientDescent model adadeltaBatchPrms inputs outputs
+        trainResults <- train::trainResults
+        printfn "adadelta result : %A" train
+    )    
+    printfn "adadelta perf : %A" perf
+
+    
+    let res = trainResults |> List.rev
+    
     //[res.[3]; res.[4]]
     res
     |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
-    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov"; "adagrad"]
+    |> List.skip(1)
+    |> showLines [(*"batch";*) "stochastic"; "mini batch"; "nesterov"; "adagrad"; "adadelta"]
+    

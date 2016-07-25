@@ -1,20 +1,21 @@
-﻿module ML.Regressions.Adadelta
-
+﻿// http://arxiv.org/pdf/1212.5701v1.pdf
+// http://climin.readthedocs.io/en/latest/adadelta.html
+module ML.Regressions.AdadeltaGradientDescent
 
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 
-let adagradGradientDescent
+let adadeltaGradientDescent
     (model: GLMModel)
-    (prms: AdagradTrainModelParams)
+    (prms: AdadeltaTrainModelParams)
     (x : float Matrix)
     (y : float Vector) =
 
         let x = x |> appendOnes
 
-        let rec iter w errors (G: float Vector) =
+        let rec iter w errors (Eg: float Vector) (Et: float Vector) =
             let epochCnt = errors |> List.length 
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.    
             let error = model.Loss w x y
@@ -28,21 +29,30 @@ let adagradGradientDescent
                 // iters count achieved
                 { ResultType = MaxIterCountAchieved; Weights = w; Errors = errors }
             else    
-                let mutable g = G
+                let mutable eg = Eg
+                let mutable et = Et
                 let mutable theta = w 
                 genRanges prms.BatchSize x.RowCount           
                 |> Seq.map (fun (start, len) -> 
                     (spliceRows start len x), (spliceVector start len y)
                 )
-                |> Seq.iter (fun (sx, sy) ->                    
+                |> Seq.iter (fun (sx, sy) ->                  
+                    //calculate gradient  
                     let gradients = model.Gradient theta sx sy
-                    let k = prms.Alpha / (prms.Epsilon + g.PointwisePower(0.5))                    
-                    theta <- theta - k .* gradients                
-                    g <- g + gradients.PointwisePower(2.)
+                    //accumulate gradient
+                    eg <- prms.Rho * eg + (1. - prms.Rho) * gradients.PointwisePower(2.)                    
+                    //compute update
+                    let rms_t = (et + prms.Epsilon).PointwisePower(0.5)
+                    let rms_g = (eg + prms.Epsilon).PointwisePower(0.5)
+                    let d_theta = (rms_t / rms_g) .* gradients
+                    //accumulate updates
+                    et <- prms.Rho * et + (1. - prms.Rho) * d_theta.PointwisePower(2.)                    
+                    //apply update
+                    theta <- theta - d_theta
                 )
-                iter theta (error::errors) g
+                iter theta (error::errors) eg et
 
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 
         let initialG = x.ColumnCount |> ones
-        iter initialW [] initialG
+        iter initialW [] initialW initialW

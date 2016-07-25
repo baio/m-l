@@ -21,6 +21,14 @@ type GLMModel = {
     Gradient : GradientFunc   
 }
 
+type AdadeltaTrainModelParams = {
+    EpochNumber : int // number of training iterations
+    BatchSize: int // mini batch size
+    Epsilon: float
+    Rho: float
+    MinErrorThreshold : float
+}
+
 type AdagradTrainModelParams = {
     EpochNumber : int // number of training iterations
     Alpha: float // learning rate
