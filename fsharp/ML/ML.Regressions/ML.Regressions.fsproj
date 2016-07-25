@@ -61,9 +61,10 @@
     <Compile Include="MiniBatchGradientDescent.fs" />
     <Compile Include="NesterovAcceleratedGradient.fs" />
     <Compile Include="AdagradGradientDescent.fs" />
-    <Compile Include="AdadeltaGradientDescent.fs" />
+    <Compile Include="AdadeltaAcceleratedGradientDescent.fs" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
+    <Compile Include="AdadeltaGradientDescent.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

@@ -12,6 +12,7 @@ open ML.Regressions.MiniBatchGradientDescent
 open ML.Regressions.NesterovAcceleratedGradient
 open ML.Regressions.AdagradGradientDescent
 open ML.Regressions.AdadeltaGradientDescent
+open ML.Regressions.AdadeltaAcceleratedGradientDescent
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
@@ -61,7 +62,16 @@ let linear() =
         MinErrorThreshold = 0.
         Rho = 0.95
         Epsilon = 1E-8
-        BatchSize = 1
+        BatchSize = 5        
+    }
+    let adadeltaAcceleratedBatchPrms : AdadeltaAcceleratedTrainModelParams = {
+        EpochNumber = 5000 // Epochs number
+        MinErrorThreshold = 0.
+        Rho = 0.95
+        Epsilon = 1E-8
+        BatchSize = 5        
+        Alpha = 1.
+        Gamma = 1000.
     }
 
     let mutable trainResults = [] 
@@ -105,7 +115,7 @@ let linear() =
     let res = trainResults |> List.rev
     
     let perf = Benchmark.Run (fun () ->
-        let train = adadeltaGradientDescent model adadeltaBatchPrms inputs outputs
+        let train = adadeltaAcceleratedGradientDescent model adadeltaAcceleratedBatchPrms inputs outputs
         trainResults <- train::trainResults
         printfn "adadelta result : %A" train
     )    

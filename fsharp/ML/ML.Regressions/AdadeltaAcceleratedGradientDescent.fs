@@ -1,15 +1,15 @@
 ﻿// http://arxiv.org/pdf/1212.5701v1.pdf
 // http://climin.readthedocs.io/en/latest/adadelta.html
-module ML.Regressions.AdadeltaGradientDescent
+module ML.Regressions.AdadeltaAcceleratedGradientDescent
 
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 
-let adadeltaGradientDescent
+let adadeltaAcceleratedGradientDescent
     (model: GLMModel)
-    (prms: AdadeltaTrainModelParams)
+    (prms: AdadeltaAcceleratedTrainModelParams)
     (x : float Matrix)
     (y : float Vector) =
 
@@ -38,20 +38,21 @@ let adadeltaGradientDescent
                     (spliceRows start len x), (spliceVector start len y)
                 )
                 |> Seq.iter (fun (sx, sy) ->              
+                    let a = theta - prms.Gamma * delta
                     //calculate gradient  
-                    let gradients = model.Gradient theta sx sy
+                    let gradients = model.Gradient a sx sy
                     //accumulate gradient
                     eg <- prms.Rho * eg + (1. - prms.Rho) * gradients.PointwisePower(2.)                    
                     //compute update
                     let rms_t = (et + prms.Epsilon).PointwisePower(0.5)
                     let rms_g = (eg + prms.Epsilon).PointwisePower(0.5)
-                    let delta = (rms_t / rms_g) .* gradients
+                    delta <- prms.Alpha * (rms_t / rms_g) .* gradients
                     //accumulate updates
                     et <- prms.Rho * et + (1. - prms.Rho) * delta.PointwisePower(2.)                    
                     //apply update
                     theta <- theta - delta
                 )
-                iter theta (error::errors) eg et dt
+                iter theta (error::errors) eg et delta
 
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 
