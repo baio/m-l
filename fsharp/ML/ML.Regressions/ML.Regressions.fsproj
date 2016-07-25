@@ -61,6 +61,7 @@
     <Compile Include="MiniBatchGradientDescent.fs" />
     <Compile Include="NesterovAcceleratedGradient.fs" />
     <Compile Include="AdagradGradientDescent.fs" />
+    <Compile Include="AdadeltaGradientDescent.fs" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
   </ItemGroup>
