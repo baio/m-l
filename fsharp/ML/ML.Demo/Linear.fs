@@ -105,6 +105,7 @@ let linear() =
     )    
     printfn "nesterov perf : %A" perf
 
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = adagradGradientDescent model adagradBatchPrms inputs outputs
         trainResults <- train::trainResults
@@ -120,6 +121,7 @@ let linear() =
         printfn "adadelta result : %A" train
     )    
     printfn "adadelta perf : %A" perf
+    *)
 
     
     let res = trainResults |> List.rev
@@ -127,6 +129,5 @@ let linear() =
     //[res.[3]; res.[4]]
     res
     |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
-    |> List.skip(1)
-    |> showLines [(*"batch";*) "stochastic"; "mini batch"; "nesterov"; "adagrad"; "adadelta"]
+    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov"; "adagrad"; "adadelta"]
     

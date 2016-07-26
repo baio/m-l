@@ -56,5 +56,4 @@ let adadeltaAcceleratedGradientDescent
 
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 
-        let initialG = x.ColumnCount |> ones
         iter initialW [] initialW initialW initialW

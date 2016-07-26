@@ -15,7 +15,7 @@ let adadeltaGradientDescent
 
         let x = x |> appendOnes
 
-        let rec iter w errors (Eg: float Vector) (Et: float Vector) (dt: float Vector) =
+        let rec iter w errors (Eg: float Vector) (Et: float Vector) =
             let epochCnt = errors |> List.length 
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.    
             let error = model.Loss w x y
@@ -32,7 +32,6 @@ let adadeltaGradientDescent
                 let mutable eg = Eg
                 let mutable et = Et
                 let mutable theta = w 
-                let mutable delta = dt
                 genRanges prms.BatchSize x.RowCount           
                 |> Seq.map (fun (start, len) -> 
                     (spliceRows start len x), (spliceVector start len y)
@@ -51,9 +50,8 @@ let adadeltaGradientDescent
                     //apply update
                     theta <- theta - delta
                 )
-                iter theta (error::errors) eg et dt
+                iter theta (error::errors) eg et 
 
         // initialize random weights
-        let initialW = x.ColumnCount |> zeros 
-        let initialG = x.ColumnCount |> ones
-        iter initialW [] initialW initialW initialW
+        let initial = x.ColumnCount |> zeros 
+        iter initial [] initial initial

@@ -14,7 +14,7 @@ Batch gradient descent performs redundant computations for large datasets, as it
 before each parameter update. SGD does away with this redundancy by performing one update at a time. It is therefore usually much faster and can also be used to learn online.
 On the other hand, this ultimately complicates convergence to the exact minimum, as SGD will keep overshooting.
 
-### 2. Mini-batch gradient descent (SGD)
+### 3. Mini-batch gradient descent (SGD)
 
 Mini-batch gradient descent finally takes the best of both worlds and performs an update for every mini-batch of nn training examples
 

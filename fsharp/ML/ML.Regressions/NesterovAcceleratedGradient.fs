@@ -43,5 +43,5 @@ let nesterovAcceleratedGradientDescent
                 iter theta (error::errors)  momentum
 
         // initialize random weights
-        let initialW = x.ColumnCount |> zeros 
-        iter initialW [] initialW 
+        let initial = x.ColumnCount |> zeros 
+        iter initial [] initial

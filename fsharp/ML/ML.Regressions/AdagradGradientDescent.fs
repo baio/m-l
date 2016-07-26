@@ -44,6 +44,6 @@ let adagradGradientDescent
                 iter theta (error::errors) g
 
         // initialize random weights
-        let initialW = x.ColumnCount |> zeros 
-        let initialG = x.ColumnCount |> ones
-        iter initialW [] initialG
+        let initial = x.ColumnCount |> zeros 
+        //let initialG = x.ColumnCount |> ones
+        iter initial [] initial
