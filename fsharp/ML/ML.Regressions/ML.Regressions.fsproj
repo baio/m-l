@@ -57,12 +57,12 @@
     <Compile Include="LogisticRegression.fs" />
     <Compile Include="GradientDescent.fs" />
     <Compile Include="BatchGradientDescent.fs" />
-    <Compile Include="StochasticGradientDescent.fs" />
-    <Compile Include="MiniBatchGradientDescent.fs" />
-    <Compile Include="NesterovAcceleratedGradient.fs" />
-    <Compile Include="AdagradGradientDescent.fs" />
-    <Compile Include="AdadeltaGradientDescent.fs" />
-    <Compile Include="AdadeltaAcceleratedGradientDescent.fs" />
+    <None Include="StochasticGradientDescent.fs" />
+    <None Include="MiniBatchGradientDescent.fs" />
+    <None Include="NesterovAcceleratedGradient.fs" />
+    <None Include="AdagradGradientDescent.fs" />
+    <None Include="AdadeltaGradientDescent.fs" />
+    <None Include="AdadeltaAcceleratedGradientDescent.fs" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
   </ItemGroup>

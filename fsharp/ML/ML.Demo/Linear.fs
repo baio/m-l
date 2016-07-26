@@ -7,12 +7,14 @@ open ML.Core.Utils
 open ML.Regressions.GLM
 open ML.Regressions.LinearRegression
 open ML.Regressions.BatchGradientDescent
+(*
 open ML.Regressions.StochasticGradientDescent
 open ML.Regressions.MiniBatchGradientDescent
 open ML.Regressions.NesterovAcceleratedGradient
 open ML.Regressions.AdagradGradientDescent
 open ML.Regressions.AdadeltaGradientDescent
 open ML.Regressions.AdadeltaAcceleratedGradientDescent
+*)
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
@@ -31,7 +33,19 @@ let linear() =
         Loss = linearMSELoss
         Gradient = linearMSEGradient
     }
-    
+
+    let prms = {
+        EpochNumber = 5000 // Epochs number
+        MinErrorThreshold = 0.
+    }
+
+    let hyper = {
+        Alpha = 0.01
+    }
+
+    let train = batchGradientDescent model prms hyper inputs outputs        
+    printfn "batch result : %A" train
+    (*
     let prms = {
         MaxIterNumber = 5000 // Epochs number
         MinErrorThreshold = 0.
@@ -130,4 +144,5 @@ let linear() =
     res
     |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
     |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov"; "adagrad"; "adadelta"]
+    *)
     

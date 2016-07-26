@@ -4,6 +4,8 @@ open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 
+open GradientDescent 
+
 let stochasticGradientDescent
     (model: GLMModel)
     (prms: IterativeTrainModelParams)

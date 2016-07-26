@@ -21,53 +21,42 @@ type GLMModel = {
     Gradient : GradientFunc   
 }
 
-type AdadeltaAcceleratedTrainModelParams = {
-    EpochNumber : int // number of training iterations
-    BatchSize: int // mini batch size
-    Epsilon: float
-    Rho: float
-    MinErrorThreshold : float
-    Alpha: float // learning rate
-    Gamma: float // momentum term
-}
-
-type AdadeltaTrainModelParams = {
-    EpochNumber : int // number of training iterations
-    BatchSize: int // mini batch size
-    Epsilon: float
-    Rho: float
-    MinErrorThreshold : float
-}
-
-type AdagradTrainModelParams = {
-    EpochNumber : int // number of training iterations
-    Alpha: float // learning rate
-    BatchSize: int // mini batch size
-    Epsilon: float
-    MinErrorThreshold : float
-}
-
-type AcceleratedTrainModelParams = {
-    EpochNumber : int // number of training iterations
-    Alpha: float // learning rate
-    BatchSize: int // mini batch size
-    Gamma: float // momentum term
-    MinErrorThreshold : float
-}
-
-type MiniBatchTrainModelParams = {
-    MaxIterNumber : int
-    MinErrorThreshold : float
+type BasicHyperParams = {
     Alpha: float
+}
+
+type MiniBatchHyperParams = {
+    Basic: BasicHyperParams
     BatchSize: int
 }
 
-type IterativeTrainModelParams = {
-    MaxIterNumber : int
-    MinErrorThreshold : float
-    Alpha: float
+type AcceleratedHyperParams = {
+    MiniBatch: MiniBatchHyperParams
+    Gamma: float // momentum term
 }
 
+type AdagradHyperParams = {
+    Accelertaed: AcceleratedHyperParams
+    Epsilon: float
+}
+
+type AdadeltaHyperParams = {
+    Accelerated: AcceleratedHyperParams
+    Epsilon: float
+    Rho: float
+}
+
+type RegressionHyperParams = 
+    | BasicHyperParams of BasicHyperParams
+    | MiniBatchHyperParams of MiniBatchHyperParams
+    | AcceleratedHyperParams of AcceleratedHyperParams
+    | AdagradHyperParams of AdagradHyperParams
+    | AdadeltaHyperParams of AdadeltaHyperParams 
+     
+type IterativeTrainModelParams = {
+    EpochNumber : int
+    MinErrorThreshold : float
+}
 
 type ModelTrainResultType = Converged | ErrorThresholdAchieved | MaxIterCountAchieved
 
@@ -80,3 +69,4 @@ let predict (w: float Vector) (x: float Vector) =
 
 let predictNorm (normPrms: NormParams) (w: float Vector) (x: float Vector) =     
     (x - normPrms.Mu) ./ normPrms.Std |> predict w
+

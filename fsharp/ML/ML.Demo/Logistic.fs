@@ -2,6 +2,7 @@
 // See the 'F# Tutorial' project for more help.
 module Logistic
 
+(*
 open ML.Core.Readers
 open ML.Core.Utils
 open ML.Regressions.GLM
@@ -46,3 +47,4 @@ let logistic() =
         printfn "batch result : %A" train
     )    
     printfn "batch perf : %A" perf
+*)
