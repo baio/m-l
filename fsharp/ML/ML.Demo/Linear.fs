@@ -71,7 +71,7 @@ let linear() =
     }
 
     let AdagradHyper : AdagradHyperParams = {        
-        NAG = NAGHyper
+        SGD = SGDHyper
         Epsilon = 1E-8
     }
 

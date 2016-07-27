@@ -36,7 +36,7 @@ type NAGHyperParams = {
 }
 
 type AdagradHyperParams = {
-    NAG: NAGHyperParams
+    SGD: SGDHyperParams
     Epsilon: float
 }
 

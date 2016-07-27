@@ -8,11 +8,11 @@ open MathNet.Numerics.LinearAlgebra
 open SGD
 open GradientDescent 
 
-type private NAGIter = {
+type NAGIter = {
     Momentum: float Vector
 }
 
-let private calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
+let calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     let theta = iter.Theta
 
     let alpha = prms.HyperParams.SGD.Basic.Alpha
