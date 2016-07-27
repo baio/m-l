@@ -60,11 +60,10 @@
     <None Include="StochasticGradientDescent.fs" />
     <Compile Include="SGD.fs" />
     <Compile Include="NAG.fs" />
-    <Compile Include="Adagrad.fs" />
-    <None Include="AdadeltaGradientDescent.fs" />
-    <None Include="AdadeltaAcceleratedGradientDescent.fs" />
+    <Compile Include="Adadelta.fs" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
+    <Compile Include="Adagrad.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

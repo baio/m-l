@@ -41,7 +41,7 @@ type AdagradHyperParams = {
 }
 
 type AdadeltaHyperParams = {
-    NAG: NAGHyperParams
+    SGD: SGDHyperParams
     Epsilon: float
     Rho: float
 }

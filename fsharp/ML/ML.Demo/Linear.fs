@@ -111,6 +111,13 @@ let linear() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf
+
+    let perf = Benchmark.Run (fun () ->
+        let train = adagrad model prms AdagradHyper inputs outputs
+        trainResults <- ("Adadelta", train)::trainResults
+        printfn "Adadelta result : %A" train
+    )    
+    printfn "Adadelta perf : %A" perf
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])
