@@ -54,7 +54,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="GLM.fs" />
     <Compile Include="LinearRegression.fs" />
-    <Compile Include="LogisticRegression.fs" />
+    <Compile Include="SoftmaxRegression.fs" />
     <Compile Include="GD.fs" />
     <Compile Include="SGD.fs" />
     <Compile Include="NAG.fs" />
@@ -63,6 +63,7 @@
     <Compile Include="GradientDescent.fs" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
+    <Compile Include="LogisticRegression.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
