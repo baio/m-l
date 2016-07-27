@@ -6,7 +6,9 @@ open ML.Core.Readers
 open ML.Core.Utils
 open ML.Regressions.GLM
 open ML.Regressions.LinearRegression
+
 open ML.Regressions.BatchGradientDescent
+open ML.Regressions.SGD
 (*
 open ML.Regressions.StochasticGradientDescent
 open ML.Regressions.MiniBatchGradientDescent
@@ -15,6 +17,8 @@ open ML.Regressions.AdagradGradientDescent
 open ML.Regressions.AdadeltaGradientDescent
 open ML.Regressions.AdadeltaAcceleratedGradientDescent
 *)
+
+
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
@@ -39,12 +43,22 @@ let linear() =
         MinErrorThreshold = 0.
     }
 
-    let hyper = {
+    let basicHyper = {
         Alpha = 0.01
     }
 
-    let train = batchGradientDescent model prms hyper inputs outputs        
+    let SGDHyper = {
+        Basic = basicHyper
+        BatchSize = 1
+    }
+
+
+    let train = batchGradientDescent model prms basicHyper inputs outputs        
     printfn "batch result : %A" train
+
+    let train1 = SGD model prms SGDHyper inputs outputs        
+    printfn "batch result : %A" train1
+
     (*
     let prms = {
         MaxIterNumber = 5000 // Epochs number

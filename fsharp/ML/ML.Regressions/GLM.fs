@@ -25,13 +25,13 @@ type BasicHyperParams = {
     Alpha: float
 }
 
-type MiniBatchHyperParams = {
+type SGDHyperParams = {
     Basic: BasicHyperParams
     BatchSize: int
 }
 
 type AcceleratedHyperParams = {
-    MiniBatch: MiniBatchHyperParams
+    MiniBatch: SGDHyperParams
     Gamma: float // momentum term
 }
 
@@ -48,7 +48,7 @@ type AdadeltaHyperParams = {
 
 type RegressionHyperParams = 
     | BasicHyperParams of BasicHyperParams
-    | MiniBatchHyperParams of MiniBatchHyperParams
+    | MiniBatchHyperParams of SGDHyperParams
     | AcceleratedHyperParams of AcceleratedHyperParams
     | AdagradHyperParams of AdagradHyperParams
     | AdadeltaHyperParams of AdadeltaHyperParams 

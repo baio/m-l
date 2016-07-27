@@ -58,7 +58,7 @@
     <Compile Include="GradientDescent.fs" />
     <Compile Include="BatchGradientDescent.fs" />
     <None Include="StochasticGradientDescent.fs" />
-    <None Include="MiniBatchGradientDescent.fs" />
+    <Compile Include="MiniBatchGradientDescent.fs" />
     <None Include="NesterovAcceleratedGradient.fs" />
     <None Include="AdagradGradientDescent.fs" />
     <None Include="AdadeltaGradientDescent.fs" />

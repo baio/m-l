@@ -1,5 +1,33 @@
-﻿module ML.Regressions.MiniBatchGradientDescent
+﻿module ML.Regressions.SGD
 
+open ML.Core.Utils
+open ML.Core.LinearAlgebra
+open ML.Regressions.GLM
+open MathNet.Numerics.LinearAlgebra
+open GradientDescent 
+
+let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
+    let x = prms.X
+    let y = prms.Y
+
+    let mutable theta = iter.Theta
+    genRanges prms.HyperParams.BatchSize x.RowCount           
+    |> Seq.map (fun (start, len) -> 
+        (spliceRows start len x), (spliceVector start len y)
+    )
+    |> Seq.iter (fun (sx, sy) ->
+        let gradients = prms.Gradient theta sx sy
+        theta <- theta - prms.HyperParams.Basic.Alpha * gradients                
+    )
+    { Theta  = theta ; Params = ()}
+
+let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = () }
+    
+let SGD : GradientDescentFunc<SGDHyperParams> = 
+    gradientDescent<Unit, SGDHyperParams> initIter calcGradient
+
+
+(*
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
@@ -41,3 +69,7 @@ let miniBatchGradientDescent
         // initialize random weights
         let initialW = x.ColumnCount |> zeros 
         iter initialW []
+
+
+module ML.Regressions.BatchGradientDescent
+*)
