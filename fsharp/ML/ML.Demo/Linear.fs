@@ -1,26 +1,17 @@
-﻿// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
-module Linear
+﻿module Linear
 
 open ML.Core.Readers
 open ML.Core.Utils
 open ML.Regressions.GLM
 open ML.Regressions.LinearRegression
 
-//open ML.Regressions.BatchGradientDescent
+open ML.Regressions.GD
 open ML.Regressions.SGD
 open ML.Regressions.NAG
 open ML.Regressions.Adagrad
-(*
-open ML.Regressions.StochasticGradientDescent
-open ML.Regressions.MiniBatchGradientDescent
-open ML.Regressions.NesterovAcceleratedGradient
-open ML.Regressions.AdagradGradientDescent
-open ML.Regressions.AdadeltaGradientDescent
-open ML.Regressions.AdadeltaAcceleratedGradientDescent
-*)
+open ML.Regressions.Adadelta
 
-
+open ML.Regressions.GradientDescent
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
@@ -30,9 +21,9 @@ open ML.Statistics.Charting
 
 let linear() = 
         
-    let _inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex1\ex1\ex1data2.csv" false [|0..1|] 2    
+    let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex1\ex1\ex1data2.csv" false [|0..1|] 2    
     let outputs = vector outputs
-    let inputs = matrix _inputs
+    let inputs = matrix inputs
     let inputs, normPrms = norm inputs
 
     let model = {
@@ -46,74 +37,80 @@ let linear() =
         ConvergeMode = ConvergeModeCostStopsChange
     }
 
-    let basicHyper = {
+    let batchHyper : SGDHyperParams = {
         Alpha = 0.01
-    }
-
-    let batchHyper = {
-        Basic = basicHyper
         BatchSize = inputs.RowCount
     }
 
-    let stochasticHyper = {
-        Basic = basicHyper
+    let stochasticHyper : SGDHyperParams = {
+        Alpha = 0.01
         BatchSize = 1
     }
 
-    let SGDHyper = {
-        Basic = basicHyper
+    let SGDHyper : SGDHyperParams = {
+        Alpha = 0.01
         BatchSize = 5
     }
 
-    let NAGHyper = {        
-        SGD = SGDHyper
+    let NAGHyper : NAGHyperParams = {        
+        Alpha = 0.01
+        BatchSize = 5
         Gamma = 0.5
     }
 
     let AdagradHyper : AdagradHyperParams = {        
-        SGD = SGDHyper
+        Alpha = 0.01
+        BatchSize = 5
         Epsilon = 1E-8
     }
 
+    let AdadeltaHyper : AdadeltaHyperParams = {        
+        BatchSize = 5
+        Epsilon = 1E-8
+        Rho = 0.6
+    }
+
     let mutable trainResults = [] 
+
+    let gd = gradientDescent model prms inputs outputs 
     
     let perf = Benchmark.Run (fun () ->
-        let train = SGD model prms batchHyper inputs outputs        
+        let train = SGDHyperParams batchHyper |> gd
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )    
     printfn "batch perf : %A" perf
     
     let perf = Benchmark.Run (fun () ->
-        let train = SGD model prms stochasticHyper inputs outputs
+        let train = SGDHyperParams stochasticHyper |> gd
         trainResults <- ("stochastic", train)::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = SGD model prms SGDHyper inputs outputs
+        let train = SGDHyperParams SGDHyper |> gd
         trainResults <- ("SGD", train)::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = NAG model prms NAGHyper inputs outputs
+        let train = NAGHyperParams NAGHyper |> gd
         trainResults <- ("NAG", train)::trainResults
         printfn "NAG result : %A" train
     )    
     printfn "NAG perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = adagrad model prms AdagradHyper inputs outputs
+        let train = AdagradHyperParams AdagradHyper |> gd
         trainResults <- ("Adagrad", train)::trainResults
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = adagrad model prms AdagradHyper inputs outputs
+        let train = AdadeltaHyperParams AdadeltaHyper |> gd
         trainResults <- ("Adadelta", train)::trainResults
         printfn "Adadelta result : %A" train
     )    
@@ -125,3 +122,4 @@ let linear() =
     |> showLines2
 
     
+

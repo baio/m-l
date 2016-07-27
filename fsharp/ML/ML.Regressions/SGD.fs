@@ -1,10 +1,15 @@
 ﻿module ML.Regressions.SGD
 
+open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
-open ML.Regressions.GLM
-open MathNet.Numerics.LinearAlgebra
-open GradientDescent 
+open GLM
+open GD 
+
+type SGDHyperParams = {
+    Alpha: float
+    BatchSize: int
+}
 
 let calcGradientBatch<'iter, 'hyper> (batchSize: int) (prms: CalcGradientParams<'hyper>) (iter: GradientDescentIter<'iter>) (grad: ClacGradientFunc<'iter, 'hyper>) =
     let x = prms.X
@@ -24,7 +29,7 @@ let calcGradientBatch<'iter, 'hyper> (batchSize: int) (prms: CalcGradientParams<
 let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
     let theta = iter.Theta
     let gradients = prms.Gradient theta prms.X prms.Y
-    { Theta  = theta - prms.HyperParams.Basic.Alpha * gradients; Params = ()}
+    { Theta  = theta - prms.HyperParams.Alpha * gradients; Params = ()}
     
 
 let private calcGradient2 (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
@@ -34,5 +39,5 @@ let private calcGradient2 (prms: CalcGradientParams<SGDHyperParams>) (iter: Grad
 let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = () }
     
 let SGD : GradientDescentFunc<SGDHyperParams> = 
-    gradientDescent<Unit, SGDHyperParams> initIter calcGradient2
+    GD<Unit, SGDHyperParams> initIter calcGradient2
 

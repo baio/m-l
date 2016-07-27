@@ -2,12 +2,18 @@
 // http://climin.readthedocs.io/en/latest/adadelta.html
 module ML.Regressions.Adadelta
 
+open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
-open ML.Regressions.GLM
-open MathNet.Numerics.LinearAlgebra
+open GLM
+open GD
 open SGD
-open GradientDescent 
+
+type AdadeltaHyperParams = {
+    BatchSize: int
+    Epsilon: float
+    Rho: float
+}
 
 type private AdadeltaIter = {
     EG: float Vector
@@ -17,7 +23,6 @@ type private AdadeltaIter = {
 let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
         
     let epsilon = prms.HyperParams.Epsilon
-    let alpha = prms.HyperParams.SGD.Basic.Alpha
     let theta = iter.Theta
     let rho = prms.HyperParams.Rho
     let eg = iter.Params.EG
@@ -39,9 +44,9 @@ let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: 
     { Theta  = updatedTheta ; Params = { EG = updatedEG; ET = updatedET } }
     
 let private calcGradient2 (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
-    calcGradientBatch prms.HyperParams.SGD.BatchSize prms iter calcGradient
+    calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
 
 let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = { EG = initialTheta; ET = initialTheta } }
     
 let adadelta : GradientDescentFunc<AdadeltaHyperParams> = 
-    gradientDescent<AdadeltaIter, AdadeltaHyperParams> initIter calcGradient2
+    GD<AdadeltaIter, AdadeltaHyperParams> initIter calcGradient2

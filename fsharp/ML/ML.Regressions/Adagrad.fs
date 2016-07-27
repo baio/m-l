@@ -2,12 +2,18 @@
 
 //https://xcorr.net/2014/01/23/adagrad-eliminating-learning-rates-in-stochastic-gradient-descent/
 
+open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
-open ML.Regressions.GLM
-open MathNet.Numerics.LinearAlgebra
+open GLM
+open GD
 open SGD
-open GradientDescent 
+
+type AdagradHyperParams = {
+    Alpha: float
+    BatchSize: int
+    Epsilon: float
+}
 
 type private AdagradIter = {
     G: float Vector
@@ -16,7 +22,7 @@ type private AdagradIter = {
 let private calcGradient (prms: CalcGradientParams<AdagradHyperParams>) (iter: GradientDescentIter<AdagradIter>) =
         
     let epsilon = prms.HyperParams.Epsilon
-    let alpha = prms.HyperParams.SGD.Basic.Alpha
+    let alpha = prms.HyperParams.Alpha
     let theta = iter.Theta
     let g = iter.Params.G
 
@@ -33,10 +39,10 @@ let private calcGradient (prms: CalcGradientParams<AdagradHyperParams>) (iter: G
     { Theta  = updatedTheta ; Params = { G = updatedG } }
     
 let private calcGradient2 (prms: CalcGradientParams<AdagradHyperParams>) (iter: GradientDescentIter<AdagradIter>) =
-    calcGradientBatch prms.HyperParams.SGD.BatchSize prms iter calcGradient
+    calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
 
 let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = { G = initialTheta } }
     
 let adagrad : GradientDescentFunc<AdagradHyperParams> = 
-    gradientDescent<AdagradIter, AdagradHyperParams> initIter calcGradient2
+    GD<AdagradIter, AdagradHyperParams> initIter calcGradient2
 
