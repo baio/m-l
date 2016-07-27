@@ -45,16 +45,19 @@ let softmaxCost (theta: float Matrix) (x : float Matrix) (y : float Vector) =
     let logP = (softmax theta x).PointwiseLog()
     
     // mi : m * k
-    // one hot ?
     // in each row only one column with index equal a class number is 1, allothers are zero
     let oneHot = encodeOneHot theta.ColumnCount y 
 
-    // m * k : then sum all
-    oneHot .* logP |> Matrix.sumCols
+    // m * k : then sum all 
+    oneHot .* logP |> Matrix.sum |> (*) -1.
     
 
 let softmaxGradient (theta: float Matrix) (x: float Matrix) (y: float Vector) = 
+    //Returns n * k
+    // m * k
     let oneHot = encodeOneHot theta.ColumnCount y 
+    // m * k
     let p = softmax theta x
-    x * (oneHot - p) |> Matrix.sumCols |> (*) -1.
+    // x : n * m
+    x .* (oneHot - p) |> (*) -1.
 
