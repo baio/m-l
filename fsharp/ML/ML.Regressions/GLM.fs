@@ -30,26 +30,26 @@ type SGDHyperParams = {
     BatchSize: int
 }
 
-type AcceleratedHyperParams = {
+type NAGHyperParams = {
     SGD: SGDHyperParams
     Gamma: float // momentum term
 }
 
 type AdagradHyperParams = {
-    Accelertaed: AcceleratedHyperParams
+    Accelertaed: NAGHyperParams
     Epsilon: float
 }
 
 type AdadeltaHyperParams = {
-    Accelerated: AcceleratedHyperParams
+    Accelerated: NAGHyperParams
     Epsilon: float
     Rho: float
 }
 
 type RegressionHyperParams = 
     | BasicHyperParams of BasicHyperParams
-    | MiniBatchHyperParams of SGDHyperParams
-    | AcceleratedHyperParams of AcceleratedHyperParams
+    | SGDHyperParams of SGDHyperParams
+    | NAGHyperParams of NAGHyperParams
     | AdagradHyperParams of AdagradHyperParams
     | AdadeltaHyperParams of AdadeltaHyperParams 
      

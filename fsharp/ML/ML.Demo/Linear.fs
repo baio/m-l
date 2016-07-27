@@ -70,41 +70,38 @@ let linear() =
 
 
     let mutable trainResults = [] 
-
     
     let perf = Benchmark.Run (fun () ->
         let train = SGD model prms batchHyper inputs outputs        
-        trainResults <- train::trainResults
+        trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )    
     printfn "batch perf : %A" perf
     
     let perf = Benchmark.Run (fun () ->
         let train = SGD model prms stochasticHyper inputs outputs
-        trainResults <- train::trainResults
+        trainResults <- ("stochastic", train)::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
         let train = SGD model prms SGDHyper inputs outputs
-        trainResults <- train::trainResults
+        trainResults <- ("mini-batch", train)::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
         let train = NAG model prms NAGHyper inputs outputs
-        trainResults <- train::trainResults
-        printfn "nesterove result : %A" train
+        trainResults <- ("NAG", train)::trainResults
+        printfn "NAG result : %A" train
     )    
-    printfn "nesterov perf : %A" perf
+    printfn "NAG perf : %A" perf
 
-    
-    let res = trainResults |> List.rev
-    
-    res
-    |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
-    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov";(* "adagrad"; "adadelta" *)]
+        
+    trainResults
+    |> List.map (fun (label, res) -> (sprintf "%s : %f (%i)" label res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))    
+    |> showLines2
 
     

@@ -13,3 +13,11 @@ let showLines (legends: string seq) (xy : seq<list<float * float>>) =
    |> Seq.map (fun (legend, chart) -> Chart.Line(chart, legend) |> Chart.WithLegend(true)) 
    |> Chart.Combine |> Chart.Show
 
+
+let showLines2 (lxy : list<string * list<float * float>>) =
+   let legends, xy = lxy |> List.unzip
+   xy 
+   |> Seq.zip legends 
+   |> Seq.map (fun (legend, chart) -> Chart.Line(chart, legend) |> Chart.WithLegend(true)) 
+   |> Chart.Combine |> Chart.Show
+

@@ -8,11 +8,11 @@ open MathNet.Numerics.LinearAlgebra
 open SGD
 open GradientDescent 
 
-type private AcceleratedIter = {
+type private NAGIter = {
     Momentum: float Vector
 }
 
-let private calcGradient (prms: CalcGradientParams<AcceleratedHyperParams>) (iter: GradientDescentIter<AcceleratedIter>) =
+let private calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     let theta = iter.Theta
 
     let alpha = prms.HyperParams.SGD.Basic.Alpha
@@ -22,10 +22,10 @@ let private calcGradient (prms: CalcGradientParams<AcceleratedHyperParams>) (ite
 
     { Theta  = theta - alpha * gradients; Params = { Momentum = momentum } }
     
-let private calcGradient2 (prms: CalcGradientParams<AcceleratedHyperParams>) (iter: GradientDescentIter<AcceleratedIter>) =
+let private calcGradient2 (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     calcGradientBatch prms.HyperParams.SGD.BatchSize prms iter calcGradient
 
 let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = { Momentum = initialTheta } }
     
-let NAG : GradientDescentFunc<AcceleratedHyperParams> = 
-    gradientDescent<AcceleratedIter, AcceleratedHyperParams> initIter calcGradient2
+let NAG : GradientDescentFunc<NAGHyperParams> = 
+    gradientDescent<NAGIter, NAGHyperParams> initIter calcGradient2

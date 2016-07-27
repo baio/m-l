@@ -59,7 +59,7 @@
     <Compile Include="BatchGradientDescent.fs" />
     <None Include="StochasticGradientDescent.fs" />
     <Compile Include="SGD.fs" />
-    <Compile Include="NesterovAcceleratedGradient.fs" />
+    <Compile Include="NAG.fs" />
     <None Include="AdagradGradientDescent.fs" />
     <None Include="AdadeltaGradientDescent.fs" />
     <None Include="AdadeltaAcceleratedGradientDescent.fs" />
