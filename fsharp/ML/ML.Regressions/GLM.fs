@@ -31,7 +31,7 @@ type SGDHyperParams = {
 }
 
 type AcceleratedHyperParams = {
-    MiniBatch: SGDHyperParams
+    SGD: SGDHyperParams
     Gamma: float // momentum term
 }
 

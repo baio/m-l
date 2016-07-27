@@ -1,4 +1,4 @@
-﻿module internal ML.Regressions.GradientDescent
+﻿module ML.Regressions.GradientDescent
 
 open ML.Core.LinearAlgebra
 open ML.Regressions.GLM

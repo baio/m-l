@@ -7,8 +7,9 @@ open ML.Core.Utils
 open ML.Regressions.GLM
 open ML.Regressions.LinearRegression
 
-open ML.Regressions.BatchGradientDescent
+//open ML.Regressions.BatchGradientDescent
 open ML.Regressions.SGD
+open ML.Regressions.NAG
 (*
 open ML.Regressions.StochasticGradientDescent
 open ML.Regressions.MiniBatchGradientDescent
@@ -47,116 +48,63 @@ let linear() =
         Alpha = 0.01
     }
 
-    let SGDHyper = {
+    let batchHyper = {
+        Basic = basicHyper
+        BatchSize = inputs.RowCount
+    }
+
+    let stochasticHyper = {
         Basic = basicHyper
         BatchSize = 1
     }
 
-
-    let train = batchGradientDescent model prms basicHyper inputs outputs        
-    printfn "batch result : %A" train
-
-    let train1 = SGD model prms SGDHyper inputs outputs        
-    printfn "batch result : %A" train1
-
-    (*
-    let prms = {
-        MaxIterNumber = 5000 // Epochs number
-        MinErrorThreshold = 0.
-        Alpha = 0.01 
-    }
-    let minBatchPrms : MiniBatchTrainModelParams = {
-        MaxIterNumber = 5000 // Epochs number
-        MinErrorThreshold = 0.
-        Alpha = 0.01
+    let SGDHyper = {
+        Basic = basicHyper
         BatchSize = 5
     }
-    let acceleratedBatchPrms : AcceleratedTrainModelParams = {
-        EpochNumber = 5000 // Epochs number
-        MinErrorThreshold = 0.
-        Alpha = 0.01
-        BatchSize = 5
-        Gamma = 0.9
+
+    let NAGHyper = {        
+        SGD = SGDHyper
+        Gamma = 0.5
     }
-    let adagradBatchPrms : AdagradTrainModelParams = {
-        EpochNumber = 5000 // Epochs number
-        MinErrorThreshold = 0.
-        Alpha = 1.
-        Epsilon = 1E-8
-        BatchSize = 5
-    }
-    let adadeltaBatchPrms : AdadeltaTrainModelParams = {
-        EpochNumber = 5000 // Epochs number
-        MinErrorThreshold = 0.
-        Rho = 0.95
-        Epsilon = 1E-8
-        BatchSize = 5        
-    }
-    let adadeltaAcceleratedBatchPrms : AdadeltaAcceleratedTrainModelParams = {
-        EpochNumber = 5000 // Epochs number
-        MinErrorThreshold = 0.
-        Rho = 0.95
-        Epsilon = 1E-8
-        BatchSize = 5        
-        Alpha = 1.
-        Gamma = 1000.
-    }
+
 
     let mutable trainResults = [] 
 
     
     let perf = Benchmark.Run (fun () ->
-        let train = batchGradientDescent model prms inputs outputs        
+        let train = SGD model prms batchHyper inputs outputs        
         trainResults <- train::trainResults
         printfn "batch result : %A" train
     )    
     printfn "batch perf : %A" perf
     
     let perf = Benchmark.Run (fun () ->
-        let train = stochasticGradientDescent model prms inputs outputs
+        let train = SGD model prms stochasticHyper inputs outputs
         trainResults <- train::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = miniBatchGradientDescent model minBatchPrms inputs outputs
+        let train = SGD model prms SGDHyper inputs outputs
         trainResults <- train::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = nesterovAcceleratedGradientDescent model acceleratedBatchPrms inputs outputs
+        let train = NAG model prms NAGHyper inputs outputs
         trainResults <- train::trainResults
         printfn "nesterove result : %A" train
     )    
     printfn "nesterov perf : %A" perf
 
-    (*
-    let perf = Benchmark.Run (fun () ->
-        let train = adagradGradientDescent model adagradBatchPrms inputs outputs
-        trainResults <- train::trainResults
-        printfn "adagrad result : %A" train
-    )    
-    printfn "adagrad perf : %A" perf
     
     let res = trainResults |> List.rev
     
-    let perf = Benchmark.Run (fun () ->
-        let train = adadeltaAcceleratedGradientDescent model adadeltaAcceleratedBatchPrms inputs outputs
-        trainResults <- train::trainResults
-        printfn "adadelta result : %A" train
-    )    
-    printfn "adadelta perf : %A" perf
-    *)
-
-    
-    let res = trainResults |> List.rev
-    
-    //[res.[3]; res.[4]]
     res
     |> List.map (fun f -> f.Errors |> List.rev |> List.mapi(fun i x -> (float i, x)))    
-    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov"; "adagrad"; "adadelta"]
-    *)
+    |> showLines ["batch"; "stochastic"; "mini batch"; "nesterov";(* "adagrad"; "adadelta" *)]
+
     
