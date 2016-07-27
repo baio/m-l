@@ -29,12 +29,12 @@ let private calcGradient (prms: CalcGradientParams<AdagradHyperParams>) (iter: G
     ///
     
     let gradients = prms.Gradient theta prms.X prms.Y
-    let k = alpha / (epsilon + g.PointwisePower(0.5))                    
+    let k = alpha / (epsilon + g).PointwisePower(0.5)                   
     
     ///
 
     let updatedTheta = theta - k .* gradients                
-    let updatedG = g + gradients.PointwisePower(2.)
+    let updatedG = (g + gradients).PointwisePower(2.)
 
     { Theta  = updatedTheta ; Params = { G = updatedG } }
     
