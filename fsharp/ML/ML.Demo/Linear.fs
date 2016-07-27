@@ -27,7 +27,6 @@ let linear() =
     let inputs, normPrms = norm inputs
 
     let model = {
-        Hypothesis = linearHyp
         Cost = linearMSECost
         Gradient = linearMSEGradient
     }

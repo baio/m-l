@@ -29,10 +29,10 @@ let logistic() =
     let inputs, normPrms = norm inputs
 
     let model = {
-        Hypothesis = logisticHyp
         Cost = logisticMSECost
         Gradient = logisticMSEGradient
     }
+
     let prms = {
         EpochNumber = 400 // Epochs number
         ConvergeMode = ConvergeModeCostStopsChange

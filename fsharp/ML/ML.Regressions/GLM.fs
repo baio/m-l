@@ -11,15 +11,14 @@ type CostFunc = float Vector -> float Matrix -> float Vector -> float
 // Given weights, inputs and outputs calculate gradient array for weights
 type GradientFunc = float Vector -> float Matrix -> float Vector -> float Vector
 
-type GLMModel = {    
-    Hypothesis : HypothesisFunc
+type GLMModel = {       
     Cost : CostFunc   
     Gradient : GradientFunc   
 }
     
-let predict (theta: float Vector) (x: float Vector) = 
-    x |> vecCons 1. |> (*) theta
+let GLMPredict (hypothesis: HypothesisFunc) (theta: float Vector) (x: float Vector) = 
+    hypothesis (x |> vecCons 1.) theta
 
-let predictNorm (normPrms: NormParams) (theta: float Vector) (x: float Vector) =     
-    (x - normPrms.Mu) ./ normPrms.Std |> predict theta
+let GLMPredictNorm (hypothesis: HypothesisFunc) (normPrms: NormParams) (theta: float Vector) (x: float Vector) =     
+    (x - normPrms.Mu) ./ normPrms.Std |> GLMPredict hypothesis theta
 
