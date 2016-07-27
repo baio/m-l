@@ -60,7 +60,7 @@
     <None Include="StochasticGradientDescent.fs" />
     <Compile Include="SGD.fs" />
     <Compile Include="NAG.fs" />
-    <None Include="AdagradGradientDescent.fs" />
+    <Compile Include="Adagrad.fs" />
     <None Include="AdadeltaGradientDescent.fs" />
     <None Include="AdadeltaAcceleratedGradientDescent.fs" />
     <Content Include="packages.config" />

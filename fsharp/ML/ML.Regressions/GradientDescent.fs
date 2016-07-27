@@ -42,19 +42,20 @@ let gradientDescent<'iter, 'hyper>
             Gradient = model.Gradient
         }
 
+        let convergeCostNotImproved = 
+            match prms.ConvergeMode with
+            | ConvergeModeNone -> false
+            | ConvergeModeCostStopsChange -> true
 
         let rec iterate (iter: GradientDescentIter<'iter>) errors =
             let theta = iter.Theta
             let epochCnt = errors |> List.length 
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.
             let error = model.Cost theta x y
-            if latestError = error then
+            if convergeCostNotImproved  && latestError = error then
                 // no improvements, converged
                 { ResultType = Converged; Weights = theta; Errors = errors }
-            else if error <= prms.MinErrorThreshold then
-                // got minimal error threshold
-                { ResultType = ErrorThresholdAchieved; Weights = theta; Errors = errors }
-            else if prms.EpochNumber < epochCnt then
+            else if prms.EpochNumber <= epochCnt then
                 // iters count achieved
                 { ResultType = MaxIterCountAchieved; Weights = theta; Errors = errors }
             else

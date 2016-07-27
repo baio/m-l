@@ -10,6 +10,7 @@ open ML.Regressions.LinearRegression
 //open ML.Regressions.BatchGradientDescent
 open ML.Regressions.SGD
 open ML.Regressions.NAG
+open ML.Regressions.Adagrad
 (*
 open ML.Regressions.StochasticGradientDescent
 open ML.Regressions.MiniBatchGradientDescent
@@ -42,7 +43,7 @@ let linear() =
 
     let prms = {
         EpochNumber = 5000 // Epochs number
-        MinErrorThreshold = 0.
+        ConvergeMode = ConvergeModeCostStopsChange
     }
 
     let basicHyper = {
@@ -69,6 +70,10 @@ let linear() =
         Gamma = 0.5
     }
 
+    let AdagradHyper : AdagradHyperParams = {        
+        NAG = NAGHyper
+        Epsilon = 1E-8
+    }
 
     let mutable trainResults = [] 
     
@@ -99,6 +104,13 @@ let linear() =
         printfn "NAG result : %A" train
     )    
     printfn "NAG perf : %A" perf
+
+    let perf = Benchmark.Run (fun () ->
+        let train = adagrad model prms AdagradHyper inputs outputs
+        trainResults <- ("Adagrad", train)::trainResults
+        printfn "Adagrad result : %A" train
+    )    
+    printfn "Adagrad perf : %A" perf
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])

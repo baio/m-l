@@ -15,7 +15,7 @@ type GradientFunc = float Vector -> float Matrix -> float Vector -> float Vector
 // Given HypothesisFunc returns cost and gradient functions
 type GenLossAndGradientFunc = HypothesisFunc -> CostFunc * GradientFunc
 
-type GLMModel = {
+type GLMModel = {    
     Hypothesis : HypothesisFunc
     Cost : CostFunc   
     Gradient : GradientFunc   
@@ -36,12 +36,12 @@ type NAGHyperParams = {
 }
 
 type AdagradHyperParams = {
-    Accelertaed: NAGHyperParams
+    NAG: NAGHyperParams
     Epsilon: float
 }
 
 type AdadeltaHyperParams = {
-    Accelerated: NAGHyperParams
+    NAG: NAGHyperParams
     Epsilon: float
     Rho: float
 }
@@ -53,9 +53,13 @@ type RegressionHyperParams =
     | AdagradHyperParams of AdagradHyperParams
     | AdadeltaHyperParams of AdadeltaHyperParams 
      
+type ConvergeMode = 
+    | ConvergeModeNone
+    | ConvergeModeCostStopsChange
+
 type IterativeTrainModelParams = {
     EpochNumber : int
-    MinErrorThreshold : float
+    ConvergeMode : ConvergeMode
 }
 
 type ModelTrainResultType = Converged | ErrorThresholdAchieved | MaxIterCountAchieved
