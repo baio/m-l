@@ -12,7 +12,7 @@ let sigmoidScalar (z: float) =
 let logisticHyp (theta: float Vector) (x: float Vector) = 
      x |> appendOne |> (*) theta |> sigmoidScalar |> System.Math.Round
 
-let logisticMSELoss (w: float Vector) (x : float Matrix) (y : float Vector) =
+let logisticMSECost (w: float Vector) (x : float Matrix) (y : float Vector) =
     let s = x * w |> sigmoid
     let p = y * s.PointwiseLog()     
     let n = (1. - y) * (1. - s).PointwiseLog()

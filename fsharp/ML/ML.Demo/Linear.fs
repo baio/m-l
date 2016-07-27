@@ -33,9 +33,10 @@ let linear() =
     let outputs = vector outputs
     let inputs = matrix _inputs
     let inputs, normPrms = norm inputs
+
     let model = {
         Hypothesis = linearHyp
-        Loss = linearMSELoss
+        Cost = linearMSECost
         Gradient = linearMSEGradient
     }
 

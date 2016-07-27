@@ -9,15 +9,15 @@ open MathNet.Numerics.LinearAlgebra
 // Given weights and features return calculated label
 type HypothesisFunc = float Vector -> float Vector -> float
 // Given weights, features and labels calculate error
-type LossFunc = float Vector -> float Matrix -> float Vector -> float
+type CostFunc = float Vector -> float Matrix -> float Vector -> float
 // Given weights, inputs and outputs calculate gradient array for weights
 type GradientFunc = float Vector -> float Matrix -> float Vector -> float Vector
 // Given HypothesisFunc returns cost and gradient functions
-type GenLossAndGradientFunc = HypothesisFunc -> LossFunc * GradientFunc
+type GenLossAndGradientFunc = HypothesisFunc -> CostFunc * GradientFunc
 
 type GLMModel = {
     Hypothesis : HypothesisFunc
-    Loss : LossFunc   
+    Cost : CostFunc   
     Gradient : GradientFunc   
 }
 

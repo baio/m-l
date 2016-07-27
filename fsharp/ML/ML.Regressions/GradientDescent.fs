@@ -47,7 +47,7 @@ let gradientDescent<'iter, 'hyper>
             let theta = iter.Theta
             let epochCnt = errors |> List.length 
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.
-            let error = model.Loss theta x y
+            let error = model.Cost theta x y
             if latestError = error then
                 // no improvements, converged
                 { ResultType = Converged; Weights = theta; Errors = errors }
