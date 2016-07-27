@@ -87,7 +87,7 @@ let linear() =
 
     let perf = Benchmark.Run (fun () ->
         let train = SGD model prms SGDHyper inputs outputs
-        trainResults <- ("mini-batch", train)::trainResults
+        trainResults <- ("SGD", train)::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
@@ -98,10 +98,10 @@ let linear() =
         printfn "NAG result : %A" train
     )    
     printfn "NAG perf : %A" perf
-
         
     trainResults
-    |> List.map (fun (label, res) -> (sprintf "%s : %f (%i)" label res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))    
+    |> List.sortBy (fun (_, res) -> res.Errors.[0])
+    |> List.map (fun (label, res) -> (sprintf "%s : %f (%i)" label res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))        
     |> showLines2
 
     

@@ -18,9 +18,9 @@ let private calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: Gradi
     let alpha = prms.HyperParams.SGD.Basic.Alpha
     let a = prms.HyperParams.Gamma * iter.Params.Momentum
     let gradients = prms.Gradient (theta - a) prms.X prms.Y
-    let momentum = a + prms.HyperParams.SGD.Basic.Alpha * gradients
+    let momentum = a + alpha * gradients
 
-    { Theta  = theta - alpha * gradients; Params = { Momentum = momentum } }
+    { Theta  = theta - momentum; Params = { Momentum = momentum } }
     
 let private calcGradient2 (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     calcGradientBatch prms.HyperParams.SGD.BatchSize prms iter calcGradient
