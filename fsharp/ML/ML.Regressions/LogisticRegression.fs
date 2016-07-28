@@ -12,14 +12,14 @@ let sigmoid (z: float Vector) =
 let sigmoidScalar (z: float) = 
     1. / (1. + System.Math.Exp(-1. * z))
 
-let logisticMSECost (w: float Vector) (x : float Matrix) (y : float Vector) =
-    let s = x * w |> sigmoid
+let logisticMSECost (theta: float Vector) (x : float Matrix) (y : float Vector) =
+    let s = x * theta |> sigmoid
     let p = y * s.PointwiseLog()     
     let n = (1. - y) * (1. - s).PointwiseLog()
     - 1. * ( p + n ) / float x.RowCount
         
-let logisticMSEGradient (w: float Vector) (x : float Matrix) (y : float Vector) =
-    x.Transpose() * (sigmoid(x * w) - y) / float x.RowCount 
+let logisticMSEGradient (theta: float Vector) (x : float Matrix) (y : float Vector) =
+    x.Transpose() * (sigmoid(x * theta) - y) / float x.RowCount 
 
 let logisticHyp (theta: float Vector) (x: float Vector) = 
      theta * x |> sigmoidScalar |> System.Math.Round
