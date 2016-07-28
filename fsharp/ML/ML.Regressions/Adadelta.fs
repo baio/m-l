@@ -8,6 +8,7 @@ open ML.Core.LinearAlgebra
 open GLM
 open GD
 open SGD
+open Theta
 
 type AdadeltaHyperParams = {
     BatchSize: int
@@ -16,37 +17,37 @@ type AdadeltaHyperParams = {
 }
 
 type private AdadeltaIter = {
-    EG: float Vector
-    ET: float Vector 
+    EG: Theta
+    ET: Theta
 }
 
 let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
         
-    let epsilon = prms.HyperParams.Epsilon
-    let theta = iter.Theta
+    let epsilon = prms.HyperParams.Epsilon    
     let rho = prms.HyperParams.Rho
     let eg = iter.Params.EG
     let et = iter.Params.ET
+    let theta = iter.Theta
 
     //calculate gradient  
-    let gradients = prms.Gradient theta prms.X prms.Y
+    let grad = iter.Theta |> prms.Gradient prms.X prms.Y
     //accumulate gradient
-    let updatedEG = rho * eg + (1. - rho) * gradients.PointwisePower(2.)                    
+    let updatedEG = ( grad .^ 2.) * (1. - rho) + eg * rho                   
     //compute update
-    let rms_t = (et + epsilon).PointwisePower(0.5)
-    let rms_g = (updatedEG + epsilon).PointwisePower(0.5)
-    let delta = (rms_t / rms_g) .* gradients
+    let rms_t = (et + epsilon) .^ 0.5
+    let rms_g = (updatedEG + epsilon) .^  0.5
+    let delta = grad .* (rms_t / rms_g) 
     //accumulate updates
-    let updatedET = rho * et + (1. - rho) * delta.PointwisePower(2.)                    
+    let updatedET = et * rho + (delta .^ 2.) * (1. - rho)                   
     //apply update
     let updatedTheta = theta - delta
 
-    { Theta  = updatedTheta ; Params = { EG = updatedEG; ET = updatedET } }
+    { Theta  = updatedTheta; Params = { EG = updatedEG; ET = updatedET } }
     
 let private calcGradient2 (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
 
-let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = { EG = initialTheta; ET = initialTheta } }
+let private initIter (initialTheta: float Vector) = { Theta  = ThetaVector(initialTheta); Params = { EG = initialTheta; ET = initialTheta } }
     
 let adadelta : GradientDescentFunc<AdadeltaHyperParams> = 
     GD<AdadeltaIter, AdadeltaHyperParams> initIter calcGradient2

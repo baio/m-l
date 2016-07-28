@@ -3,6 +3,7 @@
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
+open Theta
 open GLM
 open GD 
 
@@ -25,18 +26,15 @@ let calcGradientBatch<'iter, 'hyper> (batchSize: int) (prms: CalcGradientParams<
     )
     iter
 
-
-let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
-    let theta = iter.Theta
-    let gradients = prms.Gradient theta prms.X prms.Y
-    { Theta  = theta - prms.HyperParams.Alpha * gradients; Params = ()}
+let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =    
+    let grad = iter.Theta |> prms.Gradient prms.X prms.Y
+    let theta = iter.Theta - grad * prms.HyperParams.Alpha
+    { Theta = theta; Params = () }
     
-
 let private calcGradient2 (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
     
-
-let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = () }
+let private initIter (initialTheta: float Vector) = { Theta  = ThetaVector(initialTheta); Params = () }
     
 let SGD : GradientDescentFunc<SGDHyperParams> = 
     GD<Unit, SGDHyperParams> initIter calcGradient2

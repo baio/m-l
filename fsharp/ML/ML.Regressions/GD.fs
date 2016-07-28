@@ -5,6 +5,7 @@ open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 
+open Theta
 
 type ConvergeMode = 
     | ConvergeModeNone
@@ -16,7 +17,7 @@ type IterativeTrainModelParams = {
 }
 
 type GradientDescentIter<'iter> = {
-    Theta: float Vector 
+    Theta: Theta
     Params : 'iter
 }
 
@@ -28,11 +29,11 @@ type CalcGradientParams<'hyper> = {
 }
 
 type ModelTrainResultType = Converged | MaxIterCountAchieved
-type ModelTrainResult = { ResultType : ModelTrainResultType; Weights: float Vector; Errors: float list }
+type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: Theta; Errors: float list }
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
 type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
 //Given initial theta (all zeros) return initial iter param
-type InitIter<'iter> = float Vector -> GradientDescentIter<'iter>
+type InitIter<'iter> = float Vector  -> GradientDescentIter<'iter>
 
 
 let internal GD<'iter, 'hyper>
@@ -64,13 +65,13 @@ let internal GD<'iter, 'hyper>
             let theta = iter.Theta
             let epochCnt = errors |> List.length 
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.
-            let error = model.Cost theta x y
+            let error = theta |> model.Cost x y
             if convergeCostNotImproved  && latestError = error then
                 // no improvements, converged
-                { ResultType = Converged; Weights = theta; Errors = errors }
+                { ResultType = Converged; Theta = theta; Errors = errors }
             else if prms.EpochNumber <= epochCnt then
                 // iters count achieved
-                { ResultType = MaxIterCountAchieved; Weights = theta; Errors = errors }
+                { ResultType = MaxIterCountAchieved; Theta = theta; Errors = errors }
             else
                 let updatedIterPrms = calcGradient calcGradientPrms iter
                 //If graient is plus thwn we need to move down to achive function min

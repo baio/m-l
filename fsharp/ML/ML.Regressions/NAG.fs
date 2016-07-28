@@ -7,6 +7,7 @@ open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open SGD
 open GD
+open Theta
 
 type NAGHyperParams = {
     Alpha: float
@@ -19,19 +20,19 @@ type NAGIter = {
 }
 
 let calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
-    let theta = iter.Theta
-
     let alpha = prms.HyperParams.Alpha
-    let a = prms.HyperParams.Gamma * iter.Params.Momentum
-    let gradients = prms.Gradient (theta - a) prms.X prms.Y
-    let momentum = a + alpha * gradients
-
-    { Theta  = theta - momentum; Params = { Momentum = momentum } }
+    let theta = iter.Theta
+    let momentum = iter.Params.Momentum 
+    let a = prms.HyperParams.Gamma * momentum
+    let grad = iter.Theta - a |> prms.Gradient prms.X prms.Y 
+    let updatedMomentum = grad * alpha + a
+    
+    { Theta  = theta - updatedMomentum; Params = { Momentum = momentum } }
     
 let private calcGradient2 (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
 
-let private initIter (initialTheta: float Vector) = { Theta  = initialTheta; Params = { Momentum = initialTheta } }
+let private initIter (initialTheta: float Vector) = { Theta  = ThetaVector(initialTheta); Params = { Momentum = initialTheta } }
     
 let NAG : GradientDescentFunc<NAGHyperParams> = 
     GD<NAGIter, NAGHyperParams> initIter calcGradient2
