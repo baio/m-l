@@ -33,8 +33,6 @@ type GLMSoftmaxModel = {
     ClassesNumber : int
 }
 
-
-
 type GLMModel = 
     | GLMBaseModel of GLMBaseModel
     | GLMSoftmaxModel of GLMSoftmaxModel
