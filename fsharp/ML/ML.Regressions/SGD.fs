@@ -35,5 +35,12 @@ let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: Gradi
 let private calcGradient2 (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
     
-let SGD (thetaShape: ThetaShape) (initialIter : GradientDescentIter<Unit>) : GradientDescentFunc<SGDHyperParams> = 
-    GD<Unit, SGDHyperParams> calcGradient2 thetaShape initialIter
+let SGD
+    (model: GLMModel)
+    (prms: IterativeTrainModelParams)    
+    (hyperPrms : SGDHyperParams)
+    (x : float Matrix)
+    (y : float Vector) 
+    =         
+    let shape, theta, baseModel = getModelShapeAndTheta model x.ColumnCount    
+    GD<Unit, SGDHyperParams> calcGradient2 shape { Theta = theta ; Params = () } baseModel prms hyperPrms x y              

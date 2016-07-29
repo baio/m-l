@@ -71,7 +71,7 @@ let linear() =
 
     let mutable trainResults = [] 
 
-    let gd = gradientDescent model prms inputs outputs 
+    let gd = gradientDescent (GLMBaseModel model) prms inputs outputs 
     
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams batchHyper |> gd

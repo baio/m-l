@@ -21,11 +21,28 @@ type CostFunc = ThetaShape -> float Matrix -> float Vector -> float Vector -> fl
 // Given inputs and outputs, weights calculate gradient array for weights
 type GradientFunc = ThetaShape -> float Matrix -> float Vector -> float Vector -> float Vector
 
-
-type GLMModel = {       
+// Linear or Logistic
+type GLMBaseModel = {       
     Cost : CostFunc
     Gradient : GradientFunc
 }
+
+// Softmax
+type GLMSoftmaxModel = {       
+    Base : GLMBaseModel
+    ClassesNumber : int
+}
+
+
+
+type GLMModel = 
+    | GLMBaseModel of GLMBaseModel
+    | GLMSoftmaxModel of GLMSoftmaxModel
+
+
+
+
+
 
 (*    
 let GLMPredict (hypothesis: HypothesisFunc) (theta: float Vector) (x: float Vector) = 

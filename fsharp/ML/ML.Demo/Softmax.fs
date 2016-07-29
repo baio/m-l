@@ -2,9 +2,9 @@
 
 open ML.Core.Readers
 open ML.Core.Utils
+
 open ML.Regressions.GLM
 open ML.Regressions.SoftmaxRegression
-
 open ML.Regressions.GD
 open ML.Regressions.SGD
 open ML.Regressions.NAG
@@ -26,9 +26,9 @@ let softmax() =
     let inputs = matrix inputs
     let inputs, normPrms = norm inputs
 
-    let model = {
-        Cost = softmaxCost
-        Gradient = softmaxGradient
+    let model : GLMSoftmaxModel = {
+        Base = { Cost = softmaxCost; Gradient = softmaxGradient }
+        ClassesNumber = 10
     }
 
     let prms = {
@@ -71,7 +71,7 @@ let softmax() =
 
     let mutable trainResults = [] 
 
-    let gd = gradientDescent model prms inputs outputs 
+    let gd = gradientDescent (GLMSoftmaxModel model) prms inputs outputs 
     
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams batchHyper |> gd
