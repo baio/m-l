@@ -32,13 +32,13 @@ type ModelTrainResultType = Converged | MaxIterCountAchieved
 type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: Theta; Errors: float list }
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
 type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
+//type GradientDescentFunc2<'iter, 'hyper> = GradientDescentIter<'iter> -> GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
 //Given initial theta (all zeros) return initial iter param
-type InitIter<'iter> = float Vector  -> GradientDescentIter<'iter>
 
 
 let internal GD<'iter, 'hyper>    
     (calcGradient: ClacGradientFunc<'iter, 'hyper>)    
-    (initIter : InitIter<'iter>) 
+    (initialIter : GradientDescentIter<'iter>) 
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : 'hyper)
@@ -78,6 +78,4 @@ let internal GD<'iter, 'hyper>
                 //printfn "%i: \n grads: %A \n weights : %A" iterCnt gradients updatedWeights                
                 iterate updatedIterPrms (error::errors) 
 
-        // initialize random weights
-        let initialTheta = x.ColumnCount |> zeros 
-        iterate (initIter initialTheta) []
+        iterate initialIter []

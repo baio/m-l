@@ -31,10 +31,7 @@ let calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDesce
     
 let private calcGradient2 (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
-
-let private initIter (initialTheta: float Vector) = 
-    let theta = ThetaVector(initialTheta)
-    { Theta  = theta; Params = { Momentum = theta } }
     
-let NAG : GradientDescentFunc<NAGHyperParams> = 
-    GD<NAGIter, NAGHyperParams> calcGradient2 initIter
+let NAG (initialIter: GradientDescentIter<NAGIter>) : GradientDescentFunc<NAGHyperParams> = 
+    GD<NAGIter, NAGHyperParams> calcGradient2 initialIter
+

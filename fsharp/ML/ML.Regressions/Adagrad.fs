@@ -16,7 +16,7 @@ type AdagradHyperParams = {
     Epsilon: float
 }
 
-type private AdagradIter = {
+type AdagradIter = {
     G: Theta
 }
 
@@ -46,6 +46,5 @@ let private initIter (initialTheta: float Vector) =
     let theta = ThetaVector(initialTheta)
     { Theta  = theta; Params = { G = theta } }
     
-let adagrad : GradientDescentFunc<AdagradHyperParams> = 
-    GD<AdagradIter, AdagradHyperParams> calcGradient2 initIter
-
+let adagrad (initialIter : GradientDescentIter<AdagradIter>) : GradientDescentFunc<AdagradHyperParams> = 
+    GD<AdagradIter, AdagradHyperParams> calcGradient2 initialIter

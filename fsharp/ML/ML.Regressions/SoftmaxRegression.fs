@@ -5,13 +5,16 @@ open ML.Core.Utils
 open ML.Core.LinearAlgebra
 
 open GLM
+open Theta
 
-let softmaxHyp (theta: float Matrix) (x: float Vector) = 
+let softmaxHyp (x: float Vector) (_theta: Theta) = 
+    let theta = _theta.asMatrix()
     let sum = (theta * x).PointwiseExp() |> Vector.sum 
     let exps = (theta .* x.ToColumnMatrix()).PointwiseExp()
-    (1. / sum) * exps
+    ThetaMatrix((1. / sum) * exps)
 
-let private softmax (theta: float Matrix) (x: float Matrix) =     
+let private softmax (x: float Matrix) (theta: float Matrix) =     
+
     // n = number of features
     // m = numbers of samples in x
     // k = number of classes
@@ -31,7 +34,8 @@ let private softmax (theta: float Matrix) (x: float Matrix) =
     sumrep ./ exps
 
 
-let softmaxCost (theta: float Matrix) (x : float Matrix) (y : float Vector) = 
+let softmaxCost (x : float Matrix) (y : float Vector) (_theta: Theta) = 
+    let theta = _theta.asMatrix()
     // n = number of features
     // m = numbers of samples in x
     // k = number of classes
@@ -42,7 +46,7 @@ let softmaxCost (theta: float Matrix) (x : float Matrix) (y : float Vector) =
     //Returns 1 * k
 
     // p, lp : m * k
-    let logP = (softmax theta x).PointwiseLog()
+    let logP = (softmax x theta).PointwiseLog()
     
     // mi : m * k
     // in each row only one column with index equal a class number is 1, allothers are zero
@@ -50,14 +54,16 @@ let softmaxCost (theta: float Matrix) (x : float Matrix) (y : float Vector) =
 
     // m * k : then sum all 
     oneHot .* logP |> Matrix.sum |> (*) -1.
-    
+        
 
-let softmaxGradient (theta: float Matrix) (x: float Matrix) (y: float Vector) = 
+let softmaxGradient (x: float Matrix) (y: float Vector) (_theta: Theta) = 
+    let theta = _theta.asMatrix()
     //Returns n * k
     // m * k
     let oneHot = encodeOneHot theta.ColumnCount y 
     // m * k
     let p = softmax theta x
     // x : n * m
-    x .* (oneHot - p) |> (*) -1.
+    let r = x .* (oneHot - p) |> (*) -1.
+    ThetaMatrix(r)
 
