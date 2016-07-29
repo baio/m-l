@@ -27,26 +27,25 @@ let softmax() =
         yield "virginica", 2.
 
     })    
-    let inputs, outputs = readCSV3 @"c:/dev/.data/mnist/iris.csv" true [|0..3|] 4 labelMaps
+    let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2   //readCSV3 @"c:/dev/.data/mnist/iris.csv" true [|0..3|] 4 labelMaps
     let inputs = inputs 
     let ouptuts = outputs 
     let outputs = vector outputs 
     let inputs = matrix inputs
-    let b = inputs |> Matrix.exists(fun i -> i <> 0.)
     let inputs, normPrms = norm inputs
 
     let model : GLMSoftmaxModel = {
         Base = { Cost = softmaxCost; Gradient = softmaxGradient }
-        ClassesNumber = 3
+        ClassesNumber = 2
     }
 
     let prms = {
-        EpochNumber = 5000 // Epochs number
+        EpochNumber = 400 // Epochs number
         ConvergeMode = ConvergeModeCostStopsChange
     }
 
     let batchHyper : SGDHyperParams = {
-        Alpha = 0.001
+        Alpha = 0.01
         BatchSize = inputs.RowCount
     }
 
@@ -91,7 +90,7 @@ let softmax() =
     printfn "batch perf : %A" perf
     
     
-    (*
+    
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams stochasticHyper |> gd
         trainResults <- ("stochastic", train)::trainResults
@@ -119,9 +118,7 @@ let softmax() =
         trainResults <- ("Adagrad", train)::trainResults
         printfn "Adagrad result : %A" train
     )    
-    printfn "Adagrad perf : %A" perf
-    *)
-    
+    printfn "Adagrad perf : %A" perf        
     
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyperParams AdadeltaHyper |> gd
@@ -129,6 +126,7 @@ let softmax() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf       
+    
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])

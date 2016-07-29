@@ -37,7 +37,7 @@ let private softmax (x: float Matrix) (theta: float Matrix) =
 
 let softmaxCost (thetaShape: ThetaShape) (x : float Matrix) (y : float Vector) (_theta: float Vector) = 
     
-    let theta = reshape (thetaShape.matrixSize()) _theta
+    let theta = reshape (thetaShape.matrixSize()) _theta    
     // n = number of features
     // m = numbers of samples in x
     // k = number of classes
@@ -55,10 +55,8 @@ let softmaxCost (thetaShape: ThetaShape) (x : float Matrix) (y : float Vector) (
     let oneHot = encodeOneHot theta.ColumnCount y 
 
     // m * k : then sum all 
-    printfn "%A" logP
     let a = oneHot .* logP 
-    printfn "%A" a
-    a |> Matrix.sum |> (*) -1.
+    (a |> Matrix.sum |> (*) -1.) / float x.RowCount
         
 
 let softmaxGradient (thetaShape: ThetaShape) (x: float Matrix) (y: float Vector) (_theta: float Vector) = 
@@ -68,14 +66,8 @@ let softmaxGradient (thetaShape: ThetaShape) (x: float Matrix) (y: float Vector)
     let oneHot = encodeOneHot theta.ColumnCount y 
     // m * k
     let p = softmax x theta 
-    // x : n * m
 
-    let a = x.Transpose() * (oneHot - p)
-    let b = a |> flat
-    let c = b |> (*) -1.
-    //printfn "%A" b
-    //printfn "%A" c
-    c
+    x.Transpose() * (oneHot - p) / float x.RowCount |> (*) -1. |> flat
 
     
 

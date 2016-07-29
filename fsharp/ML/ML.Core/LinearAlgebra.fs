@@ -18,13 +18,11 @@
 
     let reshape (rows, cols) (vec: _ Vector)  = 
         let mutable cnt = -1
-        matrix(List.init rows (fun r -> 
-            List.init cols (fun c -> 
-                    cnt <- cnt + 1
-                    vec.[cnt]                    
-                )
-            )
+        DenseMatrix.init rows cols (fun i j -> 
+            cnt <- cnt + 1
+            vec.[cnt]             
         )
+
 
     let ones cnt = DenseVector.init cnt (fun _ -> 1.)
 

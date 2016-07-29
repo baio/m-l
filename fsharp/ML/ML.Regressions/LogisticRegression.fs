@@ -22,7 +22,10 @@ let logisticMSECost _ (x : float Matrix) (y : float Vector) (theta: float Vector
     - 1. * ( p + n ) / float x.RowCount
         
 let logisticMSEGradient _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
-    x.Transpose() * (sigmoid(x * theta) - y) / float x.RowCount
+    //printfn "%A" theta
+    let r = x.Transpose() * (sigmoid(x * theta) - y) / float x.RowCount
+    //printfn "%A" r
+    r
 
 (*
 let predict : float Vector -> float Vector -> float = GLMPredict logisticHyp

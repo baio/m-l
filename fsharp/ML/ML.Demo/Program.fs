@@ -8,9 +8,10 @@ open Softmax
 [<EntryPoint>]
 let main argv = 
     
-    //softmax() |> ignore
+    //logistic() |> ignore
+    softmax() |> ignore
     //linear() |> ignore
-    logistic() |> ignore
+    //logistic() |> ignore
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code
