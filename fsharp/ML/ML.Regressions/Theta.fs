@@ -49,8 +49,8 @@ type Theta =
         | ThetaMatrix mx -> ThetaMatrix(mx + f)
     static member (-) (f : float, t: Theta) =
         match t with
-        | ThetaVector vec -> ThetaVector(vec - f)
-        | ThetaMatrix mx -> ThetaMatrix(mx - f)
+        | ThetaVector vec -> ThetaVector(f - vec)
+        | ThetaMatrix mx -> ThetaMatrix(f - mx)
     static member (-) (t: Theta, f : float) =
         match t with
         | ThetaVector vec -> ThetaVector(vec - f)
