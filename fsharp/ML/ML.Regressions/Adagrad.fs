@@ -25,20 +25,27 @@ let private calcGradient (prms: CalcGradientParams<AdagradHyperParams>) (iter: G
     let epsilon = prms.HyperParams.Epsilon
     let alpha = prms.HyperParams.Alpha
     let g = iter.Params.G
-
     let theta = iter.Theta    
-    let grad = iter.Theta |> prms.Gradient prms.X prms.Y
-    let k = alpha / ((g + epsilon) .^ 0.5)                       
-    let updatedG = (g + grad) .^ 2.
-    let updatedTheta = theta - k .* grad
 
-    { Theta  = updatedTheta ; Params = { G = g } }
+    //calc grad
+    let grad = iter.Theta |> prms.Gradient prms.X prms.Y
+    
+    //calc grads coefficents
+    let k = alpha / ((g + epsilon) .^ 0.5)                           
+    let updatedTheta = theta - k .* grad
+    
+    //accumulate G
+    let updatedG = (g + grad) .^ 2.
+
+    { Theta  = updatedTheta ; Params = { G = updatedG } }
     
 let private calcGradient2 (prms: CalcGradientParams<AdagradHyperParams>) (iter: GradientDescentIter<AdagradIter>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
 
-let private initIter (initialTheta: float Vector) = { Theta  = ThetaVector(initialTheta); Params = { G = initialTheta } }
+let private initIter (initialTheta: float Vector) = 
+    let theta = ThetaVector(initialTheta)
+    { Theta  = theta; Params = { G = theta } }
     
 let adagrad : GradientDescentFunc<AdagradHyperParams> = 
-    GD<AdagradIter, AdagradHyperParams> initIter calcGradient2
+    GD<AdagradIter, AdagradHyperParams> calcGradient2 initIter
 

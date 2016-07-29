@@ -8,8 +8,8 @@ open Logistic
 [<EntryPoint>]
 let main argv = 
     
-    //linear() |> ignore
-    logistic() |> ignore
+    linear() |> ignore
+    //logistic() |> ignore
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code

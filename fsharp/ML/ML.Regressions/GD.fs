@@ -36,9 +36,9 @@ type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyp
 type InitIter<'iter> = float Vector  -> GradientDescentIter<'iter>
 
 
-let internal GD<'iter, 'hyper>
+let internal GD<'iter, 'hyper>    
+    (calcGradient: ClacGradientFunc<'iter, 'hyper>)    
     (initIter : InitIter<'iter>) 
-    (calcGradient: ClacGradientFunc<'iter, 'hyper>)
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : 'hyper)

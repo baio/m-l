@@ -13,10 +13,57 @@ type Theta =
         match this with
         | ThetaMatrix mx -> mx
         | _ -> failwith "theta is not a matrix"
+    //some math
+    member this.sum() = 
+        match this with
+        | ThetaVector vec -> vec.Sum()
+        | ThetaMatrix mx -> mx |> Matrix.sum
+    member this.log() = 
+        match this with
+        | ThetaVector vec -> ThetaVector(vec.PointwiseLog())
+        | ThetaMatrix mx -> ThetaMatrix(mx.PointwiseLog())
+    member this.exp() = 
+        match this with
+        | ThetaVector vec -> ThetaVector(vec.PointwiseExp())
+        | ThetaMatrix mx -> ThetaMatrix(mx.PointwiseExp())
+    //Theta & Scalars            
+    static member (.^) (t: Theta, s : float) =
+        match t with
+        | ThetaVector vec -> ThetaVector(vec.PointwisePower(s))
+        | ThetaMatrix mx -> ThetaMatrix(mx.PointwisePower(s))
+    static member (*) (f : float, t: Theta) =
+        match t with
+        | ThetaVector vec -> ThetaVector(vec * f)
+        | ThetaMatrix mx -> ThetaMatrix(mx * f)
     static member (*) (t: Theta, f : float) =
         match t with
         | ThetaVector vec -> ThetaVector(vec * f)
         | ThetaMatrix mx -> ThetaMatrix(mx * f)
+    static member (+) (f : float, t: Theta) =
+        match t with
+        | ThetaVector vec -> ThetaVector(vec + f)
+        | ThetaMatrix mx -> ThetaMatrix(mx + f)
+    static member (+) (t: Theta, f : float) =
+        match t with
+        | ThetaVector vec -> ThetaVector(vec + f)
+        | ThetaMatrix mx -> ThetaMatrix(mx + f)
+    static member (-) (f : float, t: Theta) =
+        match t with
+        | ThetaVector vec -> ThetaVector(vec - f)
+        | ThetaMatrix mx -> ThetaMatrix(mx - f)
+    static member (-) (t: Theta, f : float) =
+        match t with
+        | ThetaVector vec -> ThetaVector(vec - f)
+        | ThetaMatrix mx -> ThetaMatrix(mx - f)
+    static member ( / ) (t : Theta, s: float) =
+        match t with
+        | ThetaVector vec -> ThetaVector(vec / s)
+        | ThetaMatrix mx ->  ThetaMatrix(mx / s)
+    static member ( / ) (s: float, t : Theta) =
+        match t with
+        | ThetaVector vec -> ThetaVector(s / vec)
+        | ThetaMatrix mx ->  ThetaMatrix(s / mx)
+    //Theta & Vectors            
     static member (-) (t: Theta, v : float Vector) =
         match t with
         | ThetaVector vec -> ThetaVector(vec - v)
@@ -25,18 +72,24 @@ type Theta =
         match t with
         | ThetaVector vec -> ThetaVector(vec + v)
         | _ -> failwith "TODO" //ThetaMatrix mx -> ThetaMatrix(mx - f)
-    static member (+) (t: Theta, s : float) =
-        match t with
-        | ThetaVector vec -> ThetaVector(vec + s)
-        | ThetaMatrix mx -> ThetaMatrix(mx + s)
     static member ( .* ) (t: Theta, v : float Vector) =
         match t with
         | ThetaVector vec -> ThetaVector(vec .* v)
         | _ -> failwith "TODO" //ThetaMatrix mx -> ThetaMatrix(mx - f)
-    static member (.^) (t: Theta, s : float) =
+    static member ( * ) (t : Theta, v : float Vector) =
         match t with
-        | ThetaVector vec -> ThetaVector(vec.PointwisePower(s))
-        | ThetaMatrix mx -> ThetaMatrix(mx.PointwisePower(s))
+        | ThetaVector vec -> vec * v
+        | ThetaMatrix mx ->  (mx * v).Maximum()
+    static member ( * ) (v : float Vector, t : Theta) =
+        match t with
+        | ThetaVector vec -> vec * v
+        | ThetaMatrix mx ->  (mx * v).Maximum()
+    //Theta & Matrix
+    static member ( * ) (m: float Matrix, t : Theta) =
+        match t with
+        | ThetaVector vec -> ThetaVector(m * vec)
+        | ThetaMatrix mx ->  ThetaMatrix(m * mx)
+    //Theta & Theta
     static member (-) (t1 : Theta, t2: Theta) =
         match t1, t2 with
         | ThetaVector(vec1), ThetaVector(vec2) -> 
@@ -65,10 +118,6 @@ type Theta =
         | ThetaMatrix(mx1), ThetaMatrix(mx2) -> 
             ThetaMatrix(mx1 .* mx2)
         | _ -> failwith "Types of thetas are different"
-    static member ( / ) (s: float, t : Theta) =
-        match t with
-        | ThetaVector vec -> ThetaVector(s / vec)
-        | ThetaMatrix mx ->  ThetaMatrix(s / mx)
                                                
 type ThetaVectorBuilder() =     
 

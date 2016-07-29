@@ -34,8 +34,9 @@ let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: Gradi
 let private calcGradient2 (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
     
-let private initIter (initialTheta: float Vector) = { Theta  = ThetaVector(initialTheta); Params = () }
+let private initIter (initialTheta: float Vector) = 
+    { Theta  = ThetaVector(initialTheta); Params = () }
     
 let SGD : GradientDescentFunc<SGDHyperParams> = 
-    GD<Unit, SGDHyperParams> initIter calcGradient2
+    GD<Unit, SGDHyperParams> calcGradient2 initIter
 

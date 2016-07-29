@@ -16,14 +16,14 @@ type NAGHyperParams = {
 }
 
 type NAGIter = {
-    Momentum: float Vector
+    Momentum: Theta
 }
 
 let calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     let alpha = prms.HyperParams.Alpha
     let theta = iter.Theta
     let momentum = iter.Params.Momentum 
-    let a = prms.HyperParams.Gamma * momentum
+    let a = momentum * prms.HyperParams.Gamma
     let grad = iter.Theta - a |> prms.Gradient prms.X prms.Y 
     let updatedMomentum = grad * alpha + a
     
@@ -32,7 +32,9 @@ let calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDesce
 let private calcGradient2 (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
 
-let private initIter (initialTheta: float Vector) = { Theta  = ThetaVector(initialTheta); Params = { Momentum = initialTheta } }
+let private initIter (initialTheta: float Vector) = 
+    let theta = ThetaVector(initialTheta)
+    { Theta  = theta; Params = { Momentum = theta } }
     
 let NAG : GradientDescentFunc<NAGHyperParams> = 
-    GD<NAGIter, NAGHyperParams> initIter calcGradient2
+    GD<NAGIter, NAGHyperParams> calcGradient2 initIter

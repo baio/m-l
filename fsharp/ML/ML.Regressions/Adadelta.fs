@@ -47,7 +47,9 @@ let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: 
 let private calcGradient2 (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
 
-let private initIter (initialTheta: float Vector) = { Theta  = ThetaVector(initialTheta); Params = { EG = initialTheta; ET = initialTheta } }
+let private initIter (initialTheta: float Vector) = 
+    let theta = ThetaVector(initialTheta)
+    { Theta  = theta; Params = { EG = theta; ET = theta } }
     
 let adadelta : GradientDescentFunc<AdadeltaHyperParams> = 
-    GD<AdadeltaIter, AdadeltaHyperParams> initIter calcGradient2
+    GD<AdadeltaIter, AdadeltaHyperParams> calcGradient2 initIter
