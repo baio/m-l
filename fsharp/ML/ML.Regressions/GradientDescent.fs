@@ -17,33 +17,29 @@ type GradientDescentHyperParams =
     | AdagradHyperParams of AdagradHyperParams
     | AdadeltaHyperParams of AdadeltaHyperParams 
 
-let gradientDescentTheta (initialTheta: Theta) (model: GLMModel) (prms: IterativeTrainModelParams) (inputs: float Matrix) (outputs: float Vector) (hyper: GradientDescentHyperParams) =
+let gradientDescentTheta (thetaShape : ThetaShape) (initialTheta: float Vector) (model: GLMModel) (prms: IterativeTrainModelParams) (inputs: float Matrix) (outputs: float Vector) (hyper: GradientDescentHyperParams) =
     match hyper with
     | SGDHyperParams hp -> 
         let initialIter = { Theta = initialTheta ; Params = () }
-        SGD initialIter model prms hp inputs outputs        
+        SGD thetaShape initialIter model prms hp inputs outputs        
     | NAGHyperParams hp -> 
         let initialIter = { Theta = initialTheta ; Params = { Momentum = initialTheta } }
-        NAG initialIter model prms hp inputs outputs        
+        NAG thetaShape initialIter model prms hp inputs outputs        
     | AdagradHyperParams hp -> 
         let initialIter = { Theta = initialTheta ; Params = { G = initialTheta } }
-        adagrad initialIter model prms hp inputs outputs        
+        adagrad thetaShape initialIter model prms hp inputs outputs        
     | AdadeltaHyperParams hp -> 
         let initialIter = { Theta = initialTheta ; Params = { EG = initialTheta ; ET = initialTheta } }
-        adadelta initialIter model prms hp inputs outputs        
+        adadelta thetaShape initialIter model prms hp inputs outputs        
 
 let gradientDescent (model: GLMModel) (prms: IterativeTrainModelParams) (inputs: float Matrix) (outputs: float Vector) (hyper: GradientDescentHyperParams) =    
     let theta = 
-        inputs.ColumnCount + 1 
-        |> zeros 
-        |> ThetaVector
+        inputs.ColumnCount + 1 |> zeros 
     
-    gradientDescentTheta theta model prms inputs outputs hyper
+    gradientDescentTheta ThetaShapeVector theta model prms inputs outputs hyper
 
 let gradientDescentSoftmax (classesNumber : int) (model: GLMModel) (prms: IterativeTrainModelParams) (inputs: float Matrix) (outputs: float Vector) (hyper: GradientDescentHyperParams) =   
-    let theta = 
-        (inputs.ColumnCount + 1, classesNumber) 
-        |> zerosMatrix 
-        |> ThetaMatrix
+    let rows, cols = (inputs.ColumnCount + 1, classesNumber) 
+    let theta = rows * cols |> zeros
 
-    gradientDescentTheta theta model prms inputs outputs hyper
+    gradientDescentTheta (ThetaShapeMatrix(rows, cols)) theta model prms inputs outputs hyper

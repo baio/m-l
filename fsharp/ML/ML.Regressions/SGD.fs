@@ -27,12 +27,13 @@ let calcGradientBatch<'iter, 'hyper> (batchSize: int) (prms: CalcGradientParams<
     iter
 
 let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =    
+    let theta = iter.Theta
     let grad = iter.Theta |> prms.Gradient prms.X prms.Y
-    let theta = iter.Theta - grad * prms.HyperParams.Alpha
-    { Theta = theta; Params = () }
+    let updatedTheta = theta - grad * prms.HyperParams.Alpha
+    { Theta = updatedTheta ; Params = () }
     
 let private calcGradient2 (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
     
-let SGD (initialIter : GradientDescentIter<Unit>) : GradientDescentFunc<SGDHyperParams> = 
-    GD<Unit, SGDHyperParams> calcGradient2 initialIter
+let SGD (thetaShape: ThetaShape) (initialIter : GradientDescentIter<Unit>) : GradientDescentFunc<SGDHyperParams> = 
+    GD<Unit, SGDHyperParams> calcGradient2 thetaShape initialIter

@@ -17,8 +17,8 @@ type AdadeltaHyperParams = {
 }
 
 type AdadeltaIter = {
-    EG: Theta
-    ET: Theta
+    EG: float Vector
+    ET: float Vector
 }
 
 let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
@@ -32,13 +32,13 @@ let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: 
     //calculate gradient  
     let grad = iter.Theta |> prms.Gradient prms.X prms.Y
     //accumulate gradient
-    let updatedEG = ( grad .^ 2.) * (1. - rho) + eg * rho                   
+    let updatedEG = grad.PointwisePower(2.) * (1. - rho) + eg * rho                   
     //compute update
-    let rms_t = (et + epsilon) .^ 0.5
-    let rms_g = (updatedEG + epsilon) .^  0.5
+    let rms_t = (et + epsilon).PointwisePower(0.5)
+    let rms_g = (updatedEG + epsilon).PointwisePower(0.5)
     let delta = grad .* (rms_t / rms_g) 
     //accumulate updates
-    let updatedET = et * rho + (delta .^ 2.) * (1. - rho)                   
+    let updatedET = et * rho + delta.PointwisePower(2.) * (1. - rho)                   
     //apply update
     let updatedTheta = theta - delta
 
@@ -46,10 +46,6 @@ let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: 
     
 let private calcGradient2 (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
     calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
-
-let private initIter (initialTheta: float Vector) = 
-    let theta = ThetaVector(initialTheta)
-    { Theta  = theta; Params = { EG = theta; ET = theta } }
     
-let adadelta (initialIter : GradientDescentIter<AdadeltaIter>) : GradientDescentFunc<AdadeltaHyperParams> = 
-    GD<AdadeltaIter, AdadeltaHyperParams> calcGradient2 initialIter
+let adadelta (thetaShape: ThetaShape) (initialIter : GradientDescentIter<AdadeltaIter>) : GradientDescentFunc<AdadeltaHyperParams> = 
+    GD<AdadeltaIter, AdadeltaHyperParams> calcGradient2 thetaShape initialIter

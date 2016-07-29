@@ -7,11 +7,11 @@ open ML.Core.LinearAlgebra
 open GLM
 open Theta
 
-let softmaxHyp (x: float Vector) (_theta: Theta) = 
-    let theta = _theta.asMatrix()
+let softmaxHyp (thetaShape: ThetaShape) (x: float Vector) (_theta: float Vector) = 
+    let theta = reshape (thetaShape.matrixSize()) _theta
     let sum = (theta * x).PointwiseExp() |> Vector.sum 
     let exps = (theta .* x.ToColumnMatrix()).PointwiseExp()
-    ThetaMatrix((1. / sum) * exps)
+    (1. / sum) * exps 
 
 let private softmax (x: float Matrix) (theta: float Matrix) =     
 
@@ -34,8 +34,9 @@ let private softmax (x: float Matrix) (theta: float Matrix) =
     sumrep ./ exps
 
 
-let softmaxCost (x : float Matrix) (y : float Vector) (_theta: Theta) = 
-    let theta = _theta.asMatrix()
+let softmaxCost (thetaShape: ThetaShape) (x : float Matrix) (y : float Vector) (_theta: float Vector) = 
+    
+    let theta = reshape (thetaShape.matrixSize()) _theta
     // n = number of features
     // m = numbers of samples in x
     // k = number of classes
@@ -56,14 +57,14 @@ let softmaxCost (x : float Matrix) (y : float Vector) (_theta: Theta) =
     oneHot .* logP |> Matrix.sum |> (*) -1.
         
 
-let softmaxGradient (x: float Matrix) (y: float Vector) (_theta: Theta) = 
-    let theta = _theta.asMatrix()
+let softmaxGradient (thetaShape: ThetaShape) (x: float Matrix) (y: float Vector) (_theta: float Vector) = 
+    let theta = reshape (thetaShape.matrixSize()) _theta
     //Returns n * k
     // m * k
     let oneHot = encodeOneHot theta.ColumnCount y 
     // m * k
     let p = softmax theta x
     // x : n * m
-    let r = x .* (oneHot - p) |> (*) -1.
-    ThetaMatrix(r)
+    x .* (oneHot - p) |> (*) -1. |> flat
+    
 

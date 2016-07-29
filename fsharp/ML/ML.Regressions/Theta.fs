@@ -4,28 +4,26 @@ open MathNet.Numerics.LinearAlgebra
 
 open ML.Core.LinearAlgebra
 
-type ThetaShape = 
-    | ThetaVector of int // for basic cases, Linear, Logistsic when theta is a Vector n
-    | ThetaMatrix of int * int // for softmax when theta is a Matrix K * n
-
-type Theta = {
-    Vector : float Vector
-    Shape : ThetaShape
-}
-
-let thetaVector (cols: int) =
-    { 
-        Vector = cols |> zeros;
-        Shape = ThetaVector(cols)
-    }
-    
-
-let thetaMatrix (rows: int) (cols: int) =
-    { 
-        Vector = rows * cols |> zeros;
-        Shape = ThetaMatrix(rows, cols)
-    }
-    
+type Theta = 
+    | ThetaVector of float Vector // for basic cases, Linear, Logistsic when theta is a Vector n
+    | ThetaMatrix of float Matrix // for softmax when theta is a Matrix K * n
+    member this.vector()  =
+        match this with
+        | ThetaVector vec -> vec
+        | _ -> failwith "theta is not a vector"
+    member this.matrix() =
+        match this with
+        | ThetaMatrix mx -> mx
+        | _ -> failwith "theta is not a matrix"
+    member this.asVector() =
+        match this with
+        | ThetaVector vec -> vec
+        | ThetaMatrix mx -> mx |> flat
+    member this.fromVector(vec: float Vector) =
+        match this with
+        | ThetaVector vec -> ThetaVector(vec)
+        | ThetaMatrix mx -> 
+            ThetaMatrix(reshape (mx.RowCount, mx.ColumnCount) vec)
 
 (*
 type Theta = 

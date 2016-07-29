@@ -17,7 +17,7 @@ type IterativeTrainModelParams = {
 }
 
 type GradientDescentIter<'iter> = {
-    Theta: Theta
+    Theta: float Vector     
     Params : 'iter
 }
 
@@ -25,11 +25,11 @@ type CalcGradientParams<'hyper> = {
     HyperParams : 'hyper 
     X: float Matrix 
     Y: float Vector 
-    Gradient: GradientFunc
+    Gradient: float Matrix -> float Vector -> float Vector -> float Vector
 }
 
 type ModelTrainResultType = Converged | MaxIterCountAchieved
-type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: Theta; Errors: float list }
+type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: float Vector; Errors: float list }
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
 type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
 //type GradientDescentFunc2<'iter, 'hyper> = GradientDescentIter<'iter> -> GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
@@ -38,6 +38,7 @@ type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyp
 
 let internal GD<'iter, 'hyper>    
     (calcGradient: ClacGradientFunc<'iter, 'hyper>)    
+    (thetaShape: ThetaShape)
     (initialIter : GradientDescentIter<'iter>) 
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
@@ -53,7 +54,7 @@ let internal GD<'iter, 'hyper>
             HyperParams = hyperPrms
             X = x
             Y = y
-            Gradient = model.Gradient
+            Gradient = (model.Gradient thetaShape)
         }
 
         let convergeCostNotImproved = 
@@ -65,7 +66,7 @@ let internal GD<'iter, 'hyper>
             let theta = iter.Theta
             let epochCnt = errors |> List.length 
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.
-            let error = theta |> model.Cost x y
+            let error = theta |> model.Cost thetaShape x y
             if convergeCostNotImproved  && latestError = error then
                 // no improvements, converged
                 { ResultType = Converged; Theta = theta; Errors = errors }

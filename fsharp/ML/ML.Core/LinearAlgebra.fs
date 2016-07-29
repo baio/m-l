@@ -13,6 +13,19 @@
     let zerosMatrix (rows, cols) = 
         matrix(List.init rows (fun r -> List.init cols (fun _ -> 0.)))
 
+    let flat (mx: _ Matrix) =
+        vector(mx.Enumerate() |> Seq.toList)  
+
+    let reshape (rows, cols) (vec: _ Vector)  = 
+        let mutable cnt = -1
+        matrix(List.init rows (fun r -> 
+            List.init cols (fun c -> 
+                    cnt <- cnt + 1
+                    vec.[cnt]                    
+                )
+            )
+        )
+
     let ones cnt = DenseVector.init cnt (fun _ -> 1.)
 
     let appendOnes (mx: _ Matrix) = mx.InsertColumn(0, ones mx.RowCount)
