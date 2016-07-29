@@ -5,7 +5,6 @@ open ML.Core.Utils
 open ML.Core.LinearAlgebra
 
 open GLM
-open Theta
 
 let sigmoid (z: float Vector) = 
     1. / (1. + (-1. * z).PointwiseExp())

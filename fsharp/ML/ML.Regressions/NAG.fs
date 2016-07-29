@@ -7,7 +7,6 @@ open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open SGD
 open GD
-open Theta
 
 type NAGHyperParams = {
     Alpha: float

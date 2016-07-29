@@ -5,8 +5,6 @@ open ML.Core.LinearAlgebra
 open ML.Regressions.GLM
 open MathNet.Numerics.LinearAlgebra
 
-open Theta
-
 type ConvergeMode = 
     | ConvergeModeNone
     | ConvergeModeCostStopsChange
@@ -28,7 +26,7 @@ type CalcGradientParams<'hyper> = {
     Gradient: float Matrix -> float Vector -> float Vector -> float Vector
 }
 
-type ModelTrainResultType = Converged | MaxIterCountAchieved
+type ModelTrainResultType = Converged | MaxIterCountAchieved | NaN
 type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: float Vector; Errors: float list }
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
 type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
@@ -72,7 +70,9 @@ let internal GD<'iter, 'hyper>
             let epochCnt = errors |> List.length 
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.
             let error = theta |> model.Cost thetaShape x y
-            if convergeCostNotImproved  && latestError = error then
+            if error <> error then
+                { ResultType = NaN; Theta = theta; Errors = errors }
+            else if convergeCostNotImproved && latestError = error then
                 // no improvements, converged
                 { ResultType = Converged; Theta = theta; Errors = errors }
             else if prms.EpochNumber <= epochCnt then

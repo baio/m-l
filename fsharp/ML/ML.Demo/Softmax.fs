@@ -21,14 +21,23 @@ open ML.Statistics.Charting
 
 let softmax() = 
         
-    let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex1\ex1\ex1data2.csv" false [|0..1|] 2    
-    let outputs = vector outputs
+    let labelMaps = Map<string, float>(seq {
+        yield "setosa", 0.
+        yield "versicolor", 1.
+        yield "virginica", 2.
+
+    })    
+    let inputs, outputs = readCSV3 @"c:/dev/.data/mnist/iris.csv" true [|0..3|] 4 labelMaps
+    let inputs = inputs 
+    let ouptuts = outputs 
+    let outputs = vector outputs 
     let inputs = matrix inputs
+    let b = inputs |> Matrix.exists(fun i -> i <> 0.)
     let inputs, normPrms = norm inputs
 
     let model : GLMSoftmaxModel = {
         Base = { Cost = softmaxCost; Gradient = softmaxGradient }
-        ClassesNumber = 10
+        ClassesNumber = 3
     }
 
     let prms = {
@@ -37,7 +46,7 @@ let softmax() =
     }
 
     let batchHyper : SGDHyperParams = {
-        Alpha = 0.01
+        Alpha = 0.001
         BatchSize = inputs.RowCount
     }
 
@@ -64,7 +73,7 @@ let softmax() =
     }
 
     let AdadeltaHyper : AdadeltaHyperParams = {        
-        BatchSize = 5
+        BatchSize = 20
         Epsilon = 1E-8
         Rho = 0.6
     }
@@ -73,6 +82,7 @@ let softmax() =
 
     let gd = gradientDescent (GLMSoftmaxModel model) prms inputs outputs 
     
+    
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams batchHyper |> gd
         trainResults <- ("batch",train)::trainResults
@@ -80,6 +90,8 @@ let softmax() =
     )    
     printfn "batch perf : %A" perf
     
+    
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams stochasticHyper |> gd
         trainResults <- ("stochastic", train)::trainResults
@@ -108,13 +120,15 @@ let softmax() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf
+    *)
+    
     
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyperParams AdadeltaHyper |> gd
         trainResults <- ("Adadelta", train)::trainResults
         printfn "Adadelta result : %A" train
     )    
-    printfn "Adadelta perf : %A" perf
+    printfn "Adadelta perf : %A" perf       
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])
@@ -122,4 +136,5 @@ let softmax() =
     |> showLines2
 
     
+
 

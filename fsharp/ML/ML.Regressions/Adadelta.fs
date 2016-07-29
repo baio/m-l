@@ -8,7 +8,6 @@ open ML.Core.LinearAlgebra
 open GLM
 open GD
 open SGD
-open Theta
 
 type AdadeltaHyperParams = {
     BatchSize: int

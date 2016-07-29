@@ -4,8 +4,6 @@ open ML.Core.Utils
 open ML.Core.LinearAlgebra
 open MathNet.Numerics.LinearAlgebra
 
-open Theta
-
 type ThetaShape = 
     | ThetaShapeVector
     | ThetaShapeMatrix of int * int
@@ -15,7 +13,7 @@ type ThetaShape =
         | _ -> failwith "Shape is not a matrix"
 
 // Given weights and features return calculated label
-type HypothesisFunc = float Vector -> Theta -> float
+type HypothesisFunc = float Vector -> float Vector -> float
 // Given features and labels, weights calculate error
 type CostFunc = ThetaShape -> float Matrix -> float Vector -> float Vector -> float
 // Given inputs and outputs, weights calculate gradient array for weights

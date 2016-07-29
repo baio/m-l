@@ -3,7 +3,6 @@
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
-open Theta
 open GLM
 open GD 
 

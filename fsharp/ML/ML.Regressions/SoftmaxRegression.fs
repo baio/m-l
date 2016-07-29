@@ -5,7 +5,7 @@ open ML.Core.Utils
 open ML.Core.LinearAlgebra
 
 open GLM
-open Theta
+
 
 let softmaxHyp (thetaShape: ThetaShape) (x: float Vector) (_theta: float Vector) = 
     let theta = reshape (thetaShape.matrixSize()) _theta
@@ -20,18 +20,19 @@ let private softmax (x: float Matrix) (theta: float Matrix) =
     // k = number of classes
     // -------------------------
     // theta : n * k
-    // x : n * m    
+    // x : m  * n
     //---------------------------
     // Returns : m * k
     
-    // sum : m * 1
-    let sum = (x.Transpose() * theta).PointwiseExp().ColumnSums().ToRowMatrix()
+    // exps : m * k
+    let exps = (x * theta).PointwiseExp()
+    // exp : m * 1
+    let sum = exps.RowSums().ToColumnMatrix()
+
     // sumrep : m * k (all column values for each row are the same)
     let sumrep = sum |> repmatCol theta.ColumnCount
-    // exps : m * k
-    let exps = (x.Transpose() * theta).PointwiseExp()
     
-    sumrep ./ exps
+    exps ./ sumrep
 
 
 let softmaxCost (thetaShape: ThetaShape) (x : float Matrix) (y : float Vector) (_theta: float Vector) = 
@@ -46,7 +47,7 @@ let softmaxCost (thetaShape: ThetaShape) (x : float Matrix) (y : float Vector) (
     //---------------------------
     //Returns 1 * k
 
-    // p, lp : m * k
+    // lp : m * k
     let logP = (softmax x theta).PointwiseLog()
     
     // mi : m * k
@@ -54,7 +55,10 @@ let softmaxCost (thetaShape: ThetaShape) (x : float Matrix) (y : float Vector) (
     let oneHot = encodeOneHot theta.ColumnCount y 
 
     // m * k : then sum all 
-    oneHot .* logP |> Matrix.sum |> (*) -1.
+    printfn "%A" logP
+    let a = oneHot .* logP 
+    printfn "%A" a
+    a |> Matrix.sum |> (*) -1.
         
 
 let softmaxGradient (thetaShape: ThetaShape) (x: float Matrix) (y: float Vector) (_theta: float Vector) = 
@@ -63,8 +67,15 @@ let softmaxGradient (thetaShape: ThetaShape) (x: float Matrix) (y: float Vector)
     // m * k
     let oneHot = encodeOneHot theta.ColumnCount y 
     // m * k
-    let p = softmax theta x
+    let p = softmax x theta 
     // x : n * m
-    x .* (oneHot - p) |> (*) -1. |> flat
+
+    let a = x.Transpose() * (oneHot - p)
+    let b = a |> flat
+    let c = b |> (*) -1.
+    //printfn "%A" b
+    //printfn "%A" c
+    c
+
     
 

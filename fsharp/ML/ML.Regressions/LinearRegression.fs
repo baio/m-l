@@ -4,9 +4,9 @@ open ML.Core.Utils
 open MathNet.Numerics.LinearAlgebra
 
 open GLM
-open Theta
 
-let linearHyp (x: float Vector) (theta: Theta) = theta.vector() * x                
+
+let linearHyp (x: float Vector) (theta: float Vector) = theta * x                
 
 let linearMSECost _ (x : float Matrix) (y : float Vector) (theta: float Vector)  =     
     ((x * theta - y).PointwisePower(2.) |> Vector.sum) / (2. * float x.RowCount) 

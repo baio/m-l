@@ -52,7 +52,6 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Theta.fs" />
     <Compile Include="GLM.fs" />
     <Compile Include="LinearRegression.fs" />
     <Compile Include="LogisticRegression.fs" />

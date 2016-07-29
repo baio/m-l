@@ -9,7 +9,6 @@ open SGD
 open NAG
 open Adagrad
 open Adadelta
-open Theta
 
 type GradientDescentHyperParams = 
     | SGDHyperParams of SGDHyperParams

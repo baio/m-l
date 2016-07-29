@@ -16,7 +16,10 @@ let norm (mx: float Matrix) : float Matrix * NormParams =
         |> List.unzip
                    
     mx |> Matrix.mapCols (fun i vec ->
-        (vec - mu.[i]) / std.[i]
+        if std.[i] <> 0. then
+            (vec - mu.[i]) / std.[i]
+        else 
+            vec - mu.[i]
     ), { Mu = vector mu; Std = vector std }
 
 

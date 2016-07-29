@@ -34,12 +34,23 @@
 
     let appendOne (vec: _ Vector) = vecCons 1. vec     
 
-    let repmatCol (cnt: int) (mx : _ Matrix) = 
-        Seq.init cnt (fun f -> mx.EnumerateColumns())
-        |> Seq.concat
-        |> Seq.toList 
-        |> List.map (fun v -> v.ToArray() |> List.ofArray)
+    let repvec (cnt : int) (vec: _ Vector) =
+        List.init cnt (fun _ -> vec.Enumerate() |> Seq.toList)
+        |> List.concat
+        |> vector
+
+    let repmatCol (cnt: int) (mx : _ Matrix) =         
+        mx.EnumerateRows()
+        |> Seq.toList
+        |> List.map (fun row -> row |> repvec cnt |> Vector.toList)
         |> matrix
+
+    let repmatRow (cnt: int) (mx : _ Matrix) =         
+        List.init cnt (fun _ -> mx.EnumerateRows() |> Seq.map(fun f ->  f |> Vector.toList))
+        |> Seq.concat 
+        |> Seq.toList       
+        |> matrix
+
 
     let encodeOneHot (classesNum: int) (labels: float Vector) = 
         List.init labels.Count (fun r -> 
