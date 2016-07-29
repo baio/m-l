@@ -10,6 +10,9 @@
 
     let zeros cnt = DenseVector.zero cnt
 
+    let zerosMatrix (rows, cols) = 
+        matrix(List.init rows (fun r -> List.init cols (fun _ -> 0.)))
+
     let ones cnt = DenseVector.init cnt (fun _ -> 1.)
 
     let appendOnes (mx: _ Matrix) = mx.InsertColumn(0, ones mx.RowCount)
