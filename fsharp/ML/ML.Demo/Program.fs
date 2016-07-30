@@ -9,9 +9,9 @@ open Softmax
 let main argv = 
     
     //logistic() |> ignore
-    softmax() |> ignore
-    //linear() |> ignore
-    //logistic() |> ignore
+    //softmax() |> ignore
+    linear() |> ignore
+    
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code

@@ -12,8 +12,7 @@ type SGDHyperParams = {
 }
 
 let calcGradientBatch<'iter, 'hyper> (batchSize: int) (prms: CalcGradientParams<'hyper>) (iter: GradientDescentIter<'iter>) (grad: ClacGradientFunc<'iter, 'hyper>) =
-    let x = prms.X
-    let y = prms.Y
+    let x, y = permuteSamples prms.X prms.Y
 
     let mutable iter = iter
     genRanges batchSize x.RowCount           

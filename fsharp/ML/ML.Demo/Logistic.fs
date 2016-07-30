@@ -82,7 +82,6 @@ let logistic() =
     )    
     printfn "batch perf : %A" perf
     
-    (*
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams stochasticHyper |> gd
         trainResults <- ("stochastic", train)::trainResults
@@ -117,7 +116,6 @@ let logistic() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
-    *)
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])

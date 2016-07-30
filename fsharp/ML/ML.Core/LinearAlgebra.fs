@@ -1,5 +1,7 @@
 ﻿module ML.Core.LinearAlgebra 
 
+    open Utils
+
     open MathNet.Numerics.LinearAlgebra
 
     let spliceRows start count (mx: _ Matrix) = 
@@ -58,3 +60,8 @@
         )
         |> matrix 
         
+    let permuteSamples (mx: _ Matrix) (vec: _ Vector) =
+        let perm = new MathNet.Numerics.Permutation (permute mx.RowCount)
+        let cloned = mx.InsertColumn(0, vec)        
+        cloned.PermuteRows(perm)
+        cloned.RemoveColumn(0), cloned.Column(0)

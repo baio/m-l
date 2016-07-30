@@ -33,7 +33,7 @@ let linear() =
 
     let prms = {
         EpochNumber = 5000 // Epochs number
-        ConvergeMode = ConvergeModeCostStopsChange
+        ConvergeMode = ConvergeModeNone
     }
 
     let batchHyper : SGDHyperParams = {
