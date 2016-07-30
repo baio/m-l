@@ -101,7 +101,7 @@ let linear() =
     )    
     printfn "NAG perf : %A" perf
 
-    
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = AdagradHyperParams AdagradHyper |> gd
         trainResults <- ("Adagrad", train)::trainResults
@@ -115,6 +115,7 @@ let linear() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
+    *)
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])

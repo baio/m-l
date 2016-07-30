@@ -8,7 +8,6 @@
 
 ## Run tensoFlow via docker
 
-
 ```
 docker run -p 8888:8888 -it --rm b.gcr.io/tensorflow-udacity/assignments
 //Windows: to edit code locally and run in docker container shared folder must be under User directory

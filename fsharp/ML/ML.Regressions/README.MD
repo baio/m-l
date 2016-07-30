@@ -1,4 +1,4 @@
-﻿# Gradient descent algoritms
+﻿# Gradient descent algorithms (F# implementation)
 
 http://sebastianruder.com/optimizing-gradient-descent/index.html
 
@@ -6,7 +6,8 @@ http://sebastianruder.com/optimizing-gradient-descent/index.html
 
 ### 1. Batch Gradient Descent
 
-Vanilla gradient descent, aka batch gradient descent, computes the gradient of the cost function w.r.t. to the parameters θθ for the entire training datase.
+Vanilla gradient descent, aka batch gradient descent, computes gradient of the cost function w.r.t.
+to the parameters θ for the entire training dataset.
 
 ### 2. Stochastic Gradient Descent
 
@@ -37,4 +38,172 @@ It adapts the learning rate to the parameters, performing larger updates for inf
 ### 3. Adadelta
 
 Adadelta is an extension of Adagrad that seeks to reduce its aggressive, monotonically decreasing learning rate.
-Instead of accumulating all past squared gradients, Adadelta restricts the window of accumulated past gradients to some fixed size ww.
+Instead of accumulating all past squared gradients, Adadelta restricts the window of accumulated past gradients to some fixed size w.
+
+## Implementation
+
+Every iterative gradient descent algorithm require three principal parameters sets which are independent
+one of another.
+
++ Model parameters
++ Particular Gradient Descent Algorithm parameters
++ Genaral Iterative Model parameters
+
+### 1. Model parameters
+
+Here you define which model you are calculating.
+Every gradient descent model requires [gradient descent function]()
+in order to minimize [cost function]().
+
+So all `model parameters` require `gradient descent function`.
+Also they require `cost function` iteslf in order to benchmark model calculation results for each iteration.
+
+Library includes following models
+
+1. [Linear](http://ufldl.stanford.edu/tutorial/supervised/LinearRegression/)
+2. [Logistic](http://ufldl.stanford.edu/tutorial/supervised/LogisticRegression/)
+3. [Softmax](http://ufldl.stanford.edu/tutorial/supervised/SoftmaxRegression/)
+
+To calculate Softmax model `number of classes` parameters also required.
+
+### 2. Particular Gradient Descent Algorithm parameters
+
+Library includes following algorithms
+
+1. MiniBatch (SGD)
+2. Nesterov accelerated gradient (NAG)
+3. Adagrad
+4. Adadelta
+
+[*SGD*](http://sebastianruder.com/optimizing-gradient-descent/index.html#minibatchgradientdescent) requires following parameters:
++ Alpha - Learning rate
++ BatchSize - Mini Batch size
+
+`SGD` could be converged to
++ `Batch Gradient Descent` when `BatchSize = samples count`
++ `Stochastic Gradient Descent` when `BatchSize = 1`
+
+`SGD` is the base for all other models in the sence all models is calculated using mini batches,
+so `BatchSize` parameter required for all models.
+
+Source : `ML.Regressions/SGD.fs`
+
+[*NAG*](http://sebastianruder.com/optimizing-gradient-descent/index.html#nesterovacceleratedgradient) requires following parameters:
++ Alpha - Learning rate
++ BatchSize - Mini Batch size
++ Gamma - momentum term
+
+Source : `ML.Regressions/NAG.fs`
+
+[*Adagrad*](http://sebastianruder.com/optimizing-gradient-descent/index.html#adagrad) requires following parameters:
++ Alpha - Learning rate
++ BatchSize - Mini Batch size (default 0.9)
++ Epsilon - Smoothing term (default 1E-8)
+
+Source : `ML.Regressions/Adagrad.fs`
+
+[*Adadelta*](http://sebastianruder.com/optimizing-gradient-descent/index.html#adadelta) requires following parameters:
++ BatchSize - Mini Batch size
++ Epsilon - Smoothing term (default 1E-8)
++ Rho - momentum term for averaging (default 0.9)
+
+Source : `ML.Regressions/Adadelta.fs`
+
+### 3. General Iterative Model parameters
+Here you choose how you iterative model behave
++ Set number of iterations
++ Set convergence flags
+
+### API
+
+`gradientDescent`
+
+Parameters :
+
++ model : `GLMModel`
+
+See `Model parameters`
+
+```F#
+// Linear or Logistic
+type GLMBaseModel = {
+    Cost : CostFunc
+    Gradient : GradientFunc
+}
+
+// Softmax
+type GLMSoftmaxModel = {
+    Base : GLMBaseModel
+    ClassesNumber : int
+}
+
+type GLMModel =
+    | GLMBaseModel of GLMBaseModel
+    | GLMSoftmaxModel of GLMSoftmaxModel
+
+```
+
++ prms: `IterativeTrainModelParams`
+
+See `General Iterative Model parameters`
+
+``` f#
+type ConvergeMode =
+    //calculate till number of epochs achieved
+    | ConvergeModeNone
+    //stop calculations when cost function value stops to increase or decrease for 2 consequential iterations
+    | ConvergeModeCostStopsChange
+
+type IterativeTrainModelParams = {
+    EpochNumber : int
+    ConvergeMode : ConvergeMode
+}
+```
+
++ inputs: `float Matrix`
+
+Samples features values
+
++ outputs:  `float Vector`
+
+Samples outputs (labels)
+
++ hyper : GradientDescentHyperParams
+
+See `Particular Gradient Descent Algorithm parameters`
+
+``` f#
+
+type SGDHyperParams = {
+    Alpha: float
+    BatchSize: int
+}
+
+type NAGHyperParams = {
+    Alpha: float
+    BatchSize: int
+    Gamma: float // momentum term
+}
+
+type AdagradHyperParams = {
+    Alpha: float
+    BatchSize: int
+    Epsilon: float
+}
+
+type AdadeltaHyperParams = {
+    BatchSize: int
+    Epsilon: float
+    Rho: float
+}
+
+type GradientDescentHyperParams =
+    | SGDHyperParams of SGDHyperParams
+    | NAGHyperParams of NAGHyperParams
+    | AdagradHyperParams of AdagradHyperParams
+    | AdadeltaHyperParams of AdadeltaHyperParams
+
+
+```
+
+Source : `ML.Regressions/GradientDescent.fs`

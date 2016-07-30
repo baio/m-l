@@ -27,9 +27,9 @@ let softmax() =
         yield "virginica", 2.
 
     })    
-    let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
+    //let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
     //let inputs, outputs = readCSV3 @"..\..\..\..\..\data\iris.csv" true [|0..3|] 4 labelMaps
-    //let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
+    let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
     let inputs = inputs 
     let ouptuts = outputs 
     let outputs = vector outputs 
@@ -38,11 +38,11 @@ let softmax() =
 
     let model : GLMSoftmaxModel = {
         Base = { Cost = softmaxCost; Gradient = softmaxGradient }
-        ClassesNumber = 2
+        ClassesNumber = 10
     }
 
     let prms = {
-        EpochNumber = 400 // Epochs number
+        EpochNumber = 25 // Epochs number
         ConvergeMode = ConvergeModeCostStopsChange
     }
 
@@ -121,6 +121,7 @@ let softmax() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf        
+    
         
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyperParams AdadeltaHyper |> gd
