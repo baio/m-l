@@ -27,7 +27,9 @@ let softmax() =
         yield "virginica", 2.
 
     })    
-    let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2   //readCSV3 @"c:/dev/.data/mnist/iris.csv" true [|0..3|] 4 labelMaps
+    //let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
+    let inputs, outputs = readCSV3 @"c:/dev/.data/mnist/iris.csv" true [|0..3|] 4 labelMaps
+    //let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
     let inputs = inputs 
     let ouptuts = outputs 
     let outputs = vector outputs 
@@ -36,7 +38,7 @@ let softmax() =
 
     let model : GLMSoftmaxModel = {
         Base = { Cost = softmaxCost; Gradient = softmaxGradient }
-        ClassesNumber = 2
+        ClassesNumber = 10
     }
 
     let prms = {
@@ -56,18 +58,18 @@ let softmax() =
 
     let SGDHyper : SGDHyperParams = {
         Alpha = 0.01
-        BatchSize = 5
+        BatchSize = 20
     }
 
     let NAGHyper : NAGHyperParams = {        
         Alpha = 0.01
-        BatchSize = 5
+        BatchSize = 20
         Gamma = 0.5
     }
 
     let AdagradHyper : AdagradHyperParams = {        
         Alpha = 0.01
-        BatchSize = 5
+        BatchSize = 20
         Epsilon = 1E-8
     }
 
@@ -80,16 +82,13 @@ let softmax() =
     let mutable trainResults = [] 
 
     let gd = gradientDescent (GLMSoftmaxModel model) prms inputs outputs 
-    
-    
+           
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams batchHyper |> gd
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )    
     printfn "batch perf : %A" perf
-    
-    
     
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams stochasticHyper |> gd
@@ -98,6 +97,7 @@ let softmax() =
     )    
     printfn "stochastic perf : %A" perf
 
+
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams SGDHyper |> gd
         trainResults <- ("SGD", train)::trainResults
@@ -105,12 +105,14 @@ let softmax() =
     )    
     printfn "miniBatch perf : %A" perf
 
+
     let perf = Benchmark.Run (fun () ->
         let train = NAGHyperParams NAGHyper |> gd
         trainResults <- ("NAG", train)::trainResults
         printfn "NAG result : %A" train
     )    
     printfn "NAG perf : %A" perf
+    
 
     
     let perf = Benchmark.Run (fun () ->
@@ -119,7 +121,7 @@ let softmax() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf        
-    
+        
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyperParams AdadeltaHyper |> gd
         trainResults <- ("Adadelta", train)::trainResults
