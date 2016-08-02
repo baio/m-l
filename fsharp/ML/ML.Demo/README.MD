@@ -198,6 +198,36 @@ Accuracy: 0.966667
 ```
 Looks like `Tensorflow` use in this case simple `SGD`
 
+## Mnist data set
+
+5000 images, batch size = 100
+Alpha = 0.01 for normalized images
+
+Result
+```
+batch result :
+ Theta = seq [-0.003722390691; 0.0; 0.0; 0.0; ...];
+ Errors = 1.180731274;
+ CpuTime = 00:00:23.6562500;
+miniBatch result :
+ Theta = seq [-0.04794816066; 0.0; 0.0; 0.0; ...];
+ Errors = 0.2530574396;
+ CpuTime = 00:03:56.0781250;
+NAG result :
+ Theta = seq [-0.04794816066; 0.0; 0.0; 0.0; ...];
+ Errors = 0.2530574396;
+ CpuTime = 00:04:05.0937500;
+Adagrad result : Diverge
+Adadelta result :
+ Theta = seq [-0.3156164803; 0.0; 0.0; 0.0; ...];
+ Errors =0.02441469104;
+ CpuTime = 00:04:00.6875000;
+```
+
+![softmax](./images/nmist-5000.png)
+
+> accuracy / error / iters
+
 ## Interpretation of results.
 
 1. Batch Gradient

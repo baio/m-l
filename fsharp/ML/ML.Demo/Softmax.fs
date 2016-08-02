@@ -22,8 +22,8 @@ open ML.Statistics.Charting
 let softmax() = 
         
     //let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
-    let inputs, outputs = readCSV @"..\..\..\..\..\data\iris.csv" true [|0..3|] 5
-    //let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
+    //let inputs, outputs = readCSV @"..\..\..\..\..\data\iris.csv" true [|0..3|] 5
+    let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
     let inputs = inputs 
     let ouptuts = outputs 
     let outputs = vector outputs 
@@ -32,11 +32,11 @@ let softmax() =
 
     let model : GLMSoftmaxModel = {
         Base = { Cost = softmaxCost; Gradient = softmaxGradient }
-        ClassesNumber = 3
+        ClassesNumber = 10
     }
 
     let prms = {
-        EpochNumber = 400 // Epochs number
+        EpochNumber = 25 // Epochs number
         ConvergeMode = ConvergeModeCostStopsChange
     }
 
@@ -52,23 +52,23 @@ let softmax() =
 
     let SGDHyper : SGDHyperParams = {
         Alpha = 0.01
-        BatchSize = 20
+        BatchSize = 100
     }
 
     let NAGHyper : NAGHyperParams = {        
         Alpha = 0.01
-        BatchSize = 20
+        BatchSize = 100
         Gamma = 0.5
     }
 
     let AdagradHyper : AdagradHyperParams = {        
         Alpha = 0.01
-        BatchSize = 20
+        BatchSize = 100
         Epsilon = 1E-8
     }
 
     let AdadeltaHyper : AdadeltaHyperParams = {        
-        BatchSize = 20
+        BatchSize = 100
         Epsilon = 1E-8
         Rho = 0.6
     }
@@ -84,12 +84,14 @@ let softmax() =
     )    
     printfn "batch perf : %A" perf
     
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams stochasticHyper |> gd
         trainResults <- ("stochastic", train)::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
+    *)
 
 
     let perf = Benchmark.Run (fun () ->
