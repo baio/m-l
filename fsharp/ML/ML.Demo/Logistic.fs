@@ -75,15 +75,13 @@ let logistic() =
 
     
     let gd = gradientDescent (GLMBaseModel model) prms inputs outputs 
-
-    (*
+    
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams batchHyper |> gd
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )    
     printfn "batch perf : %A" perf
-    *)
         
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams stochasticHyper |> gd
@@ -92,12 +90,13 @@ let logistic() =
     )    
     printfn "stochastic perf : %A" perf
 
-    let res = snd trainResults.Head
-
-    let a = accuracy res.Theta inputs outputs
-    printfn "Accuracy : %A" a
-
     (*
+    let res = snd trainResults.Head
+    let a = accuracy res.Theta inputs outputs
+    
+    printfn "Accuracy : %A" a
+    *)
+
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams SGDHyper |> gd
         trainResults <- ("SGD", train)::trainResults
@@ -125,7 +124,10 @@ let logistic() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
-    *)
+    
+    let res = snd trainResults.Head
+    let a = accuracy res.Theta inputs outputs    
+    printfn "Accuracy : %A" a
             
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])

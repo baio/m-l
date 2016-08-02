@@ -21,9 +21,7 @@ let logisticMSECost _ (x : float Matrix) (y : float Vector) (theta: float Vector
         
 let logisticMSEGradient _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
     //printfn "%A" theta
-    let r = x.Transpose() * (sigmoid(x * theta) - y) / float x.RowCount
-    //printfn "%A" r
-    r
+    x.Transpose() * (sigmoid(x * theta) - y) / float x.RowCount    
 
 let logisticHyp (theta: float Vector) (x: float Vector)  = 
      theta * x |> sigmoidScalar |> System.Math.Round

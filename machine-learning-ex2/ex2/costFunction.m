@@ -25,7 +25,6 @@ sigm = sigmoid(X * theta);
 J = - 1 * ( (y' * log(sigm)) + ((1 - y)' * log(1 - sigm)) ) / m;
 
 grad = (X' * (sigmoid(X * theta) - y)) / m;
-
 % =============================================================
 
 end

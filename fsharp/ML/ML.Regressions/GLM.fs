@@ -41,8 +41,11 @@ let GLMPredict (hypothesis: HypothesisFunc) (theta: float Vector) (mx: float Mat
         mx.Row(i) |> appendOne |> hypothesis theta 
     )
 
-let GLMAccuracy (hypothesis: HypothesisFunc) (theta: float Vector) (x: float Matrix) (y: float Vector) =
-    let actual = GLMPredict hypothesis theta x
-    let correct = actual |> Vector.mapi (fun i a -> if y.[i] = a then 0. else 1.) |> Vector.sum
+let GLMCorrectPercent (y: float Vector) (actual: float Vector) =
+    let correct = actual |> Vector.mapi (fun i a -> if y.[i] = a then 1. else 0.) |> Vector.sum
     correct / float y.Count 
+
+let GLMAccuracy (hypothesis: HypothesisFunc) (theta: float Vector) (x: float Matrix) (y: float Vector) =
+    GLMPredict hypothesis theta x
+    |> GLMCorrectPercent y
     

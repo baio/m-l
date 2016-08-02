@@ -76,4 +76,6 @@ with tf.Session() as sess:
     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-    #print "Accuracy:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels})
+    a = train[:, 0:4]
+    b = np.eye(3)[train[:, 4].astype(np.int)]
+    print "Accuracy:", accuracy.eval({x: a, y: b})

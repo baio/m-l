@@ -98,7 +98,7 @@ let softmax() =
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
-
+    
 
     let perf = Benchmark.Run (fun () ->
         let train = NAGHyperParams NAGHyper |> gd
@@ -107,16 +107,14 @@ let softmax() =
     )    
     printfn "NAG perf : %A" perf
     
-
-    
     let perf = Benchmark.Run (fun () ->
         let train = AdagradHyperParams AdagradHyper |> gd
         trainResults <- ("Adagrad", train)::trainResults
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf        
-    
-        
+
+           
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyperParams AdadeltaHyper |> gd
         trainResults <- ("Adadelta", train)::trainResults
@@ -124,10 +122,11 @@ let softmax() =
     )    
     printfn "Adadelta perf : %A" perf       
     
+    let acc = accuracy model.ClassesNumber inputs outputs
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])
-    |> List.map (fun (label, res) -> (sprintf "%s : %f (%i)" label res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))        
+    |> List.map (fun (label, res) -> (sprintf "%s : %f %f (%i)" label (acc res.Theta)  res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))        
     |> showLines2
 
     

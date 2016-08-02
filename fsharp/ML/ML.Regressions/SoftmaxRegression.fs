@@ -6,13 +6,6 @@ open ML.Core.LinearAlgebra
 
 open GLM
 
-
-let softmaxHyp (thetaShape: ThetaShape) (x: float Vector) (_theta: float Vector) = 
-    let theta = reshape (thetaShape.matrixSize()) _theta
-    let sum = (theta * x).PointwiseExp() |> Vector.sum 
-    let exps = (theta .* x.ToColumnMatrix()).PointwiseExp()
-    (1. / sum) * exps 
-
 let private softmax (x: float Matrix) (theta: float Matrix) =     
 
     // n = number of features
@@ -69,3 +62,17 @@ let softmaxGradient (thetaShape: ThetaShape) (x: float Matrix) (y: float Vector)
 
     x.Transpose() * (oneHot - p) / float x.RowCount |> (*) -1. |> flat
    
+// number of classes, theta, x, y
+let predict (classesNumber: int) (_x: float Matrix) (_theta: float Vector) : float Vector =         
+    let x = _x |> appendOnes
+    let theta = reshape (x.ColumnCount, classesNumber) _theta
+    let s = softmax x theta     
+    s.EnumerateRows()
+    |> Seq.map (fun v -> v.MaximumIndex() |> float)
+    |> DenseVector.ofSeq
+        
+// number of classes, theta, x, y
+let accuracy (classesNumber: int) (x: float Matrix) (y: float Vector) (theta: float Vector) : float = 
+    predict classesNumber x theta
+    |> GLMCorrectPercent y
+    
