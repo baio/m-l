@@ -200,7 +200,7 @@ Looks like `Tensorflow` use in this case simple `SGD`
 
 ## Mnist data set
 
-5000 images, batch size = 100
+5000 images, EpochNumber = 25, batch size = 100
 Alpha = 0.01 for normalized images
 
 Result
