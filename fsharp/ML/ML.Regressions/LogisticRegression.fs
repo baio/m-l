@@ -12,8 +12,6 @@ let sigmoid (z: float Vector) =
 let sigmoidScalar (z: float) = 
     1. / (1. + System.Math.Exp(-1. * z))
 
-let logisticHyp (x: float Vector) (theta: float Vector) = 
-     theta * x |> sigmoidScalar |> System.Math.Round
 
 let logisticMSECost _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
     let s = x *  theta |> sigmoid
@@ -27,8 +25,11 @@ let logisticMSEGradient _ (x : float Matrix) (y : float Vector) (theta: float Ve
     //printfn "%A" r
     r
 
-(*
-let predict : float Vector -> float Vector -> float = GLMPredict logisticHyp
+let logisticHyp (theta: float Vector) (x: float Vector)  = 
+     theta * x |> sigmoidScalar |> System.Math.Round
 
-let predictNorm : NormParams -> float Vector -> float Vector -> float = GLMPredictNorm logisticHyp
-*)
+// theta, x, y
+let predict : float Vector -> float Matrix -> float Vector = GLMPredict logisticHyp
+
+// theta, x, y
+let accuracy : float Vector -> float Matrix -> float Vector -> float = GLMAccuracy logisticHyp

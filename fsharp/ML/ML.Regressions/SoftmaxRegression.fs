@@ -68,6 +68,4 @@ let softmaxGradient (thetaShape: ThetaShape) (x: float Matrix) (y: float Vector)
     let p = softmax x theta 
 
     x.Transpose() * (oneHot - p) / float x.RowCount |> (*) -1. |> flat
-
-    
-
+   

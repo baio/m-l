@@ -33,7 +33,7 @@ let linear() =
 
     let prms = {
         EpochNumber = 5000 // Epochs number
-        ConvergeMode = ConvergeModeNone
+        ConvergeMode = ConvergeModeCostStopsChange
     }
 
     let batchHyper : SGDHyperParams = {
@@ -100,7 +100,7 @@ let linear() =
         printfn "NAG result : %A" train
     )    
     printfn "NAG perf : %A" perf
-
+    
     (*
     let perf = Benchmark.Run (fun () ->
         let train = AdagradHyperParams AdagradHyper |> gd

@@ -14,8 +14,4 @@ let linearMSECost _ (x : float Matrix) (y : float Vector) (theta: float Vector) 
 let linearMSEGradient _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
     x.Transpose() * (x * theta - y) / float x.RowCount
 
-(*
-let predict : float Vector -> float Vector -> float = GLMPredict linearHyp
-
-let predictNorm : NormParams -> float Vector -> float Vector -> float = GLMPredictNorm linearHyp
-*)
+let predict : float Vector -> float Matrix -> float Vector = GLMPredict linearHyp

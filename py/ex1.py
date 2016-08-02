@@ -14,7 +14,7 @@ learning_rate = 0.01
 training_epochs = 10000
 display_step = 50
 
-DATA_PATH = '../machine-learning-ex1/ex1/ex1data1.txt'
+DATA_PATH = '../machine-learning-ex1/ex1/ex1data1.csv'
 
 my_data = numpy.genfromtxt(DATA_PATH, delimiter=',').astype(numpy.float32)
 

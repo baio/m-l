@@ -8,8 +8,8 @@ open Softmax
 [<EntryPoint>]
 let main argv = 
     
-    //logistic() |> ignore
-    softmax() |> ignore
+    logistic() |> ignore
+    //softmax() |> ignore
     //linear() |> ignore
     
 

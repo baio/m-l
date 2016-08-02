@@ -36,15 +36,13 @@ type GLMModel =
     | GLMSoftmaxModel of GLMSoftmaxModel
 
 
+let GLMPredict (hypothesis: HypothesisFunc) (theta: float Vector) (mx: float Matrix) =     
+    DenseVector.init mx.RowCount (fun i -> 
+        mx.Row(i) |> appendOne |> hypothesis theta 
+    )
 
-
-
-
-(*    
-let GLMPredict (hypothesis: HypothesisFunc) (theta: float Vector) (x: float Vector) = 
-    hypothesis (x |> vecCons 1.) theta
-
-let GLMPredictNorm (hypothesis: HypothesisFunc) (normPrms: NormParams) (theta: float Vector) (x: float Vector) =     
-    (x - normPrms.Mu) ./ normPrms.Std |> GLMPredict hypothesis theta
-*)
-
+let GLMAccuracy (hypothesis: HypothesisFunc) (theta: float Vector) (x: float Matrix) (y: float Vector) =
+    let actual = GLMPredict hypothesis theta x
+    let correct = actual |> Vector.mapi (fun i a -> if y.[i] = a then 0. else 1.) |> Vector.sum
+    correct / float y.Count 
+    
