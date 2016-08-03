@@ -31,3 +31,8 @@ type DGDParams = {
     | BatchSamplesIndexesProvidedByCoordinator
     | BatchSamplesStochastic
     | BatchSamplesServer
+
+
+type BatchesMessage =
+    | BatchesStart of DGDParams
+    | BatchCompleted

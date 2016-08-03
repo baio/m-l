@@ -14,40 +14,52 @@ open BatchActor
 open Types
 open SamplesStorage
      
-let BatchCoordinatorActor (mailbox: Actor<DGDParams>) = 
+let BatchCoordinatorActor (mailbox: Actor<BatchesMessage>) = 
     
-    // TODO : Number of children + broadcast                   
-    let routerOpt = SpawnOption.Router ( Akka.Routing.FromConfig.Instance )
     let supervisionOpt = SpawnOption.SupervisorStrategy (Strategy.OneForOne(fun _ ->
             Directive.Resume
     ))
 
-    let rec runEpoch() = 
+    let rec runEpoch (cnt: int) = 
         actor {
     
             let! msg = mailbox.Receive()
 
-            let batchActor = spawne mailbox "BatchActor" <@ BatchActor @> [routerOpt; supervisionOpt]
-           
-            match msg.BatchSamples with
-            | BatchSamplesProvidedByCoordinator ->
-                let samples = readSamples msg.SamplesStorage None
-                let batch = {
-                    Model = msg.Model
-                    BatchSize = msg.BatchSize
-                    HyperParams = msg.HyperParams
-                    Samples = BatchSamples(samples)
-                }
-                batchActor <! batch
-                return !waitEpochComplete()
-            | _ -> failwith "not implemeted"            
+            match msg with 
+            | BatchesStart prms ->
 
-            return! runEpoch()                
+                // TODO : Number of children + broadcast                   
+                let routerOpt = SpawnOption.Router ( Akka.Routing.FromConfig.Instance )
+                
+                let batchActor = spawne mailbox "BatchActor" <@ BatchActor @> [routerOpt; supervisionOpt]
+           
+                match prms.BatchSamples with
+                | BatchSamplesProvidedByCoordinator ->
+                    let samples = readSamples prms.SamplesStorage None
+                    let batch = {
+                        Model = prms.Model
+                        BatchSize = prms.BatchSize
+                        HyperParams = prms.HyperParams
+                        Samples = BatchSamples(samples)
+                    }
+                    batchActor <! batch
+                    return! waitEpochComplete cnt prms
+                | _ -> failwith "not implemeted"            
+
+            | _ ->
+                return! runEpoch(cnt + 1)                
         }
-    and waitEpochComplete () =         
+    and waitEpochComplete (cnt: int) (prms) =         
         actor {    
             let! msg = mailbox.Receive()
-            return! waitEpochComplete()
+            match msg with 
+            | BatchCompleted -> 
+                if cnt < prms.EpochNumber then
+                    mailbox.Self <! BatchesStart(prms)
+                    return! runEpoch cnt
+                // Number of epoch achieved
+            | _ ->                        
+                return! waitEpochComplete cnt prms
          }
 
-    runEpoch()
+    runEpoch 0

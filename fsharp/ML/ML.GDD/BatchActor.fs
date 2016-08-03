@@ -27,6 +27,7 @@ let getSamples (samples: BatchSamples) =
 let BatchActor (mailbox: Actor<BatchMessage>) = 
                    
     let rec next() = 
+        
         actor {
     
             let! msg = mailbox.Receive()
