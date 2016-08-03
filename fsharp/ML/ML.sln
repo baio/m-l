@@ -11,6 +11,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ML.Statistics", "ML.Statist
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ML.Core", "ML.Core\ML.Core.fsproj", "{C5FA82AD-173B-4B5C-940B-E6F66819F0B6}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ML.DGD", "ML.GDD\ML.DGD.fsproj", "{685714B3-718B-4DA5-98EF-CC2FDB432A5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C5FA82AD-173B-4B5C-940B-E6F66819F0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5FA82AD-173B-4B5C-940B-E6F66819F0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5FA82AD-173B-4B5C-940B-E6F66819F0B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{685714B3-718B-4DA5-98EF-CC2FDB432A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{685714B3-718B-4DA5-98EF-CC2FDB432A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{685714B3-718B-4DA5-98EF-CC2FDB432A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{685714B3-718B-4DA5-98EF-CC2FDB432A5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
