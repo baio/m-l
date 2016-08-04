@@ -11,7 +11,15 @@ type SGDHyperParams = {
     BatchSize: int
 }
 
-let calcGradientBatch<'iter, 'hyper> (batchSize: int) (prms: CalcGradientParams<'hyper>) (iter: GradientDescentIter<'iter>) (grad: ClacGradientFunc<'iter, 'hyper>) =
+type IterParamsUpdateFunc<'iter> = GradientDescentIter<'iter> -> GradientDescentIter<'iter>
+
+let calcGradientBatch<'iter, 'hyper> 
+    (iterParamsUpdate: IterParamsUpdateFunc<'iter>)
+    (batchSize: int)
+    (prms: CalcGradientParams<'hyper>)
+    (iter: GradientDescentIter<'iter>) 
+    (grad: ClacGradientFunc<'iter, 'hyper>) 
+    =
     let x, y = permuteSamples prms.X prms.Y
 
     let mutable iter = iter
@@ -20,20 +28,28 @@ let calcGradientBatch<'iter, 'hyper> (batchSize: int) (prms: CalcGradientParams<
         (spliceRows start len x), (spliceVector start len y)
     )
     |> Seq.iter (fun (sx, sy) ->
-        iter <- grad prms iter        
+        iter <- iterParamsUpdate(grad prms iter)
     )
     iter
 
-let private calcGradient (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =    
+let private calcGradient 
+    (prms: CalcGradientParams<SGDHyperParams>) 
+    (iter: GradientDescentIter<Unit>) 
+    =    
     let theta = iter.Theta
     let grad = iter.Theta |> prms.Gradient prms.X prms.Y
     let updatedTheta = theta - grad * prms.HyperParams.Alpha
     { Theta = updatedTheta ; Params = () }
     
-let private calcGradient2 (prms: CalcGradientParams<SGDHyperParams>) (iter: GradientDescentIter<Unit>) =
-    calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
+let private calcGradient2 
+    (iterParamsUpdate: IterParamsUpdateFunc<Unit>)
+    (prms: CalcGradientParams<SGDHyperParams>) 
+    (iter: GradientDescentIter<Unit>) 
+    =
+    calcGradientBatch iterParamsUpdate prms.HyperParams.BatchSize prms iter calcGradient
     
-let SGD
+let SGD2
+    (iterParamsUpdate: IterParamsUpdateFunc<Unit>)
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : SGDHyperParams)
@@ -41,4 +57,6 @@ let SGD
     (y : float Vector) 
     =         
     let shape, theta, baseModel = getModelShapeAndTheta model x.ColumnCount    
-    GD<Unit, SGDHyperParams> calcGradient2 shape { Theta = theta ; Params = () } baseModel prms hyperPrms x y              
+    GD<Unit, SGDHyperParams> (calcGradient2 iterParamsUpdate) shape { Theta = theta ; Params = () } baseModel prms hyperPrms x y              
+
+let SGD : GradientDescentFunc<SGDHyperParams> = SGD2 (fun p -> p)

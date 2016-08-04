@@ -35,7 +35,7 @@ let logistic() =
 
     let prms = {
         EpochNumber = 400 // Epochs number
-        ConvergeMode = ConvergeModeNone
+        ConvergeMode = ConvergeModeCostStopsChange
     }       
 
     let batchHyper : SGDHyperParams = {

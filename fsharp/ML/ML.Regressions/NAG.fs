@@ -28,10 +28,14 @@ let calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDesce
     
     { Theta  = theta - updatedMomentum; Params = { Momentum = momentum } }
     
-let private calcGradient2 (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDescentIter<NAGIter>) =
-    calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
+let private calcGradient2 
+    (iterParamsUpdate: IterParamsUpdateFunc<NAGIter>)
+    (prms: CalcGradientParams<NAGHyperParams>) 
+    (iter: GradientDescentIter<NAGIter>) =
+    calcGradientBatch iterParamsUpdate prms.HyperParams.BatchSize prms iter calcGradient
     
-let NAG 
+let NAG2
+    (iterParamsUpdate: IterParamsUpdateFunc<'iter>) 
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : NAGHyperParams)
@@ -39,5 +43,6 @@ let NAG
     (y : float Vector) 
     =         
     let shape, theta, baseModel = getModelShapeAndTheta model x.ColumnCount    
-    GD<NAGIter, NAGHyperParams> calcGradient2 shape { Theta = theta ; Params = { Momentum = theta } } baseModel prms hyperPrms x y              
+    GD<NAGIter, NAGHyperParams> (calcGradient2 iterParamsUpdate) shape { Theta = theta ; Params = { Momentum = theta } } baseModel prms hyperPrms x y              
 
+let NAG : GradientDescentFunc<NAGHyperParams> = NAG2 (fun p -> p)

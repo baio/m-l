@@ -43,10 +43,15 @@ let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: 
 
     { Theta  = updatedTheta; Params = { EG = updatedEG; ET = updatedET } }
     
-let private calcGradient2 (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: GradientDescentIter<AdadeltaIter>) =
-    calcGradientBatch prms.HyperParams.BatchSize prms iter calcGradient
+let private calcGradient2
+    (iterParamsUpdate: IterParamsUpdateFunc<AdadeltaIter>)
+    (prms: CalcGradientParams<AdadeltaHyperParams>) 
+    (iter: GradientDescentIter<AdadeltaIter>) 
+    =
+    calcGradientBatch iterParamsUpdate prms.HyperParams.BatchSize prms iter calcGradient
     
-let adadelta
+let adadelta2
+    (iterParamsUpdate: IterParamsUpdateFunc<AdadeltaIter>)
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : AdadeltaHyperParams)
@@ -54,4 +59,6 @@ let adadelta
     (y : float Vector) 
     =
     let shape, theta, baseModel = getModelShapeAndTheta model x.ColumnCount       
-    GD<AdadeltaIter, AdadeltaHyperParams> calcGradient2 shape {Theta = theta; Params = { EG = theta; ET = theta }} baseModel prms hyperPrms x y              
+    GD<AdadeltaIter, AdadeltaHyperParams> (calcGradient2 iterParamsUpdate) shape {Theta = theta; Params = { EG = theta; ET = theta }} baseModel prms hyperPrms x y              
+
+let adadelta : GradientDescentFunc<AdadeltaHyperParams> = adadelta2 (fun p -> p)
