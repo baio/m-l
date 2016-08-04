@@ -16,14 +16,21 @@ type GradientDescentHyperParams =
     | AdagradHyperParams of AdagradHyperParams
     | AdadeltaHyperParams of AdadeltaHyperParams 
 
-let gradientDescent (model: GLMModel) (prms: IterativeTrainModelParams) (inputs: float Matrix) (outputs: float Vector) (hyper: GradientDescentHyperParams) =
+
+let gg (f: obj) : obj = f
+
+let gradientDescent2 (iterParamsUpdate: IterParamsUpdateFunc) (model: GLMModel) (prms: IterativeTrainModelParams) (inputs: float Matrix) (outputs: float Vector) (hyper: GradientDescentHyperParams) =
+
     match hyper with
-    | SGDHyperParams hp ->         
-        SGD model prms hp inputs outputs        
+    | SGDHyperParams hp ->                           
+        SGD2 iterParamsUpdate model prms hp inputs outputs                
     | NAGHyperParams hp -> 
-        NAG model prms hp inputs outputs        
+        NAG2 iterParamsUpdate model prms hp inputs outputs        
     | AdagradHyperParams hp -> 
-        adagrad model prms hp inputs outputs        
+        adagrad2 iterParamsUpdate model prms hp inputs outputs        
     | AdadeltaHyperParams hp -> 
-        adadelta model prms hp inputs outputs        
+        adadelta2 iterParamsUpdate model prms hp inputs outputs        
+
+let gradientDescent : GLMModel -> IterativeTrainModelParams -> float Matrix -> float Vector -> GradientDescentHyperParams ->  ModelTrainResult =
+    gradientDescent2 (fun f -> f)
 

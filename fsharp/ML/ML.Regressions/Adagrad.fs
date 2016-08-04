@@ -39,7 +39,7 @@ let private calcGradient (prms: CalcGradientParams<AdagradHyperParams>) (iter: G
     { Theta  = updatedTheta ; Params = { G = updatedG } }
     
 let private calcGradient2 
-    (iterParamsUpdate: IterParamsUpdateFunc<AdagradIter>)
+    (iterParamsUpdate)
     (prms: CalcGradientParams<AdagradHyperParams>) 
     (iter: GradientDescentIter<AdagradIter>) 
     =
@@ -47,7 +47,7 @@ let private calcGradient2
 
     
 let adagrad2
-    (iterParamsUpdate: IterParamsUpdateFunc<AdagradIter>)
+    (iterParamsUpdate)
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : AdagradHyperParams)

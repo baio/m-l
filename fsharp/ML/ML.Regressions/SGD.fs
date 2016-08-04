@@ -11,10 +11,10 @@ type SGDHyperParams = {
     BatchSize: int
 }
 
-type IterParamsUpdateFunc<'iter> = GradientDescentIter<'iter> -> GradientDescentIter<'iter>
+type IterParamsUpdateFunc = obj -> obj
 
 let calcGradientBatch<'iter, 'hyper> 
-    (iterParamsUpdate: IterParamsUpdateFunc<'iter>)
+    (iterParamsUpdate: IterParamsUpdateFunc)
     (batchSize: int)
     (prms: CalcGradientParams<'hyper>)
     (iter: GradientDescentIter<'iter>) 
@@ -28,7 +28,7 @@ let calcGradientBatch<'iter, 'hyper>
         (spliceRows start len x), (spliceVector start len y)
     )
     |> Seq.iter (fun (sx, sy) ->
-        iter <- iterParamsUpdate(grad prms iter)
+        iter <- (iterParamsUpdate(grad prms iter) :?> GradientDescentIter<'iter>)
     )
     iter
 
@@ -42,14 +42,14 @@ let private calcGradient
     { Theta = updatedTheta ; Params = () }
     
 let private calcGradient2 
-    (iterParamsUpdate: IterParamsUpdateFunc<Unit>)
+    (iterParamsUpdate)
     (prms: CalcGradientParams<SGDHyperParams>) 
     (iter: GradientDescentIter<Unit>) 
     =
     calcGradientBatch iterParamsUpdate prms.HyperParams.BatchSize prms iter calcGradient
     
 let SGD2
-    (iterParamsUpdate: IterParamsUpdateFunc<Unit>)
+    (iterParamsUpdate)
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : SGDHyperParams)

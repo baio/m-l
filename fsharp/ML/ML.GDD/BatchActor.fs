@@ -9,6 +9,8 @@ open ML.Regressions.GradientDescent
 open ML.Regressions.GD
 open ML.Regressions.GLM
 
+open ML.DGD.IterParamsServerActor
+
 open Types
 
 type BatchMessage = {
@@ -24,8 +26,12 @@ let getSamples (samples: BatchSamples) =
     | _ -> failwith "not implemented"
 
      
-let BatchActor (mailbox: Actor<BatchMessage>) = 
-                   
+let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) = 
+
+    let updateIterParams (prms : obj) =
+        let task = async { return! iterParamsServer <? SetIterParams(prms) } 
+        Async.RunSynchronously(task)
+                              
     let rec next() = 
         
         actor {
@@ -35,8 +41,8 @@ let BatchActor (mailbox: Actor<BatchMessage>) =
             let _x, _y = getSamples msg.Samples
             let x = _x |> DenseMatrix.ofColumnList
             let y = _y |> DenseVector.ofList
-           
-            let result = gradientDescent msg.Model { EpochNumber = 1 ; ConvergeMode = ConvergeModeNone } x y msg.HyperParams
+                       
+            let result = gradientDescent2 updateIterParams msg.Model { EpochNumber = 1 ; ConvergeMode = ConvergeModeNone } x y msg.HyperParams
 
             return! next()                
         }

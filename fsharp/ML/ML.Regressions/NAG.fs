@@ -29,13 +29,13 @@ let calcGradient (prms: CalcGradientParams<NAGHyperParams>) (iter: GradientDesce
     { Theta  = theta - updatedMomentum; Params = { Momentum = momentum } }
     
 let private calcGradient2 
-    (iterParamsUpdate: IterParamsUpdateFunc<NAGIter>)
+    (iterParamsUpdate)
     (prms: CalcGradientParams<NAGHyperParams>) 
     (iter: GradientDescentIter<NAGIter>) =
     calcGradientBatch iterParamsUpdate prms.HyperParams.BatchSize prms iter calcGradient
     
 let NAG2
-    (iterParamsUpdate: IterParamsUpdateFunc<'iter>) 
+    (iterParamsUpdate) 
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : NAGHyperParams)

@@ -14,7 +14,7 @@ let DGD (prms : DGDParams) =
     let system = System.create "ML.DGD" (Configuration.load())
     
     let iterParamsServer = spawn system "IterParamsServerActor" (IterParamsServerActor)
-    let batchCoordinator = spawn system "BatchCoordinator" (BatchCoordinatorActor)    
+    let batchCoordinator = spawn system "BatchCoordinator" (BatchCoordinatorActor iterParamsServer)    
 
     batchCoordinator <! prms
         

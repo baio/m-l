@@ -14,7 +14,7 @@ open BatchActor
 open Types
 open SamplesStorage
      
-let BatchCoordinatorActor (mailbox: Actor<BatchesMessage>) = 
+let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesMessage>) = 
     
     let supervisionOpt = SpawnOption.SupervisorStrategy (Strategy.OneForOne(fun _ ->
             Directive.Resume
@@ -31,7 +31,7 @@ let BatchCoordinatorActor (mailbox: Actor<BatchesMessage>) =
                 // TODO : Number of children + broadcast                   
                 let routerOpt = SpawnOption.Router ( Akka.Routing.FromConfig.Instance )
                 
-                let batchActor = spawne mailbox "BatchActor" <@ BatchActor @> [routerOpt; supervisionOpt]
+                let batchActor = spawne mailbox "BatchActor" <@ BatchActor iterParamsServer @> [routerOpt; supervisionOpt]
            
                 match prms.BatchSamples with
                 | BatchSamplesProvidedByCoordinator ->

@@ -13,9 +13,7 @@ open ML.Core.LinearAlgebra
 open Types
 
 type ThetaServerMessage<'a> = 
-    | InitIterParams of GradientDescentIter<'a>
-    | SetIterParams of GradientDescentIter<'a>
-    | GetIterParams 
+    | SetIterParams of obj
      
 let IterParamsServerActor (mailbox: Actor<ThetaServerMessage<'a>>) = 
 
@@ -27,13 +25,13 @@ let IterParamsServerActor (mailbox: Actor<ThetaServerMessage<'a>>) =
             let! msg = mailbox.Receive()
 
             match msg with 
-            | InitIterParams iter ->
-                latestIterParam <- Some(iter)
-            | SetIterParams iter ->
-                mailbox.Sender() <! latestIterParam.Value
-                latestIterParam <- Some(iter)
-            | GetIterParams ->
-                mailbox.Sender() <! latestIterParam.Value
+            | SetIterParams iter ->                
+                match latestIterParam with
+                | Some v ->
+                    mailbox.Sender() <! v
+                | None ->
+                    mailbox.Sender() <! iter
+                    latestIterParam <- Some(iter)
                 
             return! next()                
         }

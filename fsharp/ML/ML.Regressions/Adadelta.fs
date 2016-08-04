@@ -44,14 +44,14 @@ let private calcGradient (prms: CalcGradientParams<AdadeltaHyperParams>) (iter: 
     { Theta  = updatedTheta; Params = { EG = updatedEG; ET = updatedET } }
     
 let private calcGradient2
-    (iterParamsUpdate: IterParamsUpdateFunc<AdadeltaIter>)
+    iterParamsUpdate
     (prms: CalcGradientParams<AdadeltaHyperParams>) 
     (iter: GradientDescentIter<AdadeltaIter>) 
     =
     calcGradientBatch iterParamsUpdate prms.HyperParams.BatchSize prms iter calcGradient
     
 let adadelta2
-    (iterParamsUpdate: IterParamsUpdateFunc<AdadeltaIter>)
+    iterParamsUpdate
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : AdadeltaHyperParams)
