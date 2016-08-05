@@ -28,6 +28,7 @@ let getSamples (samples: BatchSamples) =
      
 let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) = 
 
+    
     let updateIterParams (prms : obj) =
         let task = async { return! iterParamsServer <? SetIterParams(prms) } 
         Async.RunSynchronously(task)
@@ -42,7 +43,7 @@ let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) =
             let x = _x |> DenseMatrix.ofColumnList
             let y = _y |> DenseVector.ofList
                        
-            let result = gradientDescent2 updateIterParams msg.Model { EpochNumber = 1 ; ConvergeMode = ConvergeModeNone } x y msg.HyperParams
+            //let result = gradientDescent2 updateIterParams msg.Model { EpochNumber = 1 ; ConvergeMode = ConvergeModeNone } x y msg.HyperParams
 
             return! next()                
         }

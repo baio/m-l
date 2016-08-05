@@ -16,21 +16,83 @@ type GradientDescentHyperParams =
     | AdagradHyperParams of AdagradHyperParams
     | AdadeltaHyperParams of AdadeltaHyperParams 
 
+type GradientDescentIter' = 
+    | SGDGradientDescentIter of GradientDescentIter<Unit>
+    | NAGGradientDescentIter of GradientDescentIter<NAGIter>
+    | AdagradGradientDescentIter of GradientDescentIter<AdagradIter>
+    | AdadeltaGradientDescentIter of GradientDescentIter<AdadeltaIter>
 
-let gg (f: obj) : obj = f
+type IterParamsProvider' = 
+    | SGDIterParamsProvider of IterParamsProvider<Unit>
+    | NAGIterParamsProvider of IterParamsProvider<NAGIter>
+    | AdagradIterParamsProvider of IterParamsProvider<AdagradIter>
+    | AdadeltaIterParamsProvider of IterParamsProvider<AdadeltaIter>
 
-let gradientDescent2 (iterParamsUpdate: IterParamsUpdateFunc) (model: GLMModel) (prms: IterativeTrainModelParams) (inputs: float Matrix) (outputs: float Vector) (hyper: GradientDescentHyperParams) =
+let getInitialIterParams model featuresCount hyper =    
+    let _, theta, _ = getModelShapeAndTheta model featuresCount    
 
     match hyper with
     | SGDHyperParams hp ->                           
-        SGD2 iterParamsUpdate model prms hp inputs outputs                
+        SGDGradientDescentIter({ Theta = theta; Params = () })
     | NAGHyperParams hp -> 
-        NAG2 iterParamsUpdate model prms hp inputs outputs        
+        NAGGradientDescentIter({ Theta = theta ; Params = { Momentum = theta } })
     | AdagradHyperParams hp -> 
-        adagrad2 iterParamsUpdate model prms hp inputs outputs        
+        AdagradGradientDescentIter({Theta = theta; Params = { G = theta }})
     | AdadeltaHyperParams hp -> 
-        adadelta2 iterParamsUpdate model prms hp inputs outputs        
+        AdadeltaGradientDescentIter({ Theta  = theta; Params = { EG = theta; ET = theta } })
 
-let gradientDescent : GLMModel -> IterativeTrainModelParams -> float Matrix -> float Vector -> GradientDescentHyperParams ->  ModelTrainResult =
-    gradientDescent2 (fun f -> f)
+let getIterParamsProvider model featuresCount hyper  =    
+    match getInitialIterParams model featuresCount hyper with
+    | SGDGradientDescentIter iter ->
+        SGDIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
+    | NAGGradientDescentIter iter ->
+        NAGIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
+    | AdagradGradientDescentIter iter ->
+        AdagradIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
+    | AdadeltaGradientDescentIter iter ->
+        AdadeltaIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
+   
+let gradientDescent2 
+    (iterParamsProvider) 
+    (model: GLMModel) 
+    (prms: IterativeTrainModelParams) 
+    (inputs: float Matrix) 
+    (outputs: float Vector) 
+    (hyper: GradientDescentHyperParams) =
+
+    let provider = getIterParamsProvider model inputs.ColumnCount hyper
+
+    match hyper with
+    | SGDHyperParams hp ->                           
+        match iterParamsProvider with 
+        | SGDIterParamsProvider pr ->  
+            SGD pr model prms hp inputs outputs                
+        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+    | NAGHyperParams hp ->                           
+        match iterParamsProvider with 
+        | NAGIterParamsProvider pr ->  
+            NAG pr model prms hp inputs outputs                
+        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+    | AdagradHyperParams hp ->                           
+        match iterParamsProvider with 
+        | AdagradIterParamsProvider pr ->  
+            adagrad pr model prms hp inputs outputs                
+        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+    | AdadeltaHyperParams hp ->                           
+        match iterParamsProvider with 
+        | AdadeltaIterParamsProvider pr ->  
+            adadelta pr model prms hp inputs outputs                
+        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+
+
+let gradientDescent     
+    (model: GLMModel) 
+    (prms: IterativeTrainModelParams) 
+    (inputs: float Matrix) 
+    (outputs: float Vector) 
+    (hyper: GradientDescentHyperParams) =
+        let pr = getIterParamsProvider model inputs.ColumnCount hyper
+        gradientDescent2 pr model prms inputs outputs hyper
+
+
 

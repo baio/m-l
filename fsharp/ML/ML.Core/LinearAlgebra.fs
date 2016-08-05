@@ -10,7 +10,7 @@
     let spliceVector start count (vr: _ Vector) = 
         vr.SubVector(start, count)
 
-    let zeros cnt = DenseVector.zero cnt
+    let zeros cnt = DenseVector.zero<float> cnt
 
     let zerosMatrix (rows, cols) = 
         matrix(List.init rows (fun r -> List.init cols (fun _ -> 0.)))

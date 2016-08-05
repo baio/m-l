@@ -50,15 +50,17 @@ let private calcGradient2
     =
     calcGradientBatch iterParamsUpdate prms.HyperParams.BatchSize prms iter calcGradient
     
-let adadelta2
-    iterParamsUpdate
+let adadelta
+    (iterParamsProvider: IterParamsProvider<AdadeltaIter>)
     (model: GLMModel)
     (prms: IterativeTrainModelParams)    
     (hyperPrms : AdadeltaHyperParams)
     (x : float Matrix)
     (y : float Vector) 
     =
-    let shape, theta, baseModel = getModelShapeAndTheta model x.ColumnCount       
-    GD<AdadeltaIter, AdadeltaHyperParams> (calcGradient2 iterParamsUpdate) shape {Theta = theta; Params = { EG = theta; ET = theta }} baseModel prms hyperPrms x y              
+    let shape, _, baseModel = getModelShapeAndTheta model x.ColumnCount   
+    
+   
+    GD<AdadeltaIter, AdadeltaHyperParams> (calcGradient2 iterParamsProvider.update) shape (iterParamsProvider.initial()) baseModel prms hyperPrms x y              
 
-let adadelta : GradientDescentFunc<AdadeltaHyperParams> = adadelta2 (fun p -> p)
+//{Theta = theta; Params = { EG = theta; ET = theta }}

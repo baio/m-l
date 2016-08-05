@@ -16,10 +16,16 @@ type IterativeTrainModelParams = {
     ConvergeMode : ConvergeMode
 }
 
-type GradientDescentIter<'iter> = {
-    Theta: float Vector
-    Params : 'iter
-}
+type IGradientDescentIter =    
+    abstract member Theta : float Vector
+
+type GradientDescentIter<'iter> = 
+    {   
+        Theta: float Vector
+        Params : 'iter 
+    }         
+    interface IGradientDescentIter with
+        member this.Theta = this.Theta
 
 type CalcGradientParams<'hyper> = {
     HyperParams : 'hyper
@@ -28,6 +34,19 @@ type CalcGradientParams<'hyper> = {
     Gradient: float Matrix -> float Vector -> float Vector -> float Vector
 }
 
+type IterParamsUpdate<'iter> = GradientDescentIter<'iter> -> GradientDescentIter<'iter>
+
+type IterParamsProvider<'iter> = {
+    initial: Unit -> GradientDescentIter<'iter>
+    update: GradientDescentIter<'iter> -> GradientDescentIter<'iter>
+} 
+
+let inline createIterParamsProvider (initIter: GradientDescentIter<'iter>) = 
+    {
+        initial = (fun () -> initIter)
+        update = (fun (iter) -> iter)         
+    }
+    
 type ModelTrainResultType = Converged | EpochCountAchieved | NaN
 type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: float Vector; Errors: float list }
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
