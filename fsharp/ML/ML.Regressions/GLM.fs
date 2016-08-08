@@ -4,6 +4,7 @@ open ML.Core.Utils
 open ML.Core.LinearAlgebra
 open MathNet.Numerics.LinearAlgebra
 
+
 type ThetaShape = 
     | ThetaShapeVector
     | ThetaShapeMatrix of int * int
