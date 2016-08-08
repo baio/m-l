@@ -2,6 +2,7 @@
 
 open ML.Regressions.GLM
 open ML.Regressions.GradientDescent
+open ML.Regressions.GD
 open SamplesStorage
      
 type BatchSamples = 
@@ -32,7 +33,7 @@ type DGDParams = {
     | BatchSamplesStochastic
     | BatchSamplesServer
 
-
 type BatchesMessage =
     | BatchesStart of DGDParams
-    | BatchCompleted
+    | BatchesCompleted of ModelTrainResult
+    | BatchCompleted 

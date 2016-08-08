@@ -16,16 +16,11 @@ type IterativeTrainModelParams = {
     ConvergeMode : ConvergeMode
 }
 
-type IGradientDescentIter =    
-    abstract member Theta : float Vector
-
 type GradientDescentIter<'iter> = 
     {   
         Theta: float Vector
         Params : 'iter 
     }         
-    interface IGradientDescentIter with
-        member this.Theta = this.Theta
 
 type CalcGradientParams<'hyper> = {
     HyperParams : 'hyper

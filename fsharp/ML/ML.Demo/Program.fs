@@ -4,6 +4,7 @@
 open Linear
 open Logistic
 open Softmax
+open DLinear
 
 [<EntryPoint>]
 let main argv = 
@@ -12,8 +13,8 @@ let main argv =
     MathNet.Numerics.Control.UseNativeMKL()        
 
     //logistic() |> ignore
-    softmax() |> ignore
-    //linear() |> ignore
+    //softmax() |> ignore
+    DLinear() |> ignore
     
 
     System.Console.ReadLine() |> ignore

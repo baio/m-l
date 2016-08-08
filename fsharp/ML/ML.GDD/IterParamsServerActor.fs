@@ -12,8 +12,10 @@ open ML.Core.LinearAlgebra
 
 open Types
 
+//GradientDescentIter
 type ThetaServerMessage<'a> = 
-    | SetIterParams of obj
+    //only set iter params if they still not initialzied
+    | SetIterParams of 'a
      
 let IterParamsServerActor (mailbox: Actor<ThetaServerMessage<'a>>) = 
 
