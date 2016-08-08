@@ -18,7 +18,7 @@ open SamplesStorage
 let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesMessage>) = 
     
     let supervisionOpt = SpawnOption.SupervisorStrategy (Strategy.OneForOne(fun _ ->
-            Directive.Resume
+            Directive.Escalate
     ))
 
     let rec runEpoch (cnt: int) = 
@@ -59,6 +59,7 @@ let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesM
                     mailbox.Self <! BatchesStart(prms)
                     return! runEpoch cnt
                 // Number of epoch achieved
+                mailbox.Context.System.EventStream.Publish msg
             | _ ->                        
                 return! waitEpochComplete cnt prms
          }

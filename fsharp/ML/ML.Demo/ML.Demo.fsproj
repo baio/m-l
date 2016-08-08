@@ -65,6 +65,7 @@
     <None Include="App.config" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
+    <Content Include="Google.DataTable.Net.Wrapper.XML" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ML.Core\ML.Core.fsproj">
@@ -87,7 +88,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.DataTable.Net.Wrapper">
-      <HintPath>..\packages\Google.DataTable.Net.Wrapper.1.0.0\lib\Google.DataTable.Net.Wrapper.dll</HintPath>
+      <HintPath>..\packages\Google.DataTable.Net.Wrapper.3.1.2.0\lib\Google.DataTable.Net.Wrapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MathNet.Numerics">
@@ -100,7 +101,7 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.3.5.8\lib\35\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PerfUtil">

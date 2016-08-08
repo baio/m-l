@@ -19,10 +19,10 @@ type SamplesStorage = {
     Label : int
 }
 
-let readSamplesFile (path: string) (indexes: int list option) : string seq =
-    use sr = new System.IO.StreamReader (path)
+let readSamplesFile (path: string) (indexes: int list option) : string seq =    
     let mutable i = 0
     seq {
+        use sr = new System.IO.StreamReader (path)
         while not sr.EndOfStream do
             let l = sr.ReadLine()
             match indexes with

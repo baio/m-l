@@ -17,10 +17,8 @@ let DGD (prms : DGDParams) =
     
     let iterParamsServer = spawn system "IterParamsServerActor" (IterParamsServerActor)
     let batchCoordinator = spawn system "BatchCoordinatorActor" (BatchCoordinatorActor iterParamsServer)    
-
-    batchCoordinator <! prms
-
-    let mutable dgdRes = { ResultType = NaN; Theta = zeros(0); Errors = [] }
+   
+    let mutable dgdRes = { ResultType = NaN; Theta = zeros(1); Errors = [] }
 
     let mainActor = spawn system "main" ( actorOf2( fun mailbox msg ->
                     
@@ -31,6 +29,8 @@ let DGD (prms : DGDParams) =
     ) )
 
     system.EventStream.Subscribe(mainActor, typedefof<BatchesMessage>) |> ignore
+
+    batchCoordinator <! BatchesStart(prms)
         
     system.WhenTerminated.Wait()
 
