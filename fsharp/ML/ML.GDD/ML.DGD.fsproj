@@ -59,6 +59,7 @@
     <Compile Include="BatchCoordinatorActor.fs" />
     <Compile Include="DistributedGradientDescent.fs" />
     <Content Include="packages.config" />
+    <None Include="test.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Akka">

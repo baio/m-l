@@ -16,41 +16,30 @@ type GradientDescentHyperParams =
     | AdagradHyperParams of AdagradHyperParams
     | AdadeltaHyperParams of AdadeltaHyperParams 
 
-type GradientDescentIter' = 
-    | SGDGradientDescentIter of GradientDescentIter<Unit>
-    | NAGGradientDescentIter of GradientDescentIter<NAGIter>
-    | AdagradGradientDescentIter of GradientDescentIter<AdagradIter>
-    | AdadeltaGradientDescentIter of GradientDescentIter<AdadeltaIter>
-
-type IterParamsProvider' = 
-    | SGDIterParamsProvider of IterParamsProvider<Unit>
-    | NAGIterParamsProvider of IterParamsProvider<NAGIter>
-    | AdagradIterParamsProvider of IterParamsProvider<AdagradIter>
-    | AdadeltaIterParamsProvider of IterParamsProvider<AdadeltaIter>
-
-let getInitialIterParams model featuresCount hyper =    
+let getInitialIterParams<'iter> model featuresCount hyper : GradientDescentIter<'iter> =    
     let _, theta, _ = getModelShapeAndTheta model featuresCount    
 
     match hyper with
     | SGDHyperParams hp ->                           
-        SGDGradientDescentIter({ Theta = theta; Params = () })
+        { Theta = theta; Params = box () :?> 'iter}
     | NAGHyperParams hp -> 
-        NAGGradientDescentIter({ Theta = theta ; Params = { Momentum = theta } })
+        { Theta = theta ; Params = box { Momentum = theta } :?> 'iter }
     | AdagradHyperParams hp -> 
-        AdagradGradientDescentIter({Theta = theta; Params = { G = theta }})
+        {Theta = theta; Params = box { G = theta } :?> 'iter}
     | AdadeltaHyperParams hp -> 
-        AdadeltaGradientDescentIter({ Theta  = theta; Params = { EG = theta; ET = theta } })
+        { Theta  = theta; Params = box { EG = theta; ET = theta } :?> 'iter }
 
-let getIterParamsProvider model featuresCount hyper  =    
-    match getInitialIterParams model featuresCount hyper with
-    | SGDGradientDescentIter iter ->
-        SGDIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
-    | NAGGradientDescentIter iter ->
-        NAGIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
-    | AdagradGradientDescentIter iter ->
-        AdagradIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
-    | AdadeltaGradientDescentIter iter ->
-        AdadeltaIterParamsProvider({ initial = (fun () -> iter) ; update =  (fun (f) -> f) })
+let getIterParamsProvider<'iter> model featuresCount hyper  =    
+    match box (getInitialIterParams<'iter> model featuresCount hyper) with
+    | :? GradientDescentIter<Unit> as iter ->
+        { initial = (fun () -> box iter :?> GradientDescentIter<'iter>) ; update =  (fun (f) -> f) }
+    | :? GradientDescentIter<NAGIter> as iter ->
+        { initial = (fun () -> box iter :?> GradientDescentIter<'iter>) ; update =  (fun (f) -> f) }
+    | :? GradientDescentIter<AdagradIter> as iter ->
+        { initial = (fun () -> box iter :?> GradientDescentIter<'iter>) ; update =  (fun (f) -> f) }
+    | :? GradientDescentIter<AdadeltaIter> as iter ->
+        { initial = (fun () -> box iter :?> GradientDescentIter<'iter>) ; update =  (fun (f) -> f) }
+    | _ -> failwith "Unknown type"
    
 let gradientDescent2 
     (iterParamsProvider) 
@@ -60,29 +49,22 @@ let gradientDescent2
     (outputs: float Vector) 
     (hyper: GradientDescentHyperParams) =
 
-    let provider = getIterParamsProvider model inputs.ColumnCount hyper
+    //let provider = getIterParamsProvider model inputs.ColumnCount hyper
 
     match hyper with
     | SGDHyperParams hp ->                           
-        match iterParamsProvider with 
-        | SGDIterParamsProvider pr ->  
-            SGD pr model prms hp inputs outputs                
-        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+        let pr = box iterParamsProvider :?> IterParamsProvider<Unit>
+        SGD pr model prms hp inputs outputs                
     | NAGHyperParams hp ->                           
-        match iterParamsProvider with 
-        | NAGIterParamsProvider pr ->  
-            NAG pr model prms hp inputs outputs                
-        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+        let pr = box iterParamsProvider :?> IterParamsProvider<NAGIter>
+        NAG pr model prms hp inputs outputs                
     | AdagradHyperParams hp ->                           
-        match iterParamsProvider with 
-        | AdagradIterParamsProvider pr ->  
-            adagrad pr model prms hp inputs outputs                
-        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+        let pr = box iterParamsProvider :?> IterParamsProvider<AdagradIter>
+        adagrad pr model prms hp inputs outputs                
     | AdadeltaHyperParams hp ->                           
-        match iterParamsProvider with 
-        | AdadeltaIterParamsProvider pr ->  
-            adadelta pr model prms hp inputs outputs                
-        | _ -> failwith "Types of [iterParamsProvider] and [hyper] params are not consistent"
+        let pr = box iterParamsProvider :?> IterParamsProvider<AdadeltaIter>
+        adadelta pr model prms hp inputs outputs                
+
 
 
 let gradientDescent     
@@ -91,8 +73,21 @@ let gradientDescent
     (inputs: float Matrix) 
     (outputs: float Vector) 
     (hyper: GradientDescentHyperParams) =
-        let pr = getIterParamsProvider model inputs.ColumnCount hyper
-        gradientDescent2 pr model prms inputs outputs hyper
+
+        match hyper with
+        | SGDHyperParams hp ->                           
+            let pr = getIterParamsProvider<Unit> model inputs.ColumnCount hyper
+            gradientDescent2 pr model prms inputs outputs hyper
+        | NAGHyperParams hp ->                           
+            let pr = getIterParamsProvider<NAGIter> model inputs.ColumnCount hyper
+            gradientDescent2 pr model prms inputs outputs hyper
+        | AdagradHyperParams hp ->                           
+            let pr = getIterParamsProvider<AdagradIter> model inputs.ColumnCount hyper
+            gradientDescent2 pr model prms inputs outputs hyper
+        | AdadeltaHyperParams hp ->                           
+            let pr = getIterParamsProvider<AdadeltaIter> model inputs.ColumnCount hyper
+            gradientDescent2 pr model prms inputs outputs hyper
+
 
 
 
