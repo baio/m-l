@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>TypeShape</name></assembly>
+<members>
+<member name="M:TypeShape.TypeShape.Create``1">
+ <summary>
+     Creates a type shape instance for given type
+ </summary>
+</member>
+<member name="M:TypeShape.TypeShape.Create(System.Type)">
+ <summary>
+     Creates a type shape instance for given type
+ </summary>
+ <param name="typ">System.Type to be resolved.</param>
+</member>
+<member name="T:TypeShape.TypeShapeInfo">
+<summary>
+ Provides a simple breakdown of basic kinds of types.
+ Used for easier extraction of type shapes in the active pattern implementations.
+</summary>
+</member>
+<member name="M:TypeShape.Type.IsInterfaceAssignableFrom(System.Type,System.Type)">
+<summary>
+ Correctly resolves if type is assignable to interface
+</summary>
+</member>
+<member name="M:TypeShape.Activator.CreateInstanceGeneric.Static``1(Microsoft.FSharp.Core.FSharpOption{System.Type[]},Microsoft.FSharp.Core.FSharpOption{System.Object[]})">
+<summary>
+ Generic edition of the activator method which support type parameters and private types
+</summary>
+</member>
+<member name="M:TypeShape.shapeof``1">
+<summary>
+ Creates a type shape instance for given type
+</summary>
+</member>
+<member name="T:TypeShape.Shape">
+<summary>
+ TypeShape active recognizers
+</summary>
+</member>
+<member name="M:TypeShape.TypeShapeImpl.isInterfaceAssignableFrom(System.Type,System.Type)">
+<summary>
+ correctly resolves if type is assignable to interface
+</summary>
+</member>
+</members>
+</doc>

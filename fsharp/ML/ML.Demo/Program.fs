@@ -11,8 +11,8 @@ let main argv =
     //comment this if MKL provider not installed
     MathNet.Numerics.Control.UseNativeMKL()        
 
-    logistic() |> ignore
-    //softmax() |> ignore
+    //logistic() |> ignore
+    softmax() |> ignore
     //linear() |> ignore
     
 
