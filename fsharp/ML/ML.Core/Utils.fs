@@ -61,7 +61,16 @@ let permute2 (rnd: System.Random) upTo =
     arr
 
 let permute upTo = permute2 (new System.Random()) upTo
-            
+
+let memoize f =
+    let cache = ref Map.empty
+    fun x ->
+        match (!cache).TryFind(x) with
+        | Some res -> res
+        | None ->
+             let res = f x
+             cache := (!cache).Add(x,res)
+             res            
 (*
 //Wen length = 3 and items = [1;2;3;4] -> [2;3;1]
 let permute3 (rnd: System.Random) (length: int) (items : seq<_>) =

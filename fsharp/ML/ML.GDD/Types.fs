@@ -1,5 +1,7 @@
 ﻿module ML.DGD.Types
 
+open MathNet.Numerics.LinearAlgebra
+
 open ML.Regressions.GLM
 open ML.Regressions.GradientDescent
 open ML.Regressions.GD
@@ -7,7 +9,7 @@ open SamplesStorage
      
 type BatchSamples = 
     //Samples splited in GDD Batch Coordintor and provided for each batch
-    | BatchSamples of float list list *  float list
+    | BatchSamples of float Matrix *  float Vector
     //Batch indexes generated in coordinator, GDD Batch should read them from storage by index
     | BatchSamplesIndexes of SamplesStorage * int list
     //GDD Batch should randomly generate indexes of size in and then read samples from storage

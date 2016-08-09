@@ -15,6 +15,10 @@ open BatchActor
 open Types
 open SamplesStorage
 
+let private readSamplesMem = 
+    memoize (fun stg ->
+        readSamples stg None
+    )
      
 let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesMessage>) = 
     
@@ -44,11 +48,11 @@ let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesM
            
                 match prms.BatchSamples with
                 | BatchSamplesProvidedByCoordinator ->
-                    let samples = readSamples prms.SamplesStorage None
+                    let ((x, _), y) = readSamplesMem prms.SamplesStorage
                     let batch = {
                         Model = prms.Model
                         HyperParams = prms.HyperParams
-                        Samples = BatchSamples(samples)
+                        Samples = BatchSamples(x, y)
                     }
                     batchActor <! batch
                     return! waitEpochComplete epochNumber prms.DistributedBatchSize prms
@@ -70,6 +74,7 @@ let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesM
                     let avgEpochError = batchResults |> List.averageBy (fun f -> f.Errors |> List.average)
                     //update final result with new theta and add avg errors of this epoch
                     finalResult <- { ResultType = res.ResultType; Theta = res.Theta; Errors = avgEpochError::finalResult.Errors  }
+                    printfn "%A" finalResult
                     if epochNumber + 1 < prms.EpochNumber then                      
                         // all batches completed, next epoch 
                         //new epoch, reset batch results

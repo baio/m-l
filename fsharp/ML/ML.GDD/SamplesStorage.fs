@@ -1,4 +1,6 @@
 ﻿module ML.DGD.SamplesStorage
+open ML.Core.Utils
+open MathNet.Numerics.LinearAlgebra
 
 type SamplesStorageCloud =
     | SamplesStorageCloudAzure
@@ -37,17 +39,20 @@ let takeByIndexes (indexes: int list) (s : _ seq) =
     seq {for i in indexes -> (s |> Seq.nth i)}            
 
 let readSamples (storage: SamplesStorage) (indexes: int list option) =
-    
-    match storage.Location with
-    | SamplesStorageFile path -> 
-        readSamplesFile path indexes 
-    | _ -> failwith "not implemented"    
-    |> Seq.map (fun m ->
-        let x = 
-            m.Split(',') 
-            |> takeByIndexes (storage.Label::storage.Features) 
-            |> Seq.map (fun m -> System.Double.Parse(m)) 
-        (x |> Seq.skip 1 |> List.ofSeq), (x |> Seq.head)
-    )
-    |> List.ofSeq
-    |> List.unzip
+    printfn "read"
+    let x, y = 
+        match storage.Location with
+        | SamplesStorageFile path -> 
+            readSamplesFile path indexes 
+        | _ -> failwith "not implemented"    
+        |> Seq.map (fun m ->
+            let x = 
+                m.Split(',') 
+                |> takeByIndexes (storage.Label::storage.Features) 
+                |> Seq.map (fun m -> System.Double.Parse(m)) 
+            (x |> Seq.skip 1 |> List.ofSeq), (x |> Seq.head)
+        )
+        |> List.ofSeq
+        |> List.unzip
+
+    x |> DenseMatrix.ofRowList |> norm, y |> DenseVector.ofList

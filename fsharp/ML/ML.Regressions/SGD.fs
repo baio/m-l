@@ -27,7 +27,6 @@ let calcGradientBatch<'iter, 'hyper>
     |> Seq.iter (fun (sx, sy) ->
         iter <- iterParamsUpdate(grad prms iter)
     )    
-    printfn "%A" iter
     iter
 
 let private calcGradient 

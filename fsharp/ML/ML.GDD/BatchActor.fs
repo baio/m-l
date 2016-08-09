@@ -27,7 +27,6 @@ let getSamples (samples: BatchSamples) =
 
      
 let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) = 
-
     
     let getIterProvider (initialIterPrms) = {
         initial = (fun () -> 
@@ -47,9 +46,7 @@ let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) =
     
             let! msg = mailbox.Receive()
             
-            let _x, _y = getSamples msg.Samples
-            let x = _x |> DenseMatrix.ofRowList
-            let y = _y |> DenseVector.ofList
+            let x, y = getSamples msg.Samples
             
             let iterPrr = 
                 getInitialIterParams msg.Model x.ColumnCount msg.HyperParams

@@ -78,8 +78,8 @@ let DLinear() =
 
     let dgdPrms = {    
         Model = GLMBaseModel(model)
-        HyperParams = SGDHyperParams(stochasticHyper)
-        EpochNumber = 3
+        HyperParams = SGDHyperParams(SGDHyper)
+        EpochNumber = 10
         //Samples storage
         SamplesStorage = samplesStoarge
         //Distributed batch size
