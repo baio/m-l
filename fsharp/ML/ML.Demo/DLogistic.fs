@@ -30,11 +30,6 @@ let DLogistic() =
         Gradient = logisticMSEGradient
     }
 
-    let prms = {
-        EpochNumber = 3 // Epochs number
-        ConvergeMode = ConvergeModeCostStopsChange
-    }
-
     let batchHyper : SGDHyperParams = {
         Alpha = 0.01
         BatchSize = 47

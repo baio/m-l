@@ -62,6 +62,7 @@
     <Compile Include="Logistic.fs" />
     <Compile Include="DLogistic.fs" />
     <Compile Include="Softmax.fs" />
+    <Compile Include="DSoftmax.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />

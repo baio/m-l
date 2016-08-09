@@ -6,6 +6,7 @@ open Logistic
 open Softmax
 open DLinear
 open DLogistic
+open DSoftmax
 
 [<EntryPoint>]
 let main argv = 
@@ -17,7 +18,8 @@ let main argv =
     //softmax() |> ignore
     //linear() |> ignore
     //DLinear() |> ignore
-    DLogistic() |> ignore
+    //DLogistic() |> ignore
+    DSoftmax() |> ignore
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code
