@@ -60,12 +60,12 @@
     <Compile Include="Linear.fs" />
     <Compile Include="DLinear.fs" />
     <Compile Include="Logistic.fs" />
+    <Compile Include="DLogistic.fs" />
     <Compile Include="Softmax.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
-    <Content Include="Google.DataTable.Net.Wrapper.XML" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ML.Core\ML.Core.fsproj">

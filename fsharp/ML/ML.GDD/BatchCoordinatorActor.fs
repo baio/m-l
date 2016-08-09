@@ -69,7 +69,7 @@ let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesM
                     return! waitEpochComplete epochNumber (batchesToComplete - 1) prms
                 else
                     //printfn "%A" batchResults
-                    let avgEpochError = batchResults |> List.averageBy (fun f -> f.Errors |> List.average)
+                    let avgEpochError = batchResults |> List.averageBy (fun f -> 0.::f.Errors |> List.average)
                     //update final result with new theta and add avg errors of this epoch
                     finalResult <- { ResultType = res.ResultType; Theta = res.Theta; Errors = avgEpochError::finalResult.Errors  }                    
                     if epochNumber + 1 < prms.EpochNumber then                      
