@@ -16,7 +16,6 @@ open SamplesStorage
 
 type BatchMessage = {
     Model: GLMModel
-    BatchSize: int
     HyperParams: GradientDescentHyperParams
     Samples: BatchSamples
 }
@@ -32,8 +31,8 @@ let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) =
     
     let getIterProvider (initialIterPrms) = {
         initial = (fun () -> 
-            //get initial params by default, if they already exists in coordinator, they will be returned, if not will be returned initial
-            let task = async { return! iterParamsServer <? SetIterParams initialIterPrms } 
+            //set initial params by default, if they already exists in coordinator, they will be returned, if not will be returned initial
+            let task = async { return! iterParamsServer <? InitIterParams initialIterPrms } 
             Async.RunSynchronously(task)        
         )
         update = (fun (iter) -> 
@@ -49,7 +48,7 @@ let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) =
             let! msg = mailbox.Receive()
             
             let _x, _y = getSamples msg.Samples
-            let x = _x |> DenseMatrix.ofColumnList
+            let x = _x |> DenseMatrix.ofRowList
             let y = _y |> DenseVector.ofList
             
             let iterPrr = 
@@ -58,7 +57,9 @@ let BatchActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchMessage>) =
                        
             let result = gradientDescent2 iterPrr msg.Model { EpochNumber = 1 ; ConvergeMode = ConvergeModeNone } x y msg.HyperParams
 
-            return! next()                
+            mailbox.Sender() <! BatchCompleted(result)
+
+            return! next()
         }
 
     next()

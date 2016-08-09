@@ -14,12 +14,13 @@ open Types
 
 //GradientDescentIter
 type ThetaServerMessage = 
+    | InitIterParams of obj
     //only set iter params if they still not initialzied
     | SetIterParams of obj
      
 let IterParamsServerActor (mailbox: Actor<ThetaServerMessage>) = 
 
-    let mutable latestIterParam = None
+    let mutable latestIterParam= None
                    
     let rec next() = 
         actor {
@@ -27,13 +28,21 @@ let IterParamsServerActor (mailbox: Actor<ThetaServerMessage>) =
             let! msg = mailbox.Receive()
 
             match msg with 
-            | SetIterParams iter ->                
+            | InitIterParams (iter) ->
+                match latestIterParam with
+                | None -> 
+                    //initalize only once
+                    latestIterParam <- Some(iter)
+                    mailbox.Sender() <! iter
+                | Some v -> 
+                    mailbox.Sender() <! v
+            | SetIterParams (iter) ->                
                 match latestIterParam with
                 | Some v ->
+                    latestIterParam <- Some(iter)
                     mailbox.Sender() <! v
                 | None ->
-                    mailbox.Sender() <! iter
-                    latestIterParam <- Some(iter)
+                    failwith "Params should be initialized first"
                 
             return! next()                
         }

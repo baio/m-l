@@ -25,6 +25,7 @@ let DGD (prms : DGDParams) =
         match msg with 
         | BatchesCompleted res ->
             dgdRes <- res
+            system.Terminate() |> ignore
         | _ -> ()            
     ) )
 

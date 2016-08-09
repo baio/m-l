@@ -33,11 +33,18 @@ let getIterParamsProvider model featuresCount hyper  =
     let init = getInitialIterParams model featuresCount hyper
     { initial = (fun () -> init) ; update =  (fun (f) -> f) }
 
+//TODO !!!
 let unwrapIterParamsProvider<'iter> (iterParamsProvider: IterParamsProvider<obj>) : IterParamsProvider<'iter> =
 
     let init = iterParamsProvider.initial();  
     let iterInit = { Theta = init.Theta; Params = box init.Params :?> 'iter}   
-    { initial = (fun () -> iterInit) ; update =  (fun (f) -> f) }
+    { 
+        initial = (fun () -> iterInit) 
+        update = (fun x -> 
+            let upd = iterParamsProvider.update( { Theta = x.Theta; Params = box x.Params } )
+            { Theta = upd.Theta; Params = upd.Params :?> 'iter}
+        ) 
+    }
     
   
 let gradientDescent2 

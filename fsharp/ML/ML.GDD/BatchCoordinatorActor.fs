@@ -9,6 +9,7 @@ open ML.Regressions.GradientDescent
 open ML.Regressions.GD
 open ML.Regressions.GLM
 open ML.Core.Utils
+open ML.Core.LinearAlgebra
 
 open BatchActor
 open Types
@@ -17,51 +18,69 @@ open SamplesStorage
      
 let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesMessage>) = 
     
+
     let supervisionOpt = SpawnOption.SupervisorStrategy (Strategy.OneForOne(fun _ ->
             Directive.Escalate
     ))
 
-    let rec runEpoch (cnt: int) = 
+    // TODO : Number of children 
+    let routerOpt = SpawnOption.Router ( Akka.Routing.FromConfig.Instance )
+
+    // spawn batch actors                
+    let batchActor = spawne mailbox "BatchActor" <@ BatchActor iterParamsServer @> [routerOpt; supervisionOpt]
+
+    //final results for each epoch
+    let mutable finalResult = { ResultType = ModelTrainResultType.NaN; Theta = empty(); Errors = [] }
+    //errors during epoch (returned from different batches)
+    let mutable batchResults = []
+    
+    let rec runEpoch (epochNumber: int) = 
         actor {
     
             let! msg = mailbox.Receive()
 
             match msg with 
             | BatchesStart prms ->
-
-                // TODO : Number of children + broadcast                   
-                let routerOpt = SpawnOption.Router ( Akka.Routing.FromConfig.Instance )
-                
-                let batchActor = spawne mailbox "BatchActor" <@ BatchActor iterParamsServer @> [routerOpt; supervisionOpt]
            
                 match prms.BatchSamples with
                 | BatchSamplesProvidedByCoordinator ->
                     let samples = readSamples prms.SamplesStorage None
                     let batch = {
                         Model = prms.Model
-                        BatchSize = prms.BatchSize
                         HyperParams = prms.HyperParams
                         Samples = BatchSamples(samples)
                     }
                     batchActor <! batch
-                    return! waitEpochComplete cnt prms
+                    return! waitEpochComplete epochNumber prms.DistributedBatchSize prms
                 | _ -> failwith "not implemeted"            
 
             | _ ->
-                return! runEpoch(cnt + 1)                
+                return! runEpoch epochNumber               
         }
-    and waitEpochComplete (cnt: int) (prms) =         
+    and waitEpochComplete epochNumber batchesToComplete prms =         
         actor {    
             let! msg = mailbox.Receive()
             match msg with 
-            | BatchCompleted -> 
-                if cnt < prms.EpochNumber then
-                    mailbox.Self <! BatchesStart(prms)
-                    return! runEpoch cnt
-                // Number of epoch achieved
-                mailbox.Context.System.EventStream.Publish msg
+            | BatchCompleted res -> 
+                batchResults <- res::batchResults
+                if batchesToComplete > 1 then
+                    // wait till all batches completed
+                    return! waitEpochComplete epochNumber (batchesToComplete - 1) prms
+                else 
+                    let avgEpochError = batchResults |> List.averageBy (fun f -> f.Errors |> List.average)
+                    //update final result with new theta and add avg errors of this epoch
+                    finalResult <- { ResultType = res.ResultType; Theta = res.Theta; Errors = avgEpochError::finalResult.Errors  }
+                    if epochNumber + 1 < prms.EpochNumber then                      
+                        // all batches completed, next epoch 
+                        //new epoch, reset batch results
+                        batchResults <- [] 
+                        mailbox.Self <! BatchesStart prms
+                        return! runEpoch (epochNumber + 1)
+                    else 
+                        // all epoches completed, publish result
+                        mailbox.Context.System.EventStream.Publish (BatchesCompleted(finalResult))
             | _ ->                        
-                return! waitEpochComplete cnt prms
+                return! waitEpochComplete epochNumber batchesToComplete prms
          }
 
     runEpoch 0

@@ -29,6 +29,7 @@ let norm2 (prms: NormParams) (mx: float Matrix)  : float Matrix =
         (mx.Row(i) - prms.Mu) ./ prms.Std
    )
 
+
 //Generate ranges { [0..4], [4..8], [8..9]
 //Given: rgLength = 4, seqLength = 10
 let genRanges rgLength seqLength =

@@ -23,8 +23,6 @@ type DGDParams = {
     SamplesStorage: SamplesStorage
     //Distributed batch size
     DistributedBatchSize: int
-    //Gradfient descent batch size
-    BatchSize: int
     //How GDBatch get samples
     BatchSamples: GDDBatchSamples 
 } and GDDBatchSamples = 
@@ -34,6 +32,6 @@ type DGDParams = {
     | BatchSamplesServer
 
 type BatchesMessage =
-    | BatchesStart of DGDParams
+    | BatchesStart of DGDParams    
+    | BatchCompleted of ModelTrainResult
     | BatchesCompleted of ModelTrainResult
-    | BatchCompleted 

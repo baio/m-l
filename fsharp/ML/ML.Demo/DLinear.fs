@@ -32,13 +32,13 @@ let DLinear() =
     }
 
     let prms = {
-        EpochNumber = 5000 // Epochs number
+        EpochNumber = 3 // Epochs number
         ConvergeMode = ConvergeModeCostStopsChange
     }
 
     let batchHyper : SGDHyperParams = {
         Alpha = 0.01
-        BatchSize = 100
+        BatchSize = 5
     }
 
     let stochasticHyper : SGDHyperParams = {
@@ -78,14 +78,12 @@ let DLinear() =
 
     let dgdPrms = {    
         Model = GLMBaseModel(model)
-        HyperParams = SGDHyperParams(batchHyper)
-        EpochNumber = 500
+        HyperParams = SGDHyperParams(stochasticHyper)
+        EpochNumber = 3
         //Samples storage
         SamplesStorage = samplesStoarge
         //Distributed batch size
         DistributedBatchSize = 1
-        //Gradient descent batch size
-        BatchSize = 5
         //How GDBatch get samples
         BatchSamples = BatchSamplesProvidedByCoordinator 
     }
