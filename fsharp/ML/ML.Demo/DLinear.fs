@@ -99,23 +99,22 @@ let DLinear() =
        
     printfn "batch perf : %A" perf
     
-    (*
     let perf = Benchmark.Run (fun () ->
-        let train = SGDHyperParams stochasticHyper |> gd
+        let train = DGD { dgdPrms with HyperParams = SGDHyperParams(stochasticHyper) }
         trainResults <- ("stochastic", train)::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = SGDHyperParams SGDHyper |> gd
+        let train = DGD { dgdPrms with HyperParams = SGDHyperParams(SGDHyper) }
         trainResults <- ("SGD", train)::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
 
     let perf = Benchmark.Run (fun () ->
-        let train = NAGHyperParams NAGHyper |> gd
+        let train = DGD { dgdPrms with HyperParams = NAGHyperParams(NAGHyper) }
         trainResults <- ("NAG", train)::trainResults
         printfn "NAG result : %A" train
     )    
@@ -135,7 +134,6 @@ let DLinear() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
-    *)
     *)
         
     trainResults
