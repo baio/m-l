@@ -20,6 +20,7 @@ let calcGradientBatch<'iter, 'hyper>
     =
     let x, y = permuteSamples prms.X prms.Y
     let mutable iter = iter
+    printfn "%A" iter
     genRanges batchSize x.RowCount           
     |> Seq.map (fun (start, len) -> 
         (spliceRows start len x), (spliceVector start len y)
@@ -27,6 +28,7 @@ let calcGradientBatch<'iter, 'hyper>
     |> Seq.iter (fun (sx, sy) ->
         iter <- iterParamsUpdate(grad prms iter)
     )    
+    printfn "%A" iter
     iter
 
 let private calcGradient 

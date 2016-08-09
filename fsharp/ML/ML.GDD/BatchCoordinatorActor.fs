@@ -15,10 +15,7 @@ open BatchActor
 open Types
 open SamplesStorage
 
-let private readSamplesMem = 
-    memoize (fun stg ->
-        readSamples stg None
-    )
+let private readSamplesMem = memoize (fun stg -> readSamples stg None)
      
 let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesMessage>) = 
     
@@ -70,11 +67,11 @@ let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesM
                 if batchesToComplete > 1 then
                     // wait till all batches completed
                     return! waitEpochComplete epochNumber (batchesToComplete - 1) prms
-                else 
+                else
+                    //printfn "%A" batchResults
                     let avgEpochError = batchResults |> List.averageBy (fun f -> f.Errors |> List.average)
                     //update final result with new theta and add avg errors of this epoch
-                    finalResult <- { ResultType = res.ResultType; Theta = res.Theta; Errors = avgEpochError::finalResult.Errors  }
-                    printfn "%A" finalResult
+                    finalResult <- { ResultType = res.ResultType; Theta = res.Theta; Errors = avgEpochError::finalResult.Errors  }                    
                     if epochNumber + 1 < prms.EpochNumber then                      
                         // all batches completed, next epoch 
                         //new epoch, reset batch results

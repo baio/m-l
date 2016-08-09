@@ -14,6 +14,7 @@ let main argv =
 
     //logistic() |> ignore
     //softmax() |> ignore
+    //linear() |> ignore
     DLinear() |> ignore
     
 

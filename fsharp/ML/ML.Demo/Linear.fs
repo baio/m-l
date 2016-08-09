@@ -32,7 +32,7 @@ let linear() =
     }
 
     let prms = {
-        EpochNumber = 5000 // Epochs number
+        EpochNumber = 10 // Epochs number
         ConvergeMode = ConvergeModeCostStopsChange
     }
 
@@ -73,11 +73,13 @@ let linear() =
 
     let gd = gradientDescent (GLMBaseModel model) prms inputs outputs 
     
+    
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams batchHyper |> gd
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )    
+    (*
     printfn "batch perf : %A" perf
     
     let perf = Benchmark.Run (fun () ->
@@ -86,14 +88,17 @@ let linear() =
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
-
+    *)
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams SGDHyper |> gd
         trainResults <- ("SGD", train)::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
+    *)
 
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = NAGHyperParams NAGHyper |> gd
         trainResults <- ("NAG", train)::trainResults
@@ -101,7 +106,7 @@ let linear() =
     )    
     printfn "NAG perf : %A" perf
     
-    (*
+    
     let perf = Benchmark.Run (fun () ->
         let train = AdagradHyperParams AdagradHyper |> gd
         trainResults <- ("Adagrad", train)::trainResults
