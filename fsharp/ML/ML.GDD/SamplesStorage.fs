@@ -34,7 +34,7 @@ let readSamplesFile (path: string) (indexes: int list option) : string seq =
                     yield l
             | None ->
                 yield l
-    } 
+    } |> Seq.take 5000
 
 let takeByIndexes (indexes: int list) (s : _ seq) =
     seq {for i in indexes -> (s |> Seq.nth i)}            

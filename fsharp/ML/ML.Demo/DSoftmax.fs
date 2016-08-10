@@ -27,7 +27,7 @@ let DSoftmax() =
        
     let model : GLMSoftmaxModel = {
         Base = { Cost = softmaxCost; Gradient = softmaxGradient }
-        ClassesNumber = 3
+        ClassesNumber = 10
     }
 
     let batchHyper : SGDHyperParams = {
@@ -58,7 +58,7 @@ let DSoftmax() =
     }
 
     let AdadeltaHyper : AdadeltaHyperParams = {        
-        BatchSize = 5
+        BatchSize = 100
         Epsilon = 1E-8
         Rho = 0.6
     }
@@ -67,21 +67,28 @@ let DSoftmax() =
     //let inputs, outputs = readCSV @"..\..\..\..\..\data\iris.csv" true [|0..3|] 5
     //let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
 
+    (*
     let samplesStoarge = {
             Location = SamplesStorageFile(@"..\..\..\..\..\data\iris.csv");
             Features = [0..3];
             Label = 5;
         }
-
+    *)
+    
+    let samplesStoarge = {
+            Location = SamplesStorageFile(@"c:/dev/.data/mnist/mnist_train.csv");
+            Features = [1..784];
+            Label = 0;
+        }
 
     let dgdPrms = {    
         Model = GLMSoftmaxModel(model)
         HyperParams = SGDHyperParams(batchHyper)
-        EpochNumber = 400
+        EpochNumber = 25
         //Samples storage
         SamplesStorage = samplesStoarge
         //Distributed batch size
-        DistributedBatchSize = 1
+        DistributedBatchSize = 1000
         //How GDBatch get samples
         BatchSamples = BatchSamplesProvidedByCoordinator 
     }
@@ -89,6 +96,7 @@ let DSoftmax() =
 
     let mutable trainResults = [] 
     
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = DGD dgdPrms
         trainResults <- ("batch",train)::trainResults
@@ -125,6 +133,7 @@ let DSoftmax() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf
+    *)
     
     let perf = Benchmark.Run (fun () ->
         let train = DGD { dgdPrms with HyperParams = AdadeltaHyperParams(AdadeltaHyper) }
@@ -133,15 +142,17 @@ let DSoftmax() =
     )    
     printfn "Adadelta perf : %A" perf
     
-    let inputs, outputs = readCSV @"..\..\..\..\..\data\iris.csv" true [|0..3|] 5
+    
+    let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
     let outputs = vector outputs 
     let inputs = matrix inputs
     let inputs, normPrms = norm inputs
     let acc = accuracy model.ClassesNumber inputs outputs
+    
         
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])
-    |> List.map (fun (label, res) -> (sprintf "%s : %f %f (%i)" label (acc res.Theta)  res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))        
+    |> List.map (fun (label, res) -> (sprintf "%s %f : %f (%i)" label (acc res.Theta) res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))        
     |> showLines2
 
     
