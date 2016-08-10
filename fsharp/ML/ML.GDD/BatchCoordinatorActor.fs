@@ -17,16 +17,33 @@ open SamplesStorage
 
 let private readSamplesMem = memoize (fun stg -> readSamples stg None)
      
-let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesMessage>) = 
+let BatchCoordinatorActor dgdParams (iterParamsServer: IActorRef) (mailbox: Actor<BatchesMessage>) = 
     
+    let batch = {
+        Model = dgdParams.Model
+        HyperParams = dgdParams.HyperParams
+        Samples = BatchSamples(emptyM(), empty())
+    }
 
+    let rowsCount = 
+        match dgdParams.BatchSamples with
+        | BatchSamplesProvidedByCoordinator ->
+            let x, _ = readSamplesMem dgdParams.SamplesStorage
+            x.RowCount
+        | _ -> failwith "not implemeted"      
+    
     let supervisionOpt = SpawnOption.SupervisorStrategy (Strategy.OneForOne(fun _ ->
             Directive.Escalate
     ))
 
     // TODO : Number of children 
-    let routerOpt = SpawnOption.Router ( Akka.Routing.FromConfig.Instance )
-
+    let conf = Akka.Routing.FromConfig.Instance
+          
+    let routerOpt = SpawnOption.Router ( conf )
+     
+    let distributedBatchSize = dgdParams.DistributedBatchSize
+    let batchesCnt = rowsCount / distributedBatchSize + (if rowsCount % distributedBatchSize = 0 then 0 else 1)
+    
     // spawn batch actors                
     let batchActor = spawne mailbox "BatchActor" <@ BatchActor iterParamsServer @> [routerOpt; supervisionOpt]
 
@@ -46,19 +63,14 @@ let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesM
                 match prms.BatchSamples with
                 | BatchSamplesProvidedByCoordinator ->
                     let x, y = readSamplesMem prms.SamplesStorage
-                    let batch = {
-                        Model = prms.Model
-                        HyperParams = prms.HyperParams
-                        Samples = BatchSamples(emptyM(), empty())
-                    }
-                    let btachesCnt = x.RowCount / prms.DistributedBatchSize
-                    genRanges prms.DistributedBatchSize x.RowCount
+                    genRanges distributedBatchSize x.RowCount
                     |> Seq.iter(fun (start, len) ->
+                        //printfn "%i %i" start len
                         let bx, by = (spliceRows start len x), (spliceVector start len y)
                         batchActor <! { batch with Samples = BatchSamples(bx, by) }
                     )                              
 
-                    return! waitEpochComplete epochNumber btachesCnt prms
+                    return! waitEpochComplete epochNumber batchesCnt prms
                 | _ -> failwith "not implemeted"      
                                 
             | _ ->

@@ -16,7 +16,7 @@ let DGD (prms : DGDParams) =
     let system = System.create "MLDGD" (Configuration.load())
     
     let iterParamsServer = spawn system "IterParamsServerActor" (IterParamsServerActor)
-    let batchCoordinator = spawn system "BatchCoordinatorActor" (BatchCoordinatorActor iterParamsServer)    
+    let batchCoordinator = spawn system "BatchCoordinatorActor" (BatchCoordinatorActor prms iterParamsServer)    
    
     let mutable dgdRes = { ResultType = NaN; Theta = empty(); Errors = [] }
 
