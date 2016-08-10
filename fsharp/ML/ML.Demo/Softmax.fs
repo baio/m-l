@@ -22,8 +22,8 @@ open ML.Statistics.Charting
 let softmax() = 
         
     //let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
-    let inputs, outputs = readCSV @"..\..\..\..\..\data\iris.csv" true [|0..3|] 5
-    //let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
+    //let inputs, outputs = readCSV @"..\..\..\..\..\data\iris.csv" true [|0..3|] 5
+    let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
     let inputs = inputs 
     let ouptuts = outputs 
     let outputs = vector outputs 
@@ -32,11 +32,11 @@ let softmax() =
 
     let model : GLMSoftmaxModel = {
         Base = { Cost = softmaxCost; Gradient = softmaxGradient }
-        ClassesNumber = 3
+        ClassesNumber = 10
     }
 
     let prms = {
-        EpochNumber = 400 // Epochs number
+        EpochNumber = 25 // Epochs number
         ConvergeMode = ConvergeModeCostStopsChange
     }
 
@@ -68,7 +68,7 @@ let softmax() =
     }
 
     let AdadeltaHyper : AdadeltaHyperParams = {        
-        BatchSize = 5
+        BatchSize = 100
         Epsilon = 1E-8
         Rho = 0.6
     }
@@ -77,21 +77,20 @@ let softmax() =
 
     let gd = gradientDescent (GLMSoftmaxModel model) prms inputs outputs 
 
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams batchHyper |> gd
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
-    )    
     printfn "batch perf : %A" perf
     
-    (*
+    
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams stochasticHyper |> gd
         trainResults <- ("stochastic", train)::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
-    *)
     
 
     let perf = Benchmark.Run (fun () ->
@@ -115,7 +114,7 @@ let softmax() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf        
-
+    *)
            
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyperParams AdadeltaHyper |> gd

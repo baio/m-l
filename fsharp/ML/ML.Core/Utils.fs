@@ -29,7 +29,6 @@ let norm2 (prms: NormParams) (mx: float Matrix)  : float Matrix =
         (mx.Row(i) - prms.Mu) ./ prms.Std
    )
 
-
 //Generate ranges { [0..4], [4..8], [8..9]
 //Given: rgLength = 4, seqLength = 10
 let genRanges rgLength seqLength =
@@ -71,6 +70,7 @@ let memoize f =
              let res = f x
              cache := (!cache).Add(x,res)
              res            
+    
 (*
 //Wen length = 3 and items = [1;2;3;4] -> [2;3;1]
 let permute3 (rnd: System.Random) (length: int) (items : seq<_>) =
