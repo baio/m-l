@@ -31,19 +31,23 @@ let BatchCoordinatorActor dgdParams (iterParamsServer: IActorRef) (mailbox: Acto
             let x, _ = readSamplesMem dgdParams.SamplesStorage
             x.RowCount
         | _ -> failwith "not implemeted"      
+
+    let distributedBatchSize = dgdParams.DistributedBatchSize
+    let batchesCnt = rowsCount / distributedBatchSize + (if rowsCount % distributedBatchSize = 0 then 0 else 1)
     
     let supervisionOpt = SpawnOption.SupervisorStrategy (Strategy.OneForOne(fun _ ->
             Directive.Escalate
     ))
 
+    //SpawnOption.Router()
+
     // TODO : Number of children 
-    let conf = Akka.Routing.FromConfig.Instance
-          
-    let routerOpt = SpawnOption.Router ( conf )
-     
-    let distributedBatchSize = dgdParams.DistributedBatchSize
-    let batchesCnt = rowsCount / distributedBatchSize + (if rowsCount % distributedBatchSize = 0 then 0 else 1)
-    
+    //let conf = Akka.Routing.FromConfig.Instance
+
+    //conf.WithFallback()
+    let routerConf = new Akka.Routing.RoundRobinPool(batchesCnt)            
+    let routerOpt = SpawnOption.Router ( routerConf )
+         
     // spawn batch actors                
     let batchActor = spawne mailbox "BatchActor" <@ BatchActor iterParamsServer @> [routerOpt; supervisionOpt]
 

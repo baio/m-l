@@ -74,7 +74,7 @@ let DLinear() =
     let dgdPrms = {    
         Model = GLMBaseModel(model)
         HyperParams = SGDHyperParams(batchHyper)
-        EpochNumber = 500
+        EpochNumber = 5000
         //Samples storage
         SamplesStorage = samplesStoarge
         //Distributed batch size
@@ -93,16 +93,14 @@ let DLinear() =
     ) 
        
     printfn "batch perf : %A" perf
-    
-    (*
+        
     let perf = Benchmark.Run (fun () ->
         let train = DGD { dgdPrms with HyperParams = SGDHyperParams(stochasticHyper) }
         trainResults <- ("stochastic", train)::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
-    *)
-
+    
     let perf = Benchmark.Run (fun () ->
         let train = DGD { dgdPrms with HyperParams = SGDHyperParams(SGDHyper) }
         trainResults <- ("SGD", train)::trainResults
