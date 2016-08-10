@@ -1,5 +1,6 @@
 ﻿module ML.DGD.SamplesStorage
 open ML.Core.Utils
+open ML.Core.LinearAlgebra
 open MathNet.Numerics.LinearAlgebra
 
 type SamplesStorageCloud =
@@ -55,4 +56,6 @@ let readSamples (storage: SamplesStorage) (indexes: int list option) =
         |> List.ofSeq
         |> List.unzip
 
-    x |> DenseMatrix.ofRowList |> norm, y |> DenseVector.ofList
+    let x, nrmPrms = x |> DenseMatrix.ofRowList |> norm
+    let y = y |> DenseVector.ofList
+    permuteSamples x y

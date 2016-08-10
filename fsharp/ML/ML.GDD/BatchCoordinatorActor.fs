@@ -45,16 +45,22 @@ let BatchCoordinatorActor (iterParamsServer: IActorRef) (mailbox: Actor<BatchesM
            
                 match prms.BatchSamples with
                 | BatchSamplesProvidedByCoordinator ->
-                    let ((x, _), y) = readSamplesMem prms.SamplesStorage
+                    let x, y = readSamplesMem prms.SamplesStorage
                     let batch = {
                         Model = prms.Model
                         HyperParams = prms.HyperParams
-                        Samples = BatchSamples(x, y)
+                        Samples = BatchSamples(emptyM(), empty())
                     }
-                    batchActor <! batch
-                    return! waitEpochComplete epochNumber prms.DistributedBatchSize prms
-                | _ -> failwith "not implemeted"            
+                    let btachesCnt = x.RowCount / prms.DistributedBatchSize
+                    genRanges prms.DistributedBatchSize x.RowCount
+                    |> Seq.iter(fun (start, len) ->
+                        let bx, by = (spliceRows start len x), (spliceVector start len y)
+                        batchActor <! { batch with Samples = BatchSamples(bx, by) }
+                    )                              
 
+                    return! waitEpochComplete epochNumber btachesCnt prms
+                | _ -> failwith "not implemeted"      
+                                
             | _ ->
                 return! runEpoch epochNumber               
         }

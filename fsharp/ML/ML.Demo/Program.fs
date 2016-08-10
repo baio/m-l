@@ -17,9 +17,9 @@ let main argv =
     //logistic() |> ignore
     //softmax() |> ignore
     //linear() |> ignore
-    //DLinear() |> ignore
+    DLinear() |> ignore
     //DLogistic() |> ignore
-    DSoftmax() |> ignore
+    //DSoftmax() |> ignore
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code

@@ -18,7 +18,7 @@ let DGD (prms : DGDParams) =
     let iterParamsServer = spawn system "IterParamsServerActor" (IterParamsServerActor)
     let batchCoordinator = spawn system "BatchCoordinatorActor" (BatchCoordinatorActor iterParamsServer)    
    
-    let mutable dgdRes = { ResultType = NaN; Theta = zeros(1); Errors = [] }
+    let mutable dgdRes = { ResultType = NaN; Theta = empty(); Errors = [] }
 
     let mainActor = spawn system "main" ( actorOf2( fun mailbox msg ->
                     

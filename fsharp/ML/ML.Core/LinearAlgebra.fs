@@ -13,6 +13,7 @@
     let zeros cnt = DenseVector.zero<float> cnt
 
     let empty() = DenseVector.create 1 0.
+    let emptyM() = DenseMatrix.create 1 1 0.
 
     let zerosMatrix (rows, cols) = 
         matrix(List.init rows (fun r -> List.init cols (fun _ -> 0.)))

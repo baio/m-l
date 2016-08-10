@@ -78,7 +78,7 @@ let DLinear() =
         //Samples storage
         SamplesStorage = samplesStoarge
         //Distributed batch size
-        DistributedBatchSize = 1
+        DistributedBatchSize = 47
         //How GDBatch get samples
         BatchSamples = BatchSamplesProvidedByCoordinator 
     }
