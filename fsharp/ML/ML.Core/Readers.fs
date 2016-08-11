@@ -89,6 +89,12 @@ let normStream rowsNumber colsNumber (stream : float list Stream) =
     nrm, (mu, std)
       
 
+//The purpose of this to not optimize normalization of the columns 
+//but make it memory efficient, since this func should work with big files
+//so we need proccess file line by line
+//It is slow but, consume least memory
+//TODO : test
+//TODO : write first line with comment #RowsNum, NormMu, NormStdDev
 let normalizeFile rowsNumber normIndexes unnormIndex pathIn pathOut = 
     
     let takeByIndexes (s : _ seq) =
@@ -114,3 +120,5 @@ let normalizeFile rowsNumber normIndexes unnormIndex pathIn pathOut =
         |> String.concat ";"
         |> sw.WriteLine
     )
+
+    //TODO : write meta file
