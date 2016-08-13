@@ -8,6 +8,7 @@ open Types
 
 type ActivationFun = FVector -> FVector
 
+
 type LayerShape = {
     NodesNumber: int
     Activation: ActivationFun
@@ -22,37 +23,52 @@ let calcLayer (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) : F
 
 
 type NNLayerType = 
-    | None
-    | Input of int
-    | Hidden of int * (FMatrix * ActivationFun)
+    | None    
+    // Int number of nodes in input layer
+    | Input of int 
+    // Int number of nodes in input layer, thetas tail
+    | Hidden of int * FVector * (FMatrix * ActivationFun)
+    | Output of FMatrix * ActivationFun
 
-// Given shape of NN and long vector of thetas, returns for each layer : matrix of thetas + activation func - for each layer
+// Given shape of NN and long vector of thetas, returns for each hidden layer : matrix of thetas + activation func - for each layer
 // where rows from matrix containing one theta vector for each Node in the layer (including bias) 
 let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) array = 
-    let _input = shape.Layers.[0]
-    let _hidden = shape.Layers.[1..]
-    let input = theta.[0.._input.NodesNumber]
+
+    let makeHidden (theta: FVector) pervLayerNodesNumber (layer: LayerShape) =
+        // +1 for bias
+        let layerThetasNumber = (pervLayerNodesNumber + 1) * layer.NodesNumber
+        let mx = reshape (layer.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
+        if theta.Count = layerThetasNumber then 
+            // this is output layer
+            Output(mx, layer.Activation)                            
+        elif theta.Count > layerThetasNumber then
+            Hidden(layer.NodesNumber, theta.[layerThetasNumber..],  (mx, layer.Activation))
+        else 
+            failwith "Number of thetas doesn't corresponds shape of NN"
+            
     shape.Layers
     |> Stream.ofList
-    |> Stream.scan (fun acc v ->
+    |> Stream.scan (fun acc v ->        
         // calculate how many nodes was in pervious layer
-        //if this is first layer then use same number of thetas as nodes number 
+        // if this is first layer then use same number of thetas as nodes number 
         match acc with
         | None ->
             Input(v.NodesNumber)
         | Input (nnumber) ->            
-        | Hidden (nnumber, _, _) ->
-            let pervLayerNodesNumber = prevTheta.RowCount 
-            //if not latest layer add bias
-            let layerThetasNumber = (pervLayerNodesNumber + 1) * v.NodesNumber
-            let mx = reshape (v.NodesNumber, pervLayerNodesNumber) theta.[..layerThetasNumber - 1]
-            Some ( Some(mx, v.Activation), theta.[layerThetasNumber - 1..] )
-            
+            makeHidden theta nnumber v
+        | Hidden (nnumber, theta, _) ->
+            makeHidden theta nnumber v
+        | Output _ -> 
+            failwith "Output must be latest layer"            
     ) NNLayerType.None
     |> Stream.choose (fun res ->
         match res with
-        | Some (a, b, _)-> Some(a, b)
-        | None -> None
+        | Hidden(_, _, res) -> 
+            Some(res)
+        | Output(a, b) -> 
+            Some(a, b)
+        | _ ->
+            Option.None
     )
     |> Stream.toArray
 
