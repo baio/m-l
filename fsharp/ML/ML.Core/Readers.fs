@@ -98,7 +98,7 @@ let normStream rowsNumber colsNumber (stream : float list Stream) =
 let normalizeFile rowsNumber normIndexes unnormIndex pathIn pathOut = 
     
     let takeByIndexes (s : _ seq) =
-        List.init (normIndexes |> List.length)  (fun i -> s |> Seq.item normIndexes.[i])
+        List.init (normIndexes |> List.length)  (fun i -> s |> Seq.nth normIndexes.[i])
 
     use sw = new System.IO.StreamWriter (path = pathOut)
 
