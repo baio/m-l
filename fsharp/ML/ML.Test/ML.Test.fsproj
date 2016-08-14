@@ -57,6 +57,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
     <Compile Include="NN.Test.fs" />
+    <Compile Include="NN.Calc.Test.fs" />
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +124,11 @@
     <ProjectReference Include="..\ML.NN\ML.NN.fsproj">
       <Name>ML.NN</Name>
       <Project>{d326c1ea-795a-40a8-b317-8eba08f7c2b6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\ML.Regressions\ML.Regressions.fsproj">
+      <Name>ML.Regressions</Name>
+      <Project>{0c3ae35c-a191-48b9-8d7f-15c85bbe67d2}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

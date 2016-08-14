@@ -1,13 +1,11 @@
-﻿module ML.Test.NN
+﻿module ML.NN.Test
 
 open Xunit
-//open NUnit.Framework
 open FsUnit
 open MathNet.Numerics.LinearAlgebra
 
 open ML.NN.Types
 open ML.NN.NN
-
 let act a = a
 
 [<Fact>]
@@ -23,7 +21,6 @@ let ``Reshape for 2 inputs -> 1 output must work``() =
     let expected = [| (matrix([ [0.; 1.; 2.] ]), act) |]
     
     (actual  |> Array.map (fun f -> fst f)) |> should equal (expected |> Array.map (fun f -> fst f))
-
 
 [<Fact>]
 let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
@@ -46,7 +43,6 @@ let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
         |]
     
     (actual  |> Array.map (fun f -> fst f)) |> should equal (expected |> Array.map (fun f -> fst f))
-
 
 [<Fact>]
 let ``Reshape XOR must work``() =

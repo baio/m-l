@@ -18,10 +18,6 @@ type NNShape = {
     Layers: LayerShape list
 }
 
-let calcLayer (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) : FVector = 
-    theta * inputs |> activation
-
-
 type NNLayerType = 
     | None    
     // Int number of nodes in input layer
@@ -72,12 +68,14 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
     )
     |> Stream.toArray
 
+let calcLayer (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) : FVector = 
+  let res = theta * (inputs |> appendOne) |> activation
+  res
+  
 let calcNN (inputs: FVector) (shape: NNShape) (theta: FVector) = 
     let layers = reshapeNN shape theta
-    let firstLayer, _ = layers.[0]
-    let inputs = firstLayer.Column(0)
-
-    layers.[1..]    
+    printfn "%A" layers
+    layers
     |> Array.fold (fun acc (th, act) ->
         calcLayer th act acc
     ) inputs
