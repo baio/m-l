@@ -9,6 +9,9 @@ open GLM
 let sigmoid (z: float Vector) = 
     1. / (1. + (-1. * z).PointwiseExp())
 
+let sigmoid' (z: float Vector) = 
+    sigmoid(z) .* (1. - sigmoid(z))
+
 let sigmoidScalar (z: float) = 
     1. / (1. + System.Math.Exp(-1. * z))
 

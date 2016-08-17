@@ -6,7 +6,10 @@ open MathNet.Numerics.LinearAlgebra
 
 open ML.NN.Types
 open ML.NN.NN
-let act a = a
+
+let f a = a
+let act = {f = f; f' = f}
+
 
 [<Fact>]
 let ``Reshape for 2 inputs -> 1 output must work``() =

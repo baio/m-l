@@ -9,7 +9,9 @@ open ML.NN.NN
 
 open ML.Regressions.LogisticRegression
 
-let act a = a
+let f a = a
+let act = {f = f; f' = f}
+let sigm = { f= sigmoid;  f' = sigmoid'} 
 
 [<Fact>]
 let ``Calc 1 input -> 1 output must work``() =
@@ -24,7 +26,7 @@ let ``Calc 1 input -> 1 output must work``() =
         ]
     }
     
-    let actual = calcNN inputs shape theta
+    let actual = forward inputs shape theta
     let expected = vector([50.]);
     
     actual |> should equal expected
@@ -39,11 +41,11 @@ let ``Calc XOR Layer1 must work``() =
     let shape = {
         Layers = [ 
             { NodesNumber = 2; Activation = act }; 
-            { NodesNumber = 2; Activation = sigmoid }; 
+            { NodesNumber = 2; Activation = sigm }; 
         ]
     }
     
-    let actual = calcNN inputs shape theta
+    let actual = forward inputs shape theta
     let expected = vector([0.37; 0.74]);
     
     (actual |> Vector.map (fun m -> System.Math.Round(m, 2))) 
@@ -59,12 +61,12 @@ let ``Calc XOR must work``() =
     let shape = {
         Layers = [ 
             { NodesNumber = 2; Activation = act }; 
-            { NodesNumber = 2; Activation = sigmoid }; 
-            { NodesNumber = 1; Activation = sigmoid }; 
+            { NodesNumber = 2; Activation = sigm }; 
+            { NodesNumber = 1; Activation = sigm }; 
         ]
     }
     
-    let actual = calcNN inputs shape theta
+    let actual = forward inputs shape theta
     let expected = vector([0.76]);
     
     (actual |> Vector.map (fun m -> System.Math.Round(m, 2)))

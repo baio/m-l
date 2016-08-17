@@ -6,8 +6,7 @@ open ML.Core.LinearAlgebra
 
 open Types
 
-type ActivationFun = FVector -> FVector
-
+type ActivationFun = { f: FVector -> FVector; f' : FVector -> FVector }
 
 type LayerShape = {
     NodesNumber: int
@@ -68,16 +67,33 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
     )
     |> Stream.toArray
 
-let calcLayer (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) : FVector = 
-  let res = theta * (inputs |> appendOne) |> activation
+let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) : FVector = 
+  let res = theta * (inputs |> appendOne) |> activation.f
   res
-  
-let calcNN (inputs: FVector) (shape: NNShape) (theta: FVector) = 
-    let layers = reshapeNN shape theta
-    printfn "%A" layers
+
+let forward2 (inputs: FVector) layers = 
     layers
     |> Array.fold (fun acc (th, act) ->
-        calcLayer th act acc
+        calcLayerForward th act acc
     ) inputs
+  
+let forward (inputs: FVector) (shape: NNShape) (theta: FVector) = 
+    reshapeNN shape theta
+    |> forward2 inputs
 
+(*
+let backProp (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
+    let layers = reshapeNN shape theta
+    let res = calcNN2 inputs layers
+    let deltas = layers |> Array.foldBack (fun acc (th, act) ->
+        match acc with
+        | None ->
+            // first layer
+            Some(-1 * (res - outputs) * act.f'(th.Head() |> Vector.sum))
+        | Some delta ->            
+                   
+            
+    ) None
+    ()
+*)
 
