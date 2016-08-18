@@ -18,7 +18,7 @@ type NNShape = {
 }
 
 type NNLayerType = 
-    | None    
+    | Initial
     // Int number of nodes in input layer
     | Input of int 
     // Int number of nodes in input layer, thetas tail
@@ -47,7 +47,7 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
         // calculate how many nodes was in pervious layer
         // if this is first layer then use same number of thetas as nodes number 
         match acc with
-        | None ->
+        | Initial ->
             Input(v.NodesNumber)
         | Input (nnumber) ->            
             makeHidden theta nnumber v
@@ -55,7 +55,7 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
             makeHidden theta nnumber v
         | Output _ -> 
             failwith "Output must be latest layer"            
-    ) NNLayerType.None
+    ) Initial
     |> Stream.choose (fun res ->
         match res with
         | Hidden(_, _, res) -> 
@@ -67,33 +67,105 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
     )
     |> Stream.toArray
 
-let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) : FVector = 
-  let res = theta * (inputs |> appendOne) |> activation.f
-  res
+type LayerForwardResult = {
+    Weights: FMatrix
+    Net : FVector
+    //Out is not required in hidden layers
+    Out : FVector
+    Activation : ActivationFun
+}
 
+type LayerForward = 
+    | Input of FVector
+    | Hidden of LayerForwardResult
+
+// returns a, z
+let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) = 
+  let res1 = theta * (inputs |> appendOne) 
+  res1 |> activation.f, res1
+  
 let forward2 (inputs: FVector) layers = 
     layers
-    |> Array.fold (fun acc (th, act) ->
-        calcLayerForward th act acc
-    ) inputs
+    |> Array.scan (fun acc (th, act) ->
+        let layerInputs = match acc with | Input (i) -> i | Hidden (l) -> l.Out
+        let out, net = calcLayerForward th act layerInputs
+        Hidden({Weights = th; Net = net; Out = out; Activation = act})
+    ) (Input(inputs))
   
 let forward (inputs: FVector) (shape: NNShape) (theta: FVector) = 
-    reshapeNN shape theta
-    |> forward2 inputs
+    let outs = 
+        reshapeNN shape theta 
+        |> forward2 inputs
+    let res = outs.[outs.Length - 1]
+    match res with | Hidden l -> l.Out | _ -> failwith "Last layer must be hidden"
 
-(*
-let backProp (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
+
+let back (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
+    
     let layers = reshapeNN shape theta
-    let res = calcNN2 inputs layers
-    let deltas = layers |> Array.foldBack (fun acc (th, act) ->
+    
+    let fwd = forward2 inputs layers
+    
+    let deltas = 
+        Array.scanBack (fun v acc -> 
+            match v with
+            | Hidden l ->
+                //net delta
+                match acc with 
+                | None ->
+                    //ouput layer net
+                    l.Out - outputs
+                | Some s ->
+                    //hidden layer net
+                    (l.Weights * s)
+                // output delta
+                |> (.*) (l.Activation.f' l.Net)
+                |> Some
+            | Input _ -> 
+                None
+        ) fwd None
+        |> Array.choose (fun f -> f)
+
+    (*
+
+    let deltaErrorTotal = (frrd.[frrd.Length - 1] - outputs) * -1.
+
+    let activationOut = snd layers.[layers.Length - 1]
+
+    let delatNet = frrd |> activationOut.f'
+
+    let deltaOut =  deltaErrorTotal .* delatNet
+    *)
+        
+
+
+    //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/                
+    //http://ufldl.stanford.edu/tutorial/supervised/MultiLayerNeuralNetworks/
+
+    //1. Perform a feedforward pass, computing the activations for layers L2L2, L3L3, 
+    //up to the output layer LnlLnl, using the equations defining the forward propagation steps
+    //let frrd = forward2 inputs layers
+
+    //2. For the output layer (layer nlnl), set
+    //δ(nl)=−(y−a(nl))∙f′(z(nl))δ(nl)=−(y−a(nl))∙f′(z(nl))
+
+    //3. For l=nl−1,nl−2,nl−3,…,2l=nl−1,nl−2,nl−3,…,2, set
+    //δ(l)=((W(l))Tδ(l+1))∙f′(z(l))δ(l)=((W(l))Tδ(l+1))∙f′(z(l))
+
+    //4. Compute the desired partial derivatives:
+    //∇W(l)J(W,b;x,y)
+    //∇b(l)J(W,b;x,y)=δ(l+1)(a(l))T,=δ(l+1).
+    (*      
+    let deltas = layers |> Array.foldBack ( fun (th, act) acc ->
         match acc with
         | None ->
             // first layer
-            Some(-1 * (res - outputs) * act.f'(th.Head() |> Vector.sum))
+            let z = th.Head() |> Vector.sum
+            let d = -1 * (res - outputs) * act.f'(z)
+            Some d
         | Some delta ->            
-                   
-            
+            None                               
     ) None
+    *)
     ()
-*)
 
