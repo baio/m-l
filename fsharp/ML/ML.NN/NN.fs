@@ -100,88 +100,48 @@ let forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
     match res with | Hidden l -> l.Out | _ -> failwith "Last layer must be hidden"
 
 
-type LayerBackwordResult = { Delta : FVector; Gradient : FVector }
+type LayerBackwordResult = { Delta : FMatrix; Gradient : FMatrix }
 
 type LayerBackword = 
     | LBNone
     | LBOutput of FVector // Delta of output layer
-    | LBHidden of LayerBackwordResult
+    | LBHidden of FMatrix
 
-let back (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
+let backward (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
     
     let layers = reshapeNN shape theta
     
     let fwd = forward2 inputs layers
     
-    let grads = 
-        Array.scanBack (fun v acc ->             
-            match v with
-            | Hidden l ->
-                let deltaNet = l.Activation.f' l.Net
-                let calcHidden delta = 
-                    let deltaOut = l.Weights * delta
-                    let deltaErr = deltaNet .* deltaOut
-                    let gradient = delta .* l.Out
-                    LBHidden({Delta = deltaErr; Gradient = gradient })
-                match acc with 
-                | LBNone ->
-                    //ouput layer net
-                    let deltaOut = l.Out - outputs
-                    let deltaErr = -1. * deltaNet .* deltaOut
-                    LBOutput(deltaErr)
-                | LBOutput delta ->
-                    calcHidden delta
-                | LBHidden { Delta = delta } ->
-                    calcHidden delta
-            | Input _ -> 
-                LBNone
-        ) fwd LBNone
-        |> Array.choose (fun f -> 
-            match f with
-            | LBHidden l -> Some(l.Gradient)
-            | _ -> None
-        )
+    Array.scanBack (fun v acc ->             
+        match v with
+        | Hidden l ->
+            match acc with 
+            | LBNone ->
+                //ouput layer net
+                let deltaOut = l.Activation.f' l.Net
+                let deltaE = l.Out - outputs
+                let deltaRes = deltaOut .* deltaE
+                LBOutput(deltaRes)
+            | LBOutput dOut ->
+                //hidden layer (last)                
+                let outMx = [l.Out] |> DenseMatrix.ofRowSeq |> appendOnes |>  repmatRow dOut.Count
+                let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq |> repmatCol outMx.ColumnCount
+                let dEtotal_dw = outMx .* dOutMx
+                LBHidden dEtotal_dw
+            | LBHidden delta ->
+                LBNone                                                        
+        | Input _ -> 
+            LBNone
+    ) fwd LBNone
+    |> Array.choose (function
+        | LBHidden l -> Some(l)
+        | _ -> None
+    )
 
-    (*
-
-    let deltaErrorTotal = (frrd.[frrd.Length - 1] - outputs) * -1.
-
-    let activationOut = snd layers.[layers.Length - 1]
-
-    let delatNet = frrd |> activationOut.f'
-
-    let deltaOut =  deltaErrorTotal .* delatNet
-    *)
-        
 
 
     //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/                
     //http://ufldl.stanford.edu/tutorial/supervised/MultiLayerNeuralNetworks/
 
-    //1. Perform a feedforward pass, computing the activations for layers L2L2, L3L3, 
-    //up to the output layer LnlLnl, using the equations defining the forward propagation steps
-    //let frrd = forward2 inputs layers
-
-    //2. For the output layer (layer nlnl), set
-    //δ(nl)=−(y−a(nl))∙f′(z(nl))δ(nl)=−(y−a(nl))∙f′(z(nl))
-
-    //3. For l=nl−1,nl−2,nl−3,…,2l=nl−1,nl−2,nl−3,…,2, set
-    //δ(l)=((W(l))Tδ(l+1))∙f′(z(l))δ(l)=((W(l))Tδ(l+1))∙f′(z(l))
-
-    //4. Compute the desired partial derivatives:
-    //∇W(l)J(W,b;x,y)
-    //∇b(l)J(W,b;x,y)=δ(l+1)(a(l))T,=δ(l+1).
-    (*      
-    let deltas = layers |> Array.foldBack ( fun (th, act) acc ->
-        match acc with
-        | None ->
-            // first layer
-            let z = th.Head() |> Vector.sum
-            let d = -1 * (res - outputs) * act.f'(z)
-            Some d
-        | Some delta ->            
-            None                               
-    ) None
-    *)
-    ()
 

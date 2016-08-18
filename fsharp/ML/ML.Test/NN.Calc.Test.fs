@@ -93,3 +93,25 @@ let ``Calc Example must work``() =
     
     (actual |> Vector.map (fun m -> System.Math.Round(m, 2)))
     |> should equal expected
+
+
+[<Fact>]
+let ``Calc Example grads must work``() =
+    
+    // XOR, Math from Artificial Network 
+    let inputs = vector([0.05; 0.10])
+    let outputs = vector([0.01; 0.99])
+    let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
+    
+    let shape = {
+        Layers = [ 
+            { NodesNumber = 2; Activation = act }; 
+            { NodesNumber = 2; Activation = sigm }; 
+            { NodesNumber = 2; Activation = sigm }; 
+        ]
+    }
+    
+    let actual = backward outputs inputs shape theta
+    let expected = vector([0.75; 0.77]);
+        
+    true |> should equal false
