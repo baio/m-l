@@ -100,31 +100,47 @@ let forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
     match res with | Hidden l -> l.Out | _ -> failwith "Last layer must be hidden"
 
 
+type LayerBackwordResult = { Delta : FVector; Gradient : FVector }
+
+type LayerBackword = 
+    | LBNone
+    | LBOutput of FVector // Delta of output layer
+    | LBHidden of LayerBackwordResult
+
 let back (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
     
     let layers = reshapeNN shape theta
     
     let fwd = forward2 inputs layers
     
-    let deltas = 
-        Array.scanBack (fun v acc -> 
+    let grads = 
+        Array.scanBack (fun v acc ->             
             match v with
             | Hidden l ->
-                //net delta
+                let deltaNet = l.Activation.f' l.Net
+                let calcHidden delta = 
+                    let deltaOut = l.Weights * delta
+                    let deltaErr = deltaNet .* deltaOut
+                    let gradient = delta .* l.Out
+                    LBHidden({Delta = deltaErr; Gradient = gradient })
                 match acc with 
-                | None ->
+                | LBNone ->
                     //ouput layer net
-                    l.Out - outputs
-                | Some s ->
-                    //hidden layer net
-                    (l.Weights * s)
-                // output delta
-                |> (.*) (l.Activation.f' l.Net)
-                |> Some
+                    let deltaOut = l.Out - outputs
+                    let deltaErr = -1. * deltaNet .* deltaOut
+                    LBOutput(deltaErr)
+                | LBOutput delta ->
+                    calcHidden delta
+                | LBHidden { Delta = delta } ->
+                    calcHidden delta
             | Input _ -> 
-                None
-        ) fwd None
-        |> Array.choose (fun f -> f)
+                LBNone
+        ) fwd LBNone
+        |> Array.choose (fun f -> 
+            match f with
+            | LBHidden l -> Some(l.Gradient)
+            | _ -> None
+        )
 
     (*
 
