@@ -106,8 +106,12 @@ type LayerBackword =
     | LBNone
     | LBOutput of FMatrix * FVector // Weights of layer * Delta of output layer 
     | LBHidden of FMatrix * FVector * FMatrix // weights of layer * Delta * Gradient
+    | LBInput of FMatrix // gradient
 
-let backward (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
+//let private caclGrads delta_l_plus_1 a_l = 
+    
+
+let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
     
     let layers = reshapeNN shape theta
     
@@ -129,16 +133,21 @@ let backward (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
             let dEtotal_dw = dOutMx * outMx
             // delta
             let deltaOut = l.Activation.f' l.Net
-            let deltaE = weights * dOut
+            let deltaE = (dOutMx.Transpose() * weights.RemoveColumn(0)).Row(0)
             let delta = deltaOut .* deltaE
             LBHidden(l.Weights, delta, dEtotal_dw)
-        | (Input l, LBHidden (weights, delta, _)) ->
-            LBNone                                                        
+        | (Input l, LBHidden (weights, dOut, _)) ->
+            // gradient      
+            let outMx = [l] |> DenseMatrix.ofRowSeq |> appendOnes
+            let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq
+            let dEtotal_dw = dOutMx * outMx
+            LBInput(dEtotal_dw)
         | _ ->             
            failwith "not supported"
     ) fwd LBNone
     |> Array.choose (function
         | LBHidden(_, _, grad) -> Some(grad)
+        | LBInput(grad) -> Some(grad)
         | _ -> None
     )
 

@@ -111,7 +111,7 @@ let ``Calc Example grads must work``() =
         ]
     }
     
-    let actual = backward outputs inputs shape theta
+    let actual = backprop outputs inputs shape theta
     let expected = vector([0.75; 0.77]);
         
     true |> should equal false

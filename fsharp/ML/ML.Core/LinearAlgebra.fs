@@ -33,6 +33,8 @@
 
     let appendOnes (mx: _ Matrix) = mx.InsertColumn(0, ones mx.RowCount)
 
+    let removeFirstColumn (mx: _ Matrix) = mx.RemoveColumn(0)
+
     let vecCons (el: _) (vec: _ Vector)  = Vector.insert 0 el vec
 
     let appendOne (vec: _ Vector) = vecCons 1. vec     
