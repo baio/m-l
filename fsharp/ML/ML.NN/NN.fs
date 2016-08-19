@@ -104,7 +104,7 @@ type LayerBackwordResult = { Delta : FMatrix; Gradient : FMatrix }
 
 type LayerBackword = 
     | LBNone
-    | LBOutput of FVector // Delta of output layer
+    | LBOutput of FMatrix * FVector // Weights of layer * Delta of output layer
     | LBHidden of FMatrix
 
 let backward (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
@@ -122,16 +122,18 @@ let backward (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
                 let deltaOut = l.Activation.f' l.Net
                 let deltaE = l.Out - outputs
                 let deltaRes = deltaOut .* deltaE
-                LBOutput(deltaRes)
-            | LBOutput dOut ->
-                //hidden layer (last)                
-                let outMx = [l.Out] |> DenseMatrix.ofRowSeq |> appendOnes |>  repmatRow dOut.Count
-                let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq |> repmatCol outMx.ColumnCount
-                let dEtotal_dw = outMx .* dOutMx
+                LBOutput(l.Weights, deltaRes)
+            | LBOutput (weights, dOut) ->
+                //hidden layer (last)          
+                // gradient      
+                let outMx = [l.Out] |> DenseMatrix.ofRowSeq |> appendOnes
+                let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq
+                let dEtotal_dw = dOutMx * outMx
+                // delta
                 LBHidden dEtotal_dw
             | LBHidden delta ->
                 LBNone                                                        
-        | Input _ -> 
+        | Input _ ->             
             LBNone
     ) fwd LBNone
     |> Array.choose (function
