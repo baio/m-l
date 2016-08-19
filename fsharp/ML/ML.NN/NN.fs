@@ -104,8 +104,8 @@ type LayerBackwordResult = { Delta : FMatrix; Gradient : FMatrix }
 
 type LayerBackword = 
     | LBNone
-    | LBOutput of FMatrix * FVector // Weights of layer * Delta of output layer
-    | LBHidden of FMatrix
+    | LBOutput of FMatrix * FVector // Weights of layer * Delta of output layer 
+    | LBHidden of FMatrix * FVector * FMatrix // weights of layer * Delta * Gradient
 
 let backward (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
     
@@ -114,30 +114,31 @@ let backward (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
     let fwd = forward2 inputs layers
     
     Array.scanBack (fun v acc ->             
-        match v with
-        | Hidden l ->
-            match acc with 
-            | LBNone ->
-                //ouput layer net
-                let deltaOut = l.Activation.f' l.Net
-                let deltaE = l.Out - outputs
-                let deltaRes = deltaOut .* deltaE
-                LBOutput(l.Weights, deltaRes)
-            | LBOutput (weights, dOut) ->
-                //hidden layer (last)          
-                // gradient      
-                let outMx = [l.Out] |> DenseMatrix.ofRowSeq |> appendOnes
-                let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq
-                let dEtotal_dw = dOutMx * outMx
-                // delta
-                LBHidden dEtotal_dw
-            | LBHidden delta ->
-                LBNone                                                        
-        | Input _ ->             
-            LBNone
+        match v, acc with
+        | (Hidden l, LBNone) ->
+            //ouput layer net
+            let deltaOut = l.Activation.f' l.Net
+            let deltaE = l.Out - outputs
+            let deltaRes = deltaOut .* deltaE
+            LBOutput(l.Weights, deltaRes)
+        | (Hidden l, LBOutput (weights, dOut)) ->
+            //last hidden layer
+            // gradient      
+            let outMx = [l.Out] |> DenseMatrix.ofRowSeq |> appendOnes
+            let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq
+            let dEtotal_dw = dOutMx * outMx
+            // delta
+            let deltaOut = l.Activation.f' l.Net
+            let deltaE = weights * dOut
+            let delta = deltaOut .* deltaE
+            LBHidden(l.Weights, delta, dEtotal_dw)
+        | (Input l, LBHidden (weights, delta, _)) ->
+            LBNone                                                        
+        | _ ->             
+           failwith "not supported"
     ) fwd LBNone
     |> Array.choose (function
-        | LBHidden l -> Some(l)
+        | LBHidden(_, _, grad) -> Some(grad)
         | _ -> None
     )
 
