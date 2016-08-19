@@ -112,6 +112,40 @@ let ``Calc Example grads must work``() =
     }
     
     let actual = backprop outputs inputs shape theta
-    let expected = vector([0.75; 0.77]);
+
+    let mx1 = 
+        [
+            [
+                0.0087713546894869366
+                0.0099542547052172015
+            ]
+            [
+                0.00043856773447434685
+                0.0004977127352608601
+            ]
+            [
+                0.0008771354689486937
+                0.0009954254705217202
+            ]
+        ] |> DenseMatrix.ofColumnList
+
+
+    let mx2 = 
+        [
+            [
+                0.13849856162855698
+                -0.038098236516556229
+            ]
+            [
+                0.082167040564230784
+                -0.022602540477475067
+            ]
+            [
+                0.082667627847533259
+                -0.022740242215978219
+            ]
+        ] |> DenseMatrix.ofColumnList
+
+    let expected = [mx1 ; mx2]
         
-    true |> should equal false
+    actual |> should equal expected

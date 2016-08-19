@@ -108,11 +108,16 @@ type LayerBackword =
     | LBHidden of FMatrix * FVector * FMatrix // weights of layer * Delta * Gradient
     | LBInput of FMatrix // gradient
 
-//let private caclGrads delta_l_plus_1 a_l = 
+let private caclGrads delta_l_plus_1 a_l = 
+    let outMx = [delta_l_plus_1] |> DenseMatrix.ofRowSeq |> appendOnes
+    let dOutMx = [a_l] |> DenseMatrix.ofColumnSeq
+    dOutMx * outMx
     
-
 let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
     
+    //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/                
+    //http://ufldl.stanford.edu/tutorial/supervised/MultiLayerNeuralNetworks/
+
     let layers = reshapeNN shape theta
     
     let fwd = forward2 inputs layers
@@ -128,20 +133,21 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
         | (Hidden l, LBOutput (weights, dOut)) ->
             //last hidden layer
             // gradient      
-            let outMx = [l.Out] |> DenseMatrix.ofRowSeq |> appendOnes
-            let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq
-            let dEtotal_dw = dOutMx * outMx
+            let grad = caclGrads l.Out dOut
             // delta
             let deltaOut = l.Activation.f' l.Net
-            let deltaE = (dOutMx.Transpose() * weights.RemoveColumn(0)).Row(0)
+            let dOutMx = [dOut] |> DenseMatrix.ofRowSeq
+            let deltaE = (dOutMx * weights.RemoveColumn(0)).Row(0)
             let delta = deltaOut .* deltaE
-            LBHidden(l.Weights, delta, dEtotal_dw)
-        | (Input l, LBHidden (weights, dOut, _)) ->
+            LBHidden(l.Weights, delta, grad)
+        | (Input inputs, LBHidden (weights, dOut, _)) ->
             // gradient      
-            let outMx = [l] |> DenseMatrix.ofRowSeq |> appendOnes
-            let dOutMx = [dOut] |> DenseMatrix.ofColumnSeq
-            let dEtotal_dw = dOutMx * outMx
-            LBInput(dEtotal_dw)
+            let grad = caclGrads inputs dOut
+            LBInput(grad)
+        | (Input inputs, LBOutput (_, dOut)) ->
+            // one layer network case    
+            let grad = caclGrads inputs dOut
+            LBInput(grad)
         | _ ->             
            failwith "not supported"
     ) fwd LBNone
@@ -150,10 +156,4 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
         | LBInput(grad) -> Some(grad)
         | _ -> None
     )
-
-
-
-    //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/                
-    //http://ufldl.stanford.edu/tutorial/supervised/MultiLayerNeuralNetworks/
-
 
