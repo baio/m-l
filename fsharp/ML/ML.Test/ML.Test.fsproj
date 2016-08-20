@@ -126,8 +126,8 @@
       <Project>{c5fa82ad-173b-4b5c-940b-e6f66819f0b6}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\ML.Regressions\ML.Regressions.fsproj">
-      <Name>ML.Regressions</Name>
+    <ProjectReference Include="..\ML.Regressions\ML.GD.fsproj">
+      <Name>ML.GD</Name>
       <Project>{0c3ae35c-a191-48b9-8d7f-15c85bbe67d2}</Project>
       <Private>True</Private>
     </ProjectReference>

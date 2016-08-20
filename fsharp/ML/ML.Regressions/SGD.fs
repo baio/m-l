@@ -1,4 +1,4 @@
-﻿module ML.Regressions.SGD
+﻿module ML.GD.SGD
 
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils

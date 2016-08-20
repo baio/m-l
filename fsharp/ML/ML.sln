@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ML.Regressions", "ML.Regressions\ML.Regressions.fsproj", "{0C3AE35C-A191-48B9-8D7F-15C85BBE67D2}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ML.GD", "ML.Regressions\ML.GD.fsproj", "{0C3AE35C-A191-48B9-8D7F-15C85BBE67D2}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ML.Demo", "ML.Demo\ML.Demo.fsproj", "{5FB1BCF5-987F-46EA-A12D-4A961D5D55C1}"
 EndProject

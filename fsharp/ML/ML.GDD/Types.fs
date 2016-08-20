@@ -2,9 +2,9 @@
 
 open MathNet.Numerics.LinearAlgebra
 
-open ML.Regressions.GLM
-open ML.Regressions.GradientDescent
-open ML.Regressions.GD
+open ML.GD.GLM
+open ML.GD.GradientDescent
+open ML.GD.GD
 open SamplesStorage
      
 type BatchSamples = 

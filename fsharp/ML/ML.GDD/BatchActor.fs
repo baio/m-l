@@ -5,9 +5,9 @@ open Akka.Actor
 open Akka.FSharp
 open MathNet.Numerics.LinearAlgebra
 
-open ML.Regressions.GradientDescent
-open ML.Regressions.GD
-open ML.Regressions.GLM
+open ML.GD.GradientDescent
+open ML.GD.GD
+open ML.GD.GLM
 
 open ML.DGD.IterParamsServerActor
 

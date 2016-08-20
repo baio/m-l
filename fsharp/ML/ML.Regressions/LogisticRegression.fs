@@ -1,4 +1,4 @@
-﻿module ML.Regressions.LogisticRegression
+﻿module ML.GD.LogisticRegression
 
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils

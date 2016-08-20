@@ -3,15 +3,15 @@
 open ML.Core.Readers
 open ML.Core.Utils
 
-open ML.Regressions.GLM
-open ML.Regressions.SoftmaxRegression
-open ML.Regressions.GD
-open ML.Regressions.SGD
-open ML.Regressions.NAG
-open ML.Regressions.Adagrad
-open ML.Regressions.Adadelta
+open ML.GD.GLM
+open ML.GD.SoftmaxRegression
+open ML.GD.GD
+open ML.GD.SGD
+open ML.GD.NAG
+open ML.GD.Adagrad
+open ML.GD.Adadelta
 
-open ML.Regressions.GradientDescent
+open ML.GD.GradientDescent
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil

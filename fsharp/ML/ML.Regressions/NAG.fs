@@ -1,10 +1,10 @@
-﻿module ML.Regressions.NAG
+﻿module ML.GD.NAG
 //http://stats.stackexchange.com/questions/179915/whats-the-difference-between-momentum-based-gradient-descent-and-nesterovs-ac
 
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
-open ML.Regressions.GLM
+open GLM
 open SGD
 open GD
 

@@ -4,7 +4,7 @@ open Akka.Actor
 open Akka.FSharp
 
 open ML.DGD.BatchCoordinatorActor
-open ML.Regressions.GD
+open ML.GD.GD
 open ML.Core.LinearAlgebra
 
 open Types

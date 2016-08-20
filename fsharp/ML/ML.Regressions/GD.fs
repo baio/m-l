@@ -1,8 +1,8 @@
-﻿module ML.Regressions.GD
+﻿module ML.GD.GD
 // http://ufldl.stanford.edu/tutorial/supervised/LinearRegression/
 
 open ML.Core.LinearAlgebra
-open ML.Regressions.GLM
+open GLM
 open MathNet.Numerics.LinearAlgebra
 
 type ConvergeMode =

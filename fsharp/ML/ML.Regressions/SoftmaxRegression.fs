@@ -1,4 +1,4 @@
-﻿module ML.Regressions.SoftmaxRegression
+﻿module ML.GD.SoftmaxRegression
 
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils

@@ -1,4 +1,4 @@
-﻿module ML.Regressions.GradientDescent
+﻿module ML.GD.GradientDescent
 open MathNet.Numerics.LinearAlgebra
 
 open ML.Core.LinearAlgebra

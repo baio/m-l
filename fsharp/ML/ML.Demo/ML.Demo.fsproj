@@ -79,6 +79,11 @@
       <Project>{685714b3-718b-4da5-98ef-cc2fdb432a5e}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\ML.Regressions\ML.GD.fsproj">
+      <Name>ML.GD</Name>
+      <Project>{0c3ae35c-a191-48b9-8d7f-15c85bbe67d2}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\ML.Statistics\ML.Statistics.fsproj">
       <Name>ML.Statistics</Name>
       <Project>{0d6571af-3459-4357-8928-789ca1063889}</Project>
@@ -112,11 +117,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\ML.Regressions\ML.Regressions.fsproj">
-      <Name>ML.Regressions</Name>
-      <Project>{0c3ae35c-a191-48b9-8d7f-15c85bbe67d2}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="..\packages\MathNet.Numerics.MKL.Win.2.0.0\build\MathNet.Numerics.MKL.Win.targets" Condition="Exists('..\packages\MathNet.Numerics.MKL.Win.2.0.0\build\MathNet.Numerics.MKL.Win.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

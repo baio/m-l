@@ -1,4 +1,4 @@
-﻿module ML.Regressions.Adagrad
+﻿module ML.GD.Adagrad
 
 //https://xcorr.net/2014/01/23/adagrad-eliminating-learning-rates-in-stochastic-gradient-descent/
 

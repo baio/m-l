@@ -1,4 +1,4 @@
-﻿namespace ML.Regressions.AssemblyInfo
+﻿namespace ML.GD.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices

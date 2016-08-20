@@ -62,6 +62,11 @@
     <None Include="test.fsx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ML.Regressions\ML.GD.fsproj">
+      <Name>ML.GD</Name>
+      <Project>{0c3ae35c-a191-48b9-8d7f-15c85bbe67d2}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <Reference Include="Akka">
       <HintPath>..\packages\Akka.1.1.1\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
@@ -111,11 +116,6 @@
     <ProjectReference Include="..\ML.Core\ML.Core.fsproj">
       <Name>ML.Core</Name>
       <Project>{c5fa82ad-173b-4b5c-940b-e6f66819f0b6}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ML.Regressions\ML.Regressions.fsproj">
-      <Name>ML.Regressions</Name>
-      <Project>{0c3ae35c-a191-48b9-8d7f-15c85bbe67d2}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

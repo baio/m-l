@@ -1,10 +1,9 @@
-﻿module ML.Regressions.LinearRegression
+﻿module ML.GD.LinearRegression
 
 open ML.Core.Utils
 open MathNet.Numerics.LinearAlgebra
 
 open GLM
-
 
 let linearHyp (x: float Vector) (theta: float Vector) = theta * x                
 

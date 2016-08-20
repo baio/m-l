@@ -6,7 +6,7 @@ open MathNet.Numerics.LinearAlgebra
 
 open ML.NN
 
-open ML.Regressions.LogisticRegression
+open ML.GD.LogisticRegression
 
 let f a = a
 let act = {f = f; f' = f}

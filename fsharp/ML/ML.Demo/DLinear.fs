@@ -2,15 +2,15 @@
 
 open ML.Core.Readers
 open ML.Core.Utils
-open ML.Regressions.GLM
-open ML.Regressions.LinearRegression
+open ML.GD.GLM
+open ML.GD.LinearRegression
 
-open ML.Regressions.GD
-open ML.Regressions.SGD
-open ML.Regressions.NAG
-open ML.Regressions.Adagrad
-open ML.Regressions.Adadelta
-open ML.Regressions.GradientDescent
+open ML.GD.GD
+open ML.GD.SGD
+open ML.GD.NAG
+open ML.GD.Adagrad
+open ML.GD.Adadelta
+open ML.GD.GradientDescent
 
 open ML.DGD.Types
 open ML.DGD.DistributedGradientDescnt

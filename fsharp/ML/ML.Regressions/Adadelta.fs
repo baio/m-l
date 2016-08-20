@@ -1,6 +1,6 @@
 ﻿// http://arxiv.org/pdf/1212.5701v1.pdf
 // http://climin.readthedocs.io/en/latest/adadelta.html
-module ML.Regressions.Adadelta
+module ML.GD.Adadelta
 
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.Utils

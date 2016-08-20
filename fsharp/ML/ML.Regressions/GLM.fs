@@ -1,4 +1,4 @@
-﻿module ML.Regressions.GLM
+﻿module ML.GD.GLM
 
 open ML.Core.Utils
 open ML.Core.LinearAlgebra
