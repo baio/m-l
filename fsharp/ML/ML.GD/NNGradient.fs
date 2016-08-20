@@ -8,6 +8,8 @@ open ML.NN
 
 let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)  =     
     let shape = thetaShape.nnShape()
+    //TODO : forward require inputs without bias
+    let x = x.RemoveColumn(0)
     let errSum = 
         x.EnumerateRows() 
         |> Seq.map(fun row ->
@@ -19,6 +21,8 @@ let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)
         
 let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector) =
     let shape = thetaShape.nnShape()
+    //TODO : forward require inputs without bias
+    let x = x.RemoveColumn(0)
     let gradSum = 
         x.EnumerateRows()
         |> Seq.map(fun f ->
