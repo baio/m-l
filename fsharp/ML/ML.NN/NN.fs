@@ -114,12 +114,28 @@ type LayerBackwordResult = { Delta : FMatrix; Gradient : FMatrix }
 // δᴸᴾ = Delta in layer L + 1, same as δᴸ⁺¹, same for other symbols
 // gradients : Δᴸ, Δ, ∇
 
+
+type BackpropOutputLayerResult = {
+    Weights : FMatrix
+    Delta : FVector
+}
+
+type BackpropHiddenLayerResult = {
+    Weights : FMatrix
+    Gradient : FMatrix
+    Delta : FVector
+}
+
+type BackpropInputLayerResult = {
+    Gradient : FMatrix
+}
+
 //BackpropResult
-type LayerBackword =
-    | LBNone
-    | LBOutput of FMatrix * FVector // Weights of layer * Delta of output layer
-    | LBHidden of FMatrix * FVector * FMatrix // weights of layer * Delta * Gradient
-    | LBInput of FMatrix // gradient
+type BackpropResult =
+    | BackpropResultNone
+    | BackpropResultOutput of BackpropOutputLayerResult
+    | BackpropResultHidden of BackpropHiddenLayerResult
+    | BackpropResultInput of BackpropInputLayerResult
 
 let private caclGrads aᴸ δᴸᴾ =
     let aᴸ_mx = [aᴸ] |> DenseMatrix.ofRowSeq |> appendOnes
@@ -147,6 +163,7 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
     // 𝟃A/𝟃N
     // how much does the output change with respect to its total net input
     // calculated similary for all layers f'(Net)
+    // =========
     // Delta not calculated for input layer and biases,
     // only for nodes which have ingoing connections,
     // since these deltas will be needed to calculate gradients for these connections
@@ -164,37 +181,37 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
 
     Array.scanBack (fun v acc ->
         match v, acc with
-        | (Hidden l, LBNone) ->
+        | (Hidden l, BackpropResultNone) ->
             // ouput layer net
             // this is first calculated layer in backprop alghoritm
             let ΔE_ΔA = l.Out - outputs
             let ΔA_ΔN = l.Activation.f' l.Net
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
-            LBOutput(l.Weights, δᴸ)
-        | (Hidden l, LBOutput (wᴸᴾ, δᴸᴾ)) ->
+            BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
+        | (Hidden l, BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //last hidden layer (n_l - 1), right before outputs
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
             let Δᴸ = caclGrads l.Out δᴸᴾ
-            LBHidden(l.Weights, δᴸ, Δᴸ)
-        | (Hidden l, LBHidden (wᴸᴾ, δᴸᴾ, _)) ->
+            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
+        | (Hidden l, BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //gradient for hidden layer (n_l - 2...)
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
             let Δᴸ = caclGrads l.Out δᴸᴾ
-            LBHidden(l.Weights, δᴸ, Δᴸ)
-        | (Input inputs, LBHidden (_, δᴸᴾ, _)) ->
+            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
+        | (Input inputs, BackpropResultHidden({Delta =  δᴸᴾ})) ->
             // calc gradient for first hidden layer (n_1)
             let Δᴸ = caclGrads inputs δᴸᴾ
-            LBInput(Δᴸ)
-        | (Input inputs, LBOutput (_, δᴸᴾ)) ->
+            BackpropResultInput({Gradient = Δᴸ})
+        | (Input inputs, BackpropResultOutput ({Delta = δᴸᴾ})) ->
             // one layer network case (n_1)
             let Δᴸ = caclGrads inputs δᴸᴾ
-            LBInput(Δᴸ)
+            BackpropResultInput({ Gradient = Δᴸ})
         | _ ->
            failwith "not supported"
-    ) fwd LBNone
+    ) fwd BackpropResultNone
     |> Array.choose (function
-        | LBHidden(_, _, grad) -> Some(grad)
-        | LBInput(grad) -> Some(grad)
+        | BackpropResultHidden({Gradient = Δ}) -> Some(Δ)
+        | BackpropResultInput({Gradient = Δ}) -> Some(Δ)
         | _ -> None
     )
 
