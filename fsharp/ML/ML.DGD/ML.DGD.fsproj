@@ -62,7 +62,7 @@
     <None Include="test.fsx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ML.Regressions\ML.GD.fsproj">
+    <ProjectReference Include="..\ML.GD\ML.GD.fsproj">
       <Name>ML.GD</Name>
       <Project>{0c3ae35c-a191-48b9-8d7f-15c85bbe67d2}</Project>
       <Private>True</Private>
