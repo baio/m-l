@@ -4,14 +4,20 @@ open ML.Core.Utils
 open ML.Core.LinearAlgebra
 open MathNet.Numerics.LinearAlgebra
 
+open ML.NN
 
 type ThetaShape = 
     | ThetaShapeVector
     | ThetaShapeMatrix of int * int
+    | ThetaShapeNN of NNShape
     member this.matrixSize() = 
         match this with 
         | ThetaShapeMatrix (r, c) -> (r, c)
         | _ -> failwith "Shape is not a matrix"
+    member this.nnShape() = 
+        match this with 
+        | ThetaShapeNN (shape) -> shape
+        | _ -> failwith "Shape is not a nn"
 
 // Given weights and features return calculated label
 type HypothesisFunc = float Vector -> float Vector -> float
@@ -32,10 +38,16 @@ type GLMSoftmaxModel = {
     ClassesNumber : int
 }
 
+// NN
+type GLMNNModel = {       
+    Base : GLMBaseModel
+    Shape : NNShape
+}
+
 type GLMModel = 
     | GLMBaseModel of GLMBaseModel
     | GLMSoftmaxModel of GLMSoftmaxModel
-
+    | GLMNNModel of GLMNNModel //neural network
 
 let GLMPredict (hypothesis: HypothesisFunc) (theta: float Vector) (mx: float Matrix) =     
     DenseVector.init mx.RowCount (fun i -> 

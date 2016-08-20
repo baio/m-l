@@ -47,13 +47,16 @@ type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: float Vector
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
 type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
 
+//Return Shape, Initial theta and Base Model
 let getModelShapeAndTheta (model: GLMModel) (featuresNumber: int) =
     match model with
     | GLMBaseModel m ->
-        ThetaShapeVector, featuresNumber + 1 |> zeros, m
+        ThetaShapeVector, (featuresNumber + 1 |> zeros), m
+    | GLMNNModel({ Base = m; Shape = shape}) ->
+        ThetaShapeNN(shape), (shape.thetasCount() |> zeros), m
     | GLMSoftmaxModel m ->
         let sz = featuresNumber + 1, m.ClassesNumber
-        ThetaShapeMatrix(sz), fst sz * snd sz |> zeros, m.Base
+        ThetaShapeMatrix(sz), (fst sz * snd sz |> zeros), m.Base
 
 let internal GD<'iter, 'hyper>
     (calcGradient: ClacGradientFunc<'iter, 'hyper>)
@@ -67,6 +70,7 @@ let internal GD<'iter, 'hyper>
     : ModelTrainResult
     =
 
+        //TODO : Inputs for NN must not contain biases, they will be added automaticaly
         let x = x |> appendOnes
 
         let calcGradientPrms = {

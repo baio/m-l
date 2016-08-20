@@ -33,7 +33,6 @@ let getIterParamsProvider model featuresCount hyper  =
     let init = getInitialIterParams model featuresCount hyper
     { initial = (fun () -> init) ; update =  (fun (f) -> f) }
 
-//TODO !!!
 let unwrapIterParamsProvider<'iter> (iterParamsProvider: IterParamsProvider<obj>) : IterParamsProvider<'iter> =
 
     let init = iterParamsProvider.initial();  
@@ -69,8 +68,6 @@ let gradientDescent2
     | AdadeltaHyperParams hp ->                           
         let pr = unwrapIterParamsProvider<AdadeltaIter>(iterParamsProvider)
         adadelta pr model prms hp inputs outputs                
-
-
 
 let gradientDescent     
     (model: GLMModel) 

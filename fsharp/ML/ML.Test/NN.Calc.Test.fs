@@ -8,6 +8,16 @@ open ML.NN
 
 open ML.GD.LogisticRegression
 
+open ML.Core.Readers
+open ML.Core.Utils
+open ML.GD.GLM
+open ML.GD.NNGradient
+open ML.GD.GradientDescent
+
+
+open ML.GD.GD
+open ML.GD.SGD
+
 let f a = a
 let act = {f = f; f' = f}
 let sigm = { f= sigmoid;  f' = sigmoid'} 
@@ -148,3 +158,63 @@ let ``Calc Example grads must work``() =
     let expected = [mx1 ; mx2]
         
     actual |> should equal expected
+
+[<Fact>]
+let ``Calc GD for Example NN must work``() =
+    
+    let inputs = [vector([0.05; 0.10])] |> DenseMatrix.ofRows
+    let outputs = vector([0.01; 0.99])
+    let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
+
+    let expectedTheta = 
+        [
+            0.0
+            0.0
+
+            0.149780716
+            0.19956143
+
+            0.24975114
+            0.29950229
+
+            0.0
+            0.0
+
+            0.35891648
+            0.408666186
+
+            0.511301270
+            0.561370121
+
+        ] 
+    
+
+    let model = {
+        Cost = NNCost
+        Gradient = NNGradient
+    }
+
+    let prms = {
+        EpochNumber = 1
+        ConvergeMode = ConvergeModeNone
+    }       
+
+    let stochasticHyper : SGDHyperParams = {
+        Alpha = 0.5
+        BatchSize = 1
+    }
+
+    let shape = 
+        {
+            Layers = 
+                [ 
+                    { NodesNumber = 2; Activation = act }; 
+                    { NodesNumber = 2; Activation = sigm }; 
+                    { NodesNumber = 2; Activation = sigm }; 
+                ]
+        }
+
+    let gd = stochasticHyper |> SGDHyperParams |> gradientDescent (GLMNNModel({ Base = model; Shape = shape })) prms inputs outputs 
+    
+    gd.Theta |> should equal expectedTheta
+

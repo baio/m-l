@@ -15,7 +15,6 @@ let sigmoid' (z: float Vector) =
 let sigmoidScalar (z: float) = 
     1. / (1. + System.Math.Exp(-1. * z))
 
-
 let logisticMSECost _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
     let s = x *  theta |> sigmoid
     let p = y * s.PointwiseLog()     

@@ -4,18 +4,26 @@ open MathNet.Numerics.LinearAlgebra
 open Nessos.Streams
 open ML.Core.LinearAlgebra
 
+///////////////////////// NN Shape
+
 type ActivationFun = { f: FVector -> FVector; f' : FVector -> FVector }
 
-///////////////////////// Reshape
-
-type LayerShape = {
+type NNLayerShape = {
     NodesNumber: int
     Activation: ActivationFun
 }
 
 type NNShape = {
-    Layers: LayerShape list
-}
+        Layers: NNLayerShape list
+} with 
+    member 
+        this.thetasCount() = 
+            (0, 0)
+            |> List.foldBack(fun layer (totalLinksCount, prevLayerNodesCount) ->
+                let layerLinksCount = (layer.NodesNumber + 1) * prevLayerNodesCount
+                (totalLinksCount + layerLinksCount), layer.NodesNumber
+            ) this.Layers
+            |> fst
 
 type NNLayerType =
     | Initial
@@ -29,7 +37,7 @@ type NNLayerType =
 // where rows from matrix containing one theta vector for each Node in the layer (including bias)
 let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) array =
 
-    let makeHidden (theta: FVector) pervLayerNodesNumber (layer: LayerShape) =
+    let makeHidden (theta: FVector) pervLayerNodesNumber (layer: NNLayerShape) =
         // +1 for bias
         let layerThetasNumber = (pervLayerNodesNumber + 1) * layer.NodesNumber
         let mx = reshape (layer.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
@@ -66,6 +74,13 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
             Option.None
     )
     |> Stream.toArray
+
+let flatNNGradients (layersGrads: FMatrix array) =
+    layersGrads
+    |> Seq.collect (fun f ->
+        f.EnumerateRows()
+        |> Seq.collect (fun f -> f)
+    )
 
 /////////////////////////////////////////Forward
 
@@ -158,6 +173,7 @@ let private caclHiddenDelta fwdLayer (wᴸᴾ: FMatrix) δᴸᴾ =
     let ΔA_ΔN = fwdLayer.Activation.f' fwdLayer.Net
     ΔE_ΔA .* ΔA_ΔN
 
+//TODO : inputs must already contain bias (check FBiasVector)
 let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
 
     //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
@@ -225,3 +241,10 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
         | _ -> None
     )
 
+////
+
+let NNCost _ (x : float Matrix) (y : float Vector) (theta: float Vector)  =     
+    ((x * theta - y).PointwisePower(2.) |> Vector.sum) / (2. * float x.RowCount) 
+        
+let NNGradient _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
+    x.Transpose() * (x * theta - y) / float x.RowCount

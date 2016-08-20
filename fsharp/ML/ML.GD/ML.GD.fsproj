@@ -54,17 +54,18 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="NN.fs" />
     <Compile Include="GLM.fs" />
     <Compile Include="LinearRegression.fs" />
     <Compile Include="LogisticRegression.fs" />
     <Compile Include="SoftmaxRegression.fs" />
+    <Compile Include="NNGradient.fs" />
     <Compile Include="GD.fs" />
     <Compile Include="SGD.fs" />
     <Compile Include="NAG.fs" />
     <Compile Include="Adagrad.fs" />
     <Compile Include="Adadelta.fs" />
     <Compile Include="GradientDescent.fs" />
-    <Compile Include="NN.fs" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
   </ItemGroup>
