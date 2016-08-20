@@ -8,6 +8,8 @@ open Types
 
 type ActivationFun = { f: FVector -> FVector; f' : FVector -> FVector }
 
+///////////////////////// Reshape
+
 type LayerShape = {
     NodesNumber: int
     Activation: ActivationFun
@@ -67,7 +69,13 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
     )
     |> Stream.toArray
 
-type LayerForwardResult = {
+/////////////////////////////////////////Forward
+
+type ForwardInputLayerResult = {
+    Inputs: FVector
+}
+
+type ForwardHiddenLayerResult = {
     //same as `W`
     Weights: FMatrix
     //same as `z`
@@ -79,9 +87,9 @@ type LayerForwardResult = {
 }
 
 //ForwardResult
-type LayerForward =
-    | Input of FVector // inputs
-    | Hidden of LayerForwardResult
+type ForwardResult =
+    | ForwardResultInput of ForwardInputLayerResult // inputs
+    | ForwardResultHidden of ForwardHiddenLayerResult
 
 // returns a, z
 let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) =
@@ -91,20 +99,24 @@ let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FVect
 let forward2 (inputs: FVector) layers =
     layers
     |> Array.scan (fun acc (th, act) ->
-        let layerInputs = match acc with | Input (i) -> i | Hidden (l) -> l.Out
+        let layerInputs =
+            match acc with
+            | ForwardResultInput ({Inputs = inputs}) -> inputs
+            | ForwardResultHidden({Out = inputs}) -> inputs
         let out, net = calcLayerForward th act layerInputs
-        Hidden({Weights = th; Net = net; Out = out; Activation = act})
-    ) (Input(inputs))
+        ForwardResultHidden({Weights = th; Net = net; Out = out; Activation = act})
+    ) (ForwardResultInput({ Inputs = inputs }))
 
 let forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
     let outs =
         reshapeNN shape theta
         |> forward2 inputs
     let res = outs.[outs.Length - 1]
-    match res with | Hidden l -> l.Out | _ -> failwith "Last layer must be hidden"
+    match res with
+    | ForwardResultHidden({Out = out}) -> out
+    | _ -> failwith "Last layer must be hidden"
 
-
-type LayerBackwordResult = { Delta : FMatrix; Gradient : FMatrix }
+///////////////////////// Backprop
 
 // Notation notes :
 // Z, z, Net, N - layer net (b + x1*w1 + x2*w2 + ..)
@@ -181,30 +193,30 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
 
     Array.scanBack (fun v acc ->
         match v, acc with
-        | (Hidden l, BackpropResultNone) ->
+        | (ForwardResultHidden(l), BackpropResultNone) ->
             // ouput layer net
             // this is first calculated layer in backprop alghoritm
             let ΔE_ΔA = l.Out - outputs
             let ΔA_ΔN = l.Activation.f' l.Net
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
             BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
-        | (Hidden l, BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
+        | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //last hidden layer (n_l - 1), right before outputs
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
             let Δᴸ = caclGrads l.Out δᴸᴾ
             BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
-        | (Hidden l, BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
+        | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //gradient for hidden layer (n_l - 2...)
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
             let Δᴸ = caclGrads l.Out δᴸᴾ
             BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
-        | (Input inputs, BackpropResultHidden({Delta =  δᴸᴾ})) ->
+        | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ})) ->
             // calc gradient for first hidden layer (n_1)
-            let Δᴸ = caclGrads inputs δᴸᴾ
+            let Δᴸ = caclGrads l.Inputs δᴸᴾ
             BackpropResultInput({Gradient = Δᴸ})
-        | (Input inputs, BackpropResultOutput ({Delta = δᴸᴾ})) ->
+        | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ})) ->
             // one layer network case (n_1)
-            let Δᴸ = caclGrads inputs δᴸᴾ
+            let Δᴸ = caclGrads l.Inputs δᴸᴾ
             BackpropResultInput({ Gradient = Δᴸ})
         | _ ->
            failwith "not supported"
