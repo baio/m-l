@@ -121,9 +121,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ML.NN\ML.NN.fsproj">
-      <Name>ML.NN</Name>
-      <Project>{d326c1ea-795a-40a8-b317-8eba08f7c2b6}</Project>
+    <ProjectReference Include="..\ML.Core\ML.Core.fsproj">
+      <Name>ML.Core</Name>
+      <Project>{c5fa82ad-173b-4b5c-940b-e6f66819f0b6}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\ML.Regressions\ML.Regressions.fsproj">

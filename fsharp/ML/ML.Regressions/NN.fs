@@ -1,10 +1,8 @@
-﻿module ML.NN.NN
+﻿module ML.NN
 
 open MathNet.Numerics.LinearAlgebra
 open Nessos.Streams
 open ML.Core.LinearAlgebra
-
-open Types
 
 type ActivationFun = { f: FVector -> FVector; f' : FVector -> FVector }
 

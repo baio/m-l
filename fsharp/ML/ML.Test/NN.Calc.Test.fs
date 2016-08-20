@@ -4,8 +4,7 @@ open Xunit
 open FsUnit
 open MathNet.Numerics.LinearAlgebra
 
-open ML.NN.Types
-open ML.NN.NN
+open ML.NN
 
 open ML.Regressions.LogisticRegression
 

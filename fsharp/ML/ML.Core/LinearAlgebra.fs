@@ -4,6 +4,10 @@
 
     open MathNet.Numerics.LinearAlgebra
 
+    type FVector = float Vector
+
+    type FMatrix = float Matrix
+
     let spliceRows start count (mx: _ Matrix) = 
         mx.SubMatrix(start, count, 0, mx.ColumnCount)
 
