@@ -30,5 +30,5 @@ let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVec
             |> flatNNGradients
         )
         |> DenseMatrix.ofColumnSeq
-        |> Matrix.sumCols
+        |> Matrix.sumRows
     gradSum / float x.RowCount
