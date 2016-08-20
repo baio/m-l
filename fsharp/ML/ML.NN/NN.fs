@@ -104,7 +104,7 @@ let forward2 (inputs: FVector) layers =
             | ForwardResultInput ({Inputs = inputs}) -> inputs
             | ForwardResultHidden({Out = inputs}) -> inputs
         let out, net = calcLayerForward th act layerInputs
-        ForwardResultHidden({Weights = th; Net = net; Out = out; Activation = act})
+        ForwardResultHidden({ Weights = th; Net = net; Out = out; Activation = act })
     ) (ForwardResultInput({ Inputs = inputs }))
 
 let forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
@@ -222,8 +222,8 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
            failwith "not supported"
     ) fwd BackpropResultNone
     |> Array.choose (function
-        | BackpropResultHidden({Gradient = Δ}) -> Some(Δ)
-        | BackpropResultInput({Gradient = Δ}) -> Some(Δ)
+        | BackpropResultHidden({ Gradient = Δ }) -> Some(Δ)
+        | BackpropResultInput({ Gradient = Δ }) -> Some(Δ)
         | _ -> None
     )
 
