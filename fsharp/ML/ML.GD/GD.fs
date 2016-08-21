@@ -52,8 +52,16 @@ let getModelShapeAndTheta (model: GLMModel) (featuresNumber: int) =
     match model with
     | GLMBaseModel m ->
         ThetaShapeVector, (featuresNumber + 1 |> zeros), m
-    | GLMNNModel({ Base = m; Shape = shape}) ->
-        ThetaShapeNN(shape), (shape.thetasCount() |> zeros), m
+    | GLMNNModel({ Base = m; Shape = shape; InitialTheta = th}) ->
+#if DEBUG
+        let theta = 
+            match th with 
+            | Some th -> th
+            | None -> shape.thetasCount() |> rndvec
+#else 
+        let theta = shape.thetasCount() |> rndvec
+#endif        
+        ThetaShapeNN(shape), theta, m
     | GLMSoftmaxModel m ->
         let sz = featuresNumber + 1, m.ClassesNumber
         ThetaShapeMatrix(sz), (fst sz * snd sz |> zeros), m.Base

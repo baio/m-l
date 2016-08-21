@@ -23,7 +23,7 @@ open ML.Statistics.Charting
 
 let logistic() = 
         
-    let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
+    let inputs, outputs = readCSV @"..\..\..\..\..\cour-ml\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
     let outputs = vector outputs
     let inputs = matrix inputs
     let inputs, normPrms = norm inputs

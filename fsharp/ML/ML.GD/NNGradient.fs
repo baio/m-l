@@ -7,26 +7,28 @@ open GLM
 open ML.NN
 
 let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)  =     
-    let shape = thetaShape.nnShape()
+    let shape = thetaShape.nnShape()    
+    let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
     let x = x.RemoveColumn(0)
     let errSum = 
         x.EnumerateRows() 
-        |> Seq.map(fun row ->
+        |> Seq.mapi(fun i row ->
             let out = forward row shape theta
-            (out - y).PointwisePower(2.) |> Vector.sum
+            (out - ys.[i]).PointwisePower(2.) |> Vector.sum
         )
         |> Seq.sum
     errSum / (2. * float x.RowCount) 
         
 let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector) =
     let shape = thetaShape.nnShape()
+    let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
     let x = x.RemoveColumn(0)
     let gradSum = 
         x.EnumerateRows()
-        |> Seq.map(fun f ->
-            backprop y f shape theta
+        |> Seq.mapi(fun i f ->
+            backprop ys.[i] f shape theta
             |> flatNNGradients
         )
         |> DenseMatrix.ofColumnSeq

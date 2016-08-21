@@ -42,6 +42,7 @@ type GLMSoftmaxModel = {
 type GLMNNModel = {       
     Base : GLMBaseModel
     Shape : NNShape
+    InitialTheta : FVector option // for debugging
 }
 
 type GLMModel = 
