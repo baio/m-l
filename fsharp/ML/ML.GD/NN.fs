@@ -78,7 +78,7 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
 let flatNNGradients (layersGrads: FMatrix array) =
     layersGrads
     |> Seq.collect (fun f ->
-        f.EnumerateRows()
+        f.EnumerateColumns()
         |> Seq.collect (fun f -> f)
     )
 

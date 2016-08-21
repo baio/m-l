@@ -169,6 +169,7 @@ let ``Calc GD for Example NN must work``() =
     
     let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
     
+    (*
     let expectedTheta = 
         [
             0.0
@@ -190,6 +191,7 @@ let ``Calc GD for Example NN must work``() =
             0.561370121
 
         ] 
+    *)
     
 
     let model = {
@@ -226,7 +228,25 @@ let ``Calc GD for Example NN must work``() =
             }
         )
 
+    let expected = [
+        [
+            [0.345614;  0.149781;  0.199561]
+            [0.345023;  0.249751;  0.299502]
+        ] |> DenseMatrix.ofRowList
+        [
+            [0.530751;  0.358916;  0.408666]
+            [0.619049;  0.511301;   0.56137]
+        ] |> DenseMatrix.ofRowList
+    ]
+
     let gd = stochasticHyper |> SGDHyperParams |> gradientDescent glmModel prms inputs outputs 
+
+    let th = gd.Theta |> Vector.map (fun f -> System.Math.Round(f, 6))
     
-    gd.Theta |> should equal expectedTheta
+    let actual = reshapeNN shape th |> Array.map fst |> Array.toList
+
+    System.Diagnostics.Debug.WriteLine(sprintf "%A" expected)
+    System.Diagnostics.Debug.WriteLine(sprintf "%A" actual)
+    
+    actual |> should equal expected
 

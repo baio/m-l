@@ -28,8 +28,10 @@ let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVec
     let gradSum = 
         x.EnumerateRows()
         |> Seq.mapi(fun i f ->
-            backprop ys.[i] f shape theta
-            |> flatNNGradients
+            let b = backprop ys.[i] f shape theta
+            //System.Diagnostics.Debug.WriteLine(sprintf "%A" b)
+            let f = b |> flatNNGradients
+            f
         )
         |> DenseMatrix.ofColumnSeq
         |> Matrix.sumRows
