@@ -85,8 +85,10 @@ let nn_xor() =
         printfn "batch result : %A" train
     )
 
+    let acc = accuracy shape x y 
+
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])
-    |> List.map (fun (label, res) -> (sprintf "%s : %f (%i)" label res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))        
+    |> List.map (fun (label, res) -> (sprintf "%s %f : %f (%i)" label (acc res.Theta) res.Errors.[0] res.Errors.Length), res.Errors |> List.mapi(fun i x -> (float i, x)))        
     |> showLines2
     

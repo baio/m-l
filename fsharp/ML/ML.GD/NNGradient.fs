@@ -2,9 +2,11 @@
 
 open MathNet.Numerics.LinearAlgebra
 open ML.Core.LinearAlgebra
+open ML.Core.Utils
 
 open GLM
 open ML.NN
+
 
 let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)  =     
     let shape = thetaShape.nnShape()    
@@ -36,3 +38,22 @@ let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVec
         |> DenseMatrix.ofColumnSeq
         |> Matrix.sumRows
     gradSum / float x.RowCount
+
+// number of classes, theta, x, y
+let predict (shape: NNShape) (x: float Matrix) (theta: float Vector) : FVector seq =         
+    x.EnumerateRows()
+    |> Seq.map (fun row -> 
+        forward row shape theta
+    )
+        
+// number of classes, theta, x, y
+let accuracy (shape: NNShape) (x: float Matrix) (y: float Vector) (theta: float Vector) : float = 
+    let ys = chunkOutputs x.RowCount y
+    let actual = predict shape x theta |> Seq.map (fun f -> [iif (f.At(0) < 0.5) 0. 1.] |> vector)      
+    let correct = 
+        actual 
+        |> Seq.zip ys
+        |> Seq.map (ifeq 1 0)
+        |> Seq.sum
+
+    float correct / float x.RowCount

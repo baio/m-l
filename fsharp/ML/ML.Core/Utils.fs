@@ -70,6 +70,13 @@ let memoize f =
              let res = f x
              cache := (!cache).Add(x,res)
              res            
+
+
+let iif c a b = if c then a else b
+
+let ifeq ra rb (a, b) = 
+    printfn "%A %A" a b
+    iif (a = b) ra rb
     
 (*
 //Wen length = 3 and items = [1;2;3;4] -> [2;3;1]
