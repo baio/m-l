@@ -7,6 +7,7 @@ open Softmax
 open DLinear
 open DLogistic
 open DSoftmax
+open NN_XOR
 
 [<EntryPoint>]
 let main argv = 
@@ -14,12 +15,13 @@ let main argv =
     //comment this if MKL provider not installed
     MathNet.Numerics.Control.UseNativeMKL()        
 
-    logistic() |> ignore
+    //logistic() |> ignore
     //softmax() |> ignore
     //linear() |> ignore
     //DLinear() |> ignore
     //DLogistic() |> ignore
     //DSoftmax() |> ignore
+    nn_xor()
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code

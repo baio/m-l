@@ -169,31 +169,6 @@ let ``Calc GD for Example NN must work``() =
     
     let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
     
-    (*
-    let expectedTheta = 
-        [
-            0.0
-            0.0
-
-            0.149780716
-            0.19956143
-
-            0.24975114
-            0.29950229
-
-            0.0
-            0.0
-
-            0.35891648
-            0.408666186
-
-            0.511301270
-            0.561370121
-
-        ] 
-    *)
-    
-
     let model = {
         Cost = NNCost
         Gradient = NNGradient
@@ -250,3 +225,61 @@ let ``Calc GD for Example NN must work``() =
     
     actual |> should equal expected
 
+
+//[<Fact>]
+let ``XOR must work``() =
+
+    let rnd = new System.Random()
+    let generator = List.init 100 (fun _ ->
+        let x1, x2 = (rnd.Next(2) |> float), (rnd.Next(2) |> float)
+        let y = 
+            match x1, x2 with
+            | (1., 1.) | (0., 0.) -> 0.
+            | _ -> 1.
+        [y; x1; x2;]
+    )
+
+    let mx = 
+        generator |> DenseMatrix.ofRowList
+
+    let y = mx.Column(0)
+    let x = mx.RemoveColumn(0)
+
+    let model = {
+        Cost = NNCost
+        Gradient = NNGradient
+    }
+
+    let prms = {
+        EpochNumber = 10
+        ConvergeMode = ConvergeModeNone
+    }       
+
+    let stochasticHyper : SGDHyperParams = {
+        Alpha = 0.5
+        BatchSize = 1
+    }
+
+    let shape = 
+        {
+            Layers = 
+                [ 
+                    { NodesNumber = 2; Activation = act }; 
+                    { NodesNumber = 2; Activation = sigm }; 
+                    { NodesNumber = 1; Activation = sigm }; 
+                ]
+        }
+
+    let glmModel = 
+        GLMNNModel(
+            { 
+                Base = model; 
+                Shape = shape; 
+                InitialTheta = None
+            }
+        )
+
+    
+    let gd = stochasticHyper |> SGDHyperParams |> gradientDescent glmModel prms x y
+
+    true |> should equal true
