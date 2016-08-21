@@ -40,16 +40,19 @@ let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVec
     gradSum / float x.RowCount
 
 // number of classes, theta, x, y
-let predict (shape: NNShape) (x: float Matrix) (theta: float Vector) : FVector seq =         
+let predict (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (theta: float Vector) : FVector seq =         
     x.EnumerateRows()
     |> Seq.map (fun row -> 
-        forward row shape theta
+        forward row shape theta 
+        |> mapOutput
     )
         
 // number of classes, theta, x, y
-let accuracy (shape: NNShape) (x: float Matrix) (y: float Vector) (theta: float Vector) : float = 
+let accuracy (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (y: float Vector) (theta: float Vector) : float = 
     let ys = chunkOutputs x.RowCount y
-    let actual = predict shape x theta |> Seq.map (fun f -> [iif (f.At(0) < 0.5) 0. 1.] |> vector)      
+    let actual = 
+        predict mapOutput shape x theta 
+        //|> Seq.map (fun f -> [iif (f.At(0) < 0.5) 0. 1.] |> vector)      
     let correct = 
         actual 
         |> Seq.zip ys

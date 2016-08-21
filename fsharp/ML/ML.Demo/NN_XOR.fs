@@ -8,6 +8,7 @@ open ML.GD.LogisticRegression
 
 open ML.Core.Readers
 open ML.Core.Utils
+open ML.Core.LinearAlgebra
 open ML.GD.GLM
 open ML.GD.NNGradient
 open ML.GD.GradientDescent
@@ -85,7 +86,8 @@ let nn_xor() =
         printfn "batch result : %A" train
     )
 
-    let acc = accuracy shape x y 
+    let mapOutput = (fun (f: FVector) -> [iif (f.At(0) < 0.5) 0. 1.] |> vector)
+    let acc = accuracy mapOutput shape x y 
 
     trainResults
     |> List.sortBy (fun (_, res) -> res.Errors.[0])
