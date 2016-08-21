@@ -52,7 +52,6 @@ let accuracy (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) 
     let ys = chunkOutputs x.RowCount y
     let actual = 
         predict mapOutput shape x theta 
-        //|> Seq.map (fun f -> [iif (f.At(0) < 0.5) 0. 1.] |> vector)      
     let correct = 
         actual 
         |> Seq.zip ys

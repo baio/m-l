@@ -85,6 +85,7 @@ let nn_xor() =
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )
+    printfn "batch perf : %A" perf
 
     let mapOutput = (fun (f: FVector) -> [iif (f.At(0) < 0.5) 0. 1.] |> vector)
     let acc = accuracy mapOutput shape x y 

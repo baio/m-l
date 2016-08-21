@@ -75,20 +75,5 @@ let memoize f =
 let iif c a b = if c then a else b
 
 let ifeq ra rb (a, b) = 
-    printfn "%A %A" a b
     iif (a = b) ra rb
     
-(*
-//Wen length = 3 and items = [1;2;3;4] -> [2;3;1]
-let permute3 (rnd: System.Random) (length: int) (items : seq<_>) =
-    let shuffled = generateShuffled rnd length    
-    shuffled
-    |> Seq.take length
-    |> Seq.mapi (fun i _ -> items |> Seq.nth i)
-
-let permute2 (len: int) (items: seq<_>) : seq<_> = 
-    permute3 (new System.Random()) len items
-
-let permute (items : seq<_>) : seq<_> = 
-    permute2 (items |> Seq.length) items
-*)
