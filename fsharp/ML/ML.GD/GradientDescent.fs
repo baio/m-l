@@ -18,16 +18,16 @@ type GradientDescentHyperParams =
 
 let getInitialIterParams model featuresCount hyper =    
     let _, theta, _ = getModelShapeAndTheta model featuresCount    
-
+    let z = theta.Count |> zeros 
     match hyper with    
     | SGDHyperParams hp ->                           
         {Theta = theta; Params = box () :?> _}
-    | NAGHyperParams hp -> 
-        {Theta = theta; Params = box { Momentum = theta :?> _}}
+    | NAGHyperParams hp ->         
+        {Theta = theta; Params = box { Momentum = z :?> _}}
     | AdagradHyperParams hp -> 
-        {Theta = theta; Params = box { G = theta } :?> _}
+        {Theta = theta; Params = box { G = z } :?> _}
     | AdadeltaHyperParams hp -> 
-        { Theta  = theta; Params = box { EG = theta; ET = theta } :?> _}
+        { Theta  = theta; Params = box { EG = z; ET = z} :?> _}
     
 let getIterParamsProvider model featuresCount hyper  =    
     let init = getInitialIterParams model featuresCount hyper

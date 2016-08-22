@@ -47,6 +47,7 @@ type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: float Vector
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
 type GradientDescentFunc<'hyper> = GLMModel -> IterativeTrainModelParams -> 'hyper -> float Matrix -> float Vector -> ModelTrainResult
 
+// TODO : Move initialization to particular alg
 //Return Shape, Initial theta and Base Model
 let getModelShapeAndTheta (model: GLMModel) (featuresNumber: int) =
     match model with

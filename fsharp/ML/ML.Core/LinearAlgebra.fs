@@ -99,4 +99,4 @@ let flatMx (mx: FMatrix) =
     mx.EnumerateColumns() |> Seq.concat |> DenseVector.ofSeq
 
 let flatMxs (mxs: FMatrix array) =
-    mxs |> Seq.collect flatMx
+    mxs |> Seq.collect flatMx |> DenseVector.ofSeq

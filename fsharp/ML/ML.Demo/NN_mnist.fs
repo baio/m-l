@@ -31,9 +31,10 @@ open ML.Statistics.Regressions
 open ML.Statistics.Charting
 
 let nn_mnist() = 
-        
+            
+    let inputs, outputs  = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
 
-    let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
+    //let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
 
     let outputs = outputs |> vector |> encodeOneHot 10 |> flatMx 
     let inputs = matrix inputs
@@ -54,8 +55,10 @@ let nn_mnist() =
         {
             Layers = 
                 [ 
-                    { NodesNumber = 400; Activation = act }; 
-                    { NodesNumber = 25; Activation = sigm }; 
+                    { NodesNumber = 784; Activation = act }; 
+                    { NodesNumber = 30; Activation = sigm }; 
+                    //{ NodesNumber = 400; Activation = act }; 
+                    //{ NodesNumber = 25; Activation = sigm }; 
                     { NodesNumber = 10; Activation = sigm }; 
                 ]
         }
@@ -98,7 +101,7 @@ let nn_mnist() =
     }
 
     let AdadeltaHyper : AdadeltaHyperParams = {        
-        BatchSize = 10
+        BatchSize = 100
         Epsilon = 1E-8
         Rho = 0.6
     }

@@ -6,38 +6,39 @@ open ML.Core.Utils
 
 open GLM
 open ML.NN
-
+open Nessos.Streams
 
 let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)  =     
     let shape = thetaShape.nnShape()    
+    let thetasCount = shape.thetasCount()
     let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
     let x = x.RemoveColumn(0)
     let errSum = 
         x.EnumerateRows() 
-        |> Seq.mapi(fun i row ->
+        |> Stream.ofSeq
+        |> Stream.mapi(fun i row ->
             let ot = forward row shape theta
             (ot - ys.[i]).PointwisePower(2.) |> Vector.sum
         )
-        |> Seq.sum
+        |> Stream.sum
     errSum / (2. * float x.RowCount) 
         
 let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector) =
     let shape = thetaShape.nnShape()
+    let thetasCount = shape.thetasCount()
     let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
     // TODO !!! : Stream
     let x = x.RemoveColumn(0)
     let gradSum = 
         x.EnumerateRows()
-        |> Seq.mapi(fun i f ->
-            let b = backprop ys.[i] f shape theta
+        |> Stream.ofSeq
+        |> Stream.mapi(fun i f ->
             //System.Diagnostics.Debug.WriteLine(sprintf "%A" b)
-            let f = b |> flatMxs
-            f
+            backprop ys.[i] f shape theta |> flatMxs
         )
-        |> DenseMatrix.ofColumnSeq
-        |> Matrix.sumRows
+        |> Stream.fold (fun acc v -> acc + v) (zeros thetasCount)
     gradSum / float x.RowCount
 
 // number of classes, theta, x, y
