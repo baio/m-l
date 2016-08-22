@@ -12,6 +12,7 @@ open ML.GD.Adagrad
 open ML.GD.Adadelta
 
 open ML.GD.GradientDescent
+open ML.Core.LinearAlgebra
 
 open MathNet.Numerics.LinearAlgebra
 open PerfUtil
@@ -24,8 +25,6 @@ let softmax() =
     //let inputs, outputs = readCSV @"..\..\..\..\..\machine-learning-ex2\ex2\ex2data1.txt" false [|0..1|] 2  
     //let inputs, outputs = readCSV @"..\..\..\..\..\data\iris.csv" true [|0..3|] 5
     let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
-    let inputs = inputs 
-    let ouptuts = outputs 
     let outputs = vector outputs 
     let inputs = matrix inputs
     let inputs, normPrms = norm inputs

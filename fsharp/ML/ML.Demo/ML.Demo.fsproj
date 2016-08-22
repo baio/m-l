@@ -64,6 +64,7 @@
     <Compile Include="Softmax.fs" />
     <Compile Include="DSoftmax.fs" />
     <Compile Include="NN_XOR.fs" />
+    <Compile Include="NN_mnist.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />

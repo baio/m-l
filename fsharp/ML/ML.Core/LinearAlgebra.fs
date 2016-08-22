@@ -93,3 +93,10 @@ let permuteSamples (mx: _ Matrix) (vec: _ Vector) =
     //[[1;2];[3;4]] -> [3; 4; 1; 2]
     let vecRes = clonedVec |> Matrix.toColSeq |> Seq.collect (fun f -> f) |> DenseVector.ofSeq
     clonedMx, vecRes
+
+
+let flatMx (mx: FMatrix) =
+    mx.EnumerateColumns() |> Seq.concat |> DenseVector.ofSeq
+
+let flatMxs (mxs: FMatrix array) =
+    mxs |> Seq.collect flatMx

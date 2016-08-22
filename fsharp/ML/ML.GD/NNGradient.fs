@@ -16,8 +16,8 @@ let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)
     let errSum = 
         x.EnumerateRows() 
         |> Seq.mapi(fun i row ->
-            let out = forward row shape theta
-            (out - ys.[i]).PointwisePower(2.) |> Vector.sum
+            let ot = forward row shape theta
+            (ot - ys.[i]).PointwisePower(2.) |> Vector.sum
         )
         |> Seq.sum
     errSum / (2. * float x.RowCount) 
@@ -32,7 +32,7 @@ let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVec
         |> Seq.mapi(fun i f ->
             let b = backprop ys.[i] f shape theta
             //System.Diagnostics.Debug.WriteLine(sprintf "%A" b)
-            let f = b |> flatNNGradients
+            let f = b |> flatMxs
             f
         )
         |> DenseMatrix.ofColumnSeq
