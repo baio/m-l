@@ -26,6 +26,7 @@ let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVec
     let shape = thetaShape.nnShape()
     let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
+    // TODO !!! : Stream
     let x = x.RemoveColumn(0)
     let gradSum = 
         x.EnumerateRows()

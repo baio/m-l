@@ -33,7 +33,7 @@ open ML.Statistics.Charting
 let nn_mnist() = 
         
 
-    let inputs, outputs  = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 100
+    let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
 
     let outputs = outputs |> vector |> encodeOneHot 10 |> flatMx 
     let inputs = matrix inputs
@@ -54,8 +54,8 @@ let nn_mnist() =
         {
             Layers = 
                 [ 
-                    { NodesNumber = 784; Activation = act }; 
-                    { NodesNumber = 30; Activation = sigm }; 
+                    { NodesNumber = 400; Activation = act }; 
+                    { NodesNumber = 25; Activation = sigm }; 
                     { NodesNumber = 10; Activation = sigm }; 
                 ]
         }
@@ -98,7 +98,7 @@ let nn_mnist() =
     }
 
     let AdadeltaHyper : AdadeltaHyperParams = {        
-        BatchSize = 5
+        BatchSize = 10
         Epsilon = 1E-8
         Rho = 0.6
     }
@@ -109,12 +109,14 @@ let nn_mnist() =
 
     let mutable trainResults = [] 
 
+    
     let perf = Benchmark.Run (fun () ->
         let train = batchHyper |> SGDHyperParams |> gd
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )
     printfn "batch perf : %A" perf
+
 
     (*
     let perf = Benchmark.Run (fun () ->
@@ -125,14 +127,17 @@ let nn_mnist() =
     printfn "stochastic perf : %A" perf
     *)
     
-
+    
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = minbatchHyper |> SGDHyperParams |> gd
         trainResults <- ("miniBatch", train)::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
+    *)
 
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = NAGHyper |> NAGHyperParams |> gd
         trainResults <- ("NAG", train)::trainResults
@@ -146,6 +151,7 @@ let nn_mnist() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf
+    *)
 
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyper |> AdadeltaHyperParams |> gd
@@ -153,6 +159,7 @@ let nn_mnist() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
+    
 
     let mapOutput = (fun (f: FVector) -> 
         let encoded = zeros 10
