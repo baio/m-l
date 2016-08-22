@@ -113,7 +113,7 @@ let forward2 (inputs: FVector) layers =
         ForwardResultHidden({ Weights = th; Net = net; Out = out; Activation = act })
     ) (ForwardResultInput({ Inputs = inputs }))
 
-let forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
+let private _forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
     let outs =
         reshapeNN shape theta
         |> forward2 inputs
@@ -121,6 +121,16 @@ let forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
     match res with
     | ForwardResultHidden({Out = out}) -> out
     | _ -> failwith "Last layer must be hidden"
+
+let forward (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
+    inputs.EnumerateRows()
+    |> Stream.ofSeq
+    |> Stream.mapi(fun i row ->
+        _forward row shape theta |> Vector.toArray
+    )
+    |> Stream.toArray
+    |> DenseMatrix.ofRowSeq
+
 
 ///////////////////////// Backprop
 
@@ -167,7 +177,7 @@ let private caclHiddenDelta fwdLayer (wᴸᴾ: FMatrix) δᴸᴾ =
     ΔE_ΔA .* ΔA_ΔN
 
 //TODO : inputs must already contain bias (check FBiasVector)
-let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
+let private _backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
 
     //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
     //http://ufldl.stanford.edu/tutorial/supervised/MultiLayerNeuralNetworks/
@@ -226,6 +236,19 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
         | BackpropResultInput({ Gradient = Δ }) -> Some(Δ)
         | _ -> None
     )
+
+let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
+    //TODO : forward require inputs without bias
+    let thetasCount = shape.thetasCount()
+    let ys = chunkOutputs x.RowCount y
+    let gradSum = 
+        x.EnumerateRows()
+        |> Stream.ofSeq
+        |> Stream.mapi(fun i f ->
+            _backprop ys.[i] f shape theta |> flatMxs
+        )
+        |> Stream.fold (fun acc v -> acc + v) (zeros thetasCount)
+    gradSum / float x.RowCount
 
 ////
 

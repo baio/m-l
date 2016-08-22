@@ -10,44 +10,19 @@ open Nessos.Streams
 
 let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)  =     
     let shape = thetaShape.nnShape()    
-    let thetasCount = shape.thetasCount()
-    let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
     let x = x.RemoveColumn(0)
-    let errSum = 
-        x.EnumerateRows() 
-        |> Stream.ofSeq
-        |> Stream.mapi(fun i row ->
-            let ot = forward row shape theta
-            (ot - ys.[i]).PointwisePower(2.) |> Vector.sum
-        )
-        |> Stream.sum
-    errSum / (2. * float x.RowCount) 
+    let fwd = forward x shape theta
+    let ssum = (mxSubVec fwd  y).PointwisePower(2.) |> Matrix.sum
+    ssum / 2. * float x.RowCount
         
 let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector) =
-    let shape = thetaShape.nnShape()
-    let thetasCount = shape.thetasCount()
-    let ys = chunkOutputs x.RowCount y
-    //TODO : forward require inputs without bias
-    // TODO !!! : Stream
     let x = x.RemoveColumn(0)
-    let gradSum = 
-        x.EnumerateRows()
-        |> Stream.ofSeq
-        |> Stream.mapi(fun i f ->
-            //System.Diagnostics.Debug.WriteLine(sprintf "%A" b)
-            backprop ys.[i] f shape theta |> flatMxs
-        )
-        |> Stream.fold (fun acc v -> acc + v) (zeros thetasCount)
-    gradSum / float x.RowCount
+    backprop y x (thetaShape.nnShape()) theta: FVector
 
-// number of classes, theta, x, y
-let predict (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (theta: float Vector) : FVector seq =         
-    x.EnumerateRows()
-    |> Seq.map (fun row -> 
-        forward row shape theta 
-        |> mapOutput
-    )
+let predict (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (theta: float Vector) : FMatrix =         
+    forward x shape theta 
+    |> Matrix.mapCols (fun _ c -> mapOutput c)
         
 // number of classes, theta, x, y
 let accuracy (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (y: float Vector) (theta: float Vector) : float = 
@@ -55,7 +30,7 @@ let accuracy (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) 
     let actual = 
         predict mapOutput shape x theta 
     let correct = 
-        actual 
+        actual.EnumerateRows()
         |> Seq.zip ys
         |> Seq.map (ifeq 1 0)
         |> Seq.sum
