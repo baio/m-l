@@ -32,9 +32,9 @@ open ML.Statistics.Charting
 
 let nn_mnist() = 
             
-    let inputs, outputs  = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
+    //let inputs, outputs  = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
 
-    //let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
+    let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
 
     let outputs = outputs |> vector |> encodeOneHot 10 |> flatMx 
     let inputs = matrix inputs
@@ -55,10 +55,10 @@ let nn_mnist() =
         {
             Layers = 
                 [ 
-                    { NodesNumber = 784; Activation = act }; 
-                    { NodesNumber = 30; Activation = sigm }; 
-                    //{ NodesNumber = 400; Activation = act }; 
-                    //{ NodesNumber = 25; Activation = sigm }; 
+                    //{ NodesNumber = 784; Activation = act }; 
+                    // { NodesNumber = 30; Activation = sigm }; 
+                    { NodesNumber = 400; Activation = act }; 
+                    { NodesNumber = 25; Activation = sigm }; 
                     { NodesNumber = 10; Activation = sigm }; 
                 ]
         }
@@ -85,18 +85,18 @@ let nn_mnist() =
 
     let minbatchHyper : SGDHyperParams = {
         Alpha = 0.5
-        BatchSize = 5
+        BatchSize = 100
     }
 
     let NAGHyper : NAGHyperParams = {        
         Alpha = 0.01
-        BatchSize = 5
+        BatchSize = 100
         Gamma = 0.5
     }
 
     let AdagradHyper : AdagradHyperParams = {        
         Alpha = 0.01
-        BatchSize = 5
+        BatchSize = 100
         Epsilon = 1E-8
     }
 
@@ -131,16 +131,13 @@ let nn_mnist() =
     *)
     
     
-    (*
     let perf = Benchmark.Run (fun () ->
         let train = minbatchHyper |> SGDHyperParams |> gd
         trainResults <- ("miniBatch", train)::trainResults
         printfn "miniBatch result : %A" train
     )    
     printfn "miniBatch perf : %A" perf
-    *)
 
-    (*
     let perf = Benchmark.Run (fun () ->
         let train = NAGHyper |> NAGHyperParams |> gd
         trainResults <- ("NAG", train)::trainResults
@@ -154,7 +151,6 @@ let nn_mnist() =
         printfn "Adagrad result : %A" train
     )    
     printfn "Adagrad perf : %A" perf
-    *)
 
     let perf = Benchmark.Run (fun () ->
         let train = AdadeltaHyper |> AdadeltaHyperParams |> gd

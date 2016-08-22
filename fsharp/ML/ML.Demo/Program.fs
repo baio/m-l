@@ -22,8 +22,8 @@ let main argv =
     //DLinear() |> ignore
     //DLogistic() |> ignore
     //DSoftmax() |> ignore
-    nn_xor()
-    //nn_mnist()
+    //nn_xor()
+    nn_mnist()
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code
