@@ -90,12 +90,6 @@ let logistic() =
     )    
     printfn "stochastic perf : %A" perf
 
-    (*
-    let res = snd trainResults.Head
-    let a = accuracy res.Theta inputs outputs
-    
-    printfn "Accuracy : %A" a
-    *)
 
     let perf = Benchmark.Run (fun () ->
         let train = SGDHyperParams SGDHyper |> gd
