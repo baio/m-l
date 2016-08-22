@@ -112,25 +112,27 @@ let nn_mnist() =
 
     let mutable trainResults = [] 
 
-    
+
+    (*    
     let perf = Benchmark.Run (fun () ->
         let train = batchHyper |> SGDHyperParams |> gd
         trainResults <- ("batch",train)::trainResults
         printfn "batch result : %A" train
     )
     printfn "batch perf : %A" perf
+    *)
 
 
-    (*
     let perf = Benchmark.Run (fun () ->
         let train = stochasticHyper |> SGDHyperParams |> gd
         trainResults <- ("stochastic", train)::trainResults
         printfn "stochastic result : %A" train
     )    
     printfn "stochastic perf : %A" perf
-    *)
+
     
     
+    (*
     let perf = Benchmark.Run (fun () ->
         let train = minbatchHyper |> SGDHyperParams |> gd
         trainResults <- ("miniBatch", train)::trainResults
@@ -158,6 +160,7 @@ let nn_mnist() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
+    *)
     
 
     let mapOutput = (fun (f: FVector) -> 

@@ -99,6 +99,7 @@ let internal GD<'iter, 'hyper>
             let epochCnt = errors |> List.length
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.
             let error = theta |> model.Cost thetaShape x y
+            printfn "Epoch %i: %A" epochCnt error
             if error <> error then
                 { ResultType = NaN; Theta = theta; Errors = errors }
             else if convergeCostNotImproved && latestError = error then
@@ -109,8 +110,7 @@ let internal GD<'iter, 'hyper>
                 { ResultType = EpochCountAchieved; Theta = theta; Errors = errors }
             else
                 let updatedIterPrms = calcGradient calcGradientPrms iter
-                //If graient is plus thwn we need to move down to achive function min
-                //printfn "%i: \n grads: %A \n weights : %A" iterCnt gradients updatedWeights
+                //If graient is plus thwn we need to move down to achive function min                
                 iterate updatedIterPrms (error::errors)
 
         iterate initialIter []
