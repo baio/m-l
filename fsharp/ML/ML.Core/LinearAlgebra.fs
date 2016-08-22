@@ -94,7 +94,6 @@ let permuteSamples (mx: _ Matrix) (vec: _ Vector) =
     let vecRes = clonedVec |> Matrix.toColSeq |> Seq.collect (fun f -> f) |> DenseVector.ofSeq
     clonedMx, vecRes
 
-
 let flatMx (mx: FMatrix) =
     mx.EnumerateColumns() |> Seq.concat |> DenseVector.ofSeq
 
@@ -102,4 +101,4 @@ let flatMxs (mxs: FMatrix array) =
     mxs |> Seq.collect flatMx |> DenseVector.ofSeq
 
 let mxSubVec (mx : FMatrix) (vec : FVector) = 
-    mx |> Matrix.mapRows (fun _ r -> r - vec)
+    mx |> Matrix.mapCols (fun _ r -> r - vec)

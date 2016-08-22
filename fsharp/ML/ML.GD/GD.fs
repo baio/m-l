@@ -99,7 +99,7 @@ let internal GD<'iter, 'hyper>
             let epochCnt = errors |> List.length
             let latestError = if errors.Length <> 0 then errors |> List.head else 0.
             let error = theta |> model.Cost thetaShape x y
-            printfn "Epoch %i: %A" epochCnt error
+            //printfn "Epoch %i: %A" epochCnt error
             if error <> error then
                 { ResultType = NaN; Theta = theta; Errors = errors }
             else if convergeCostNotImproved && latestError = error then
