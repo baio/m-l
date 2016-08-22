@@ -213,22 +213,15 @@ let backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVect
             let ΔA_ΔN = l.Activation.f' l.Net
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
             BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
-        | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
-            //last hidden layer (n_l - 1), right before outputs
-            let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
-            let Δᴸ = caclGrads l.Out δᴸᴾ
-            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
+        | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) 
         | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
-            //gradient for hidden layer (n_l - 2...)
+            //last hidden layer (n_l - 1), right before outputs OR for hidden layer (n_l - 2...)
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
             let Δᴸ = caclGrads l.Out δᴸᴾ
-            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
-        | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ})) ->
-            // calc gradient for first hidden layer (n_1)
-            let Δᴸ = caclGrads l.Inputs δᴸᴾ
-            BackpropResultInput({Gradient = Δᴸ})
+            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })                    
+        | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ}))             
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ})) ->
-            // one layer network case (n_1)
+            // calc gradient for first hidden layer (n_1) OR one layer network case (n_1)
             let Δᴸ = caclGrads l.Inputs δᴸᴾ
             BackpropResultInput({ Gradient = Δᴸ})
         | _ ->
