@@ -19,7 +19,7 @@ let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)
         
 let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector) =
     let x = x.RemoveColumn(0)
-    backprop y x (thetaShape.nnShape()) theta: FVector
+    backprop y x (thetaShape.nnShape()) theta
 
 let predict (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (theta: float Vector) : FMatrix =         
     forwardOutput x shape theta 

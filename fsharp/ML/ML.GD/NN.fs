@@ -136,13 +136,13 @@ let forwardOutput (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
 
 type BackpropOutputLayerResult = {
     Weights : FMatrix
-    Delta : FVector
+    Delta : FMatrix // delats for each sample in batch
 }
 
 type BackpropHiddenLayerResult = {
     Weights : FMatrix
     Gradient : FMatrix
-    Delta : FVector
+    Delta : FMatrix // delats for each sample in batch
 }
 
 type BackpropInputLayerResult = {
@@ -157,18 +157,17 @@ type BackpropResult =
     | BackpropResultInput of BackpropInputLayerResult
 
 let private caclGrads aᴸ δᴸᴾ =
-    let aᴸ_mx = [aᴸ] |> DenseMatrix.ofRowSeq |> appendOnes
-    let δᴸᴾ_mx = [δᴸᴾ] |> DenseMatrix.ofColumnSeq
-    δᴸᴾ_mx * aᴸ_mx
+    let aᴸ = aᴸ |> appendOnes
+    let δᴸᴾ = δᴸᴾ|> appendOnes
+    δᴸᴾ * aᴸ
 
 let private caclHiddenDelta fwdLayer (wᴸᴾ: FMatrix) δᴸᴾ =
-    let δᴸᴾ_mx = [δᴸᴾ] |> DenseMatrix.ofRowSeq
-    let ΔE_ΔA = (δᴸᴾ_mx * wᴸᴾ.RemoveColumn(0)).Row(0)
-    let ΔA_ΔN = fwdLayer.Activation.f' (fwdLayer.Net.Row(0))
+    let ΔE_ΔA = δᴸᴾ * wᴸᴾ.RemoveColumn(0)
+    let ΔA_ΔN = fwdLayer.Net |> mapRows fwdLayer.Activation.f' 
     ΔE_ΔA .* ΔA_ΔN
 
 //TODO : inputs must already contain bias (check FBiasVector)
-let private _backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (theta: FVector) =
+let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector) =
 
     //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
     //http://ufldl.stanford.edu/tutorial/supervised/MultiLayerNeuralNetworks/
@@ -197,27 +196,27 @@ let private _backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (the
 
     let layers = reshapeNN shape theta
 
-    let fwd = forward2 ([inputs] |> DenseMatrix.ofRowSeq) layers
+    let fwd = forward2 X layers
 
     Array.scanBack (fun v acc ->
         match v, acc with
         | (ForwardResultHidden(l), BackpropResultNone) ->
             // ouput layer net
             // this is first calculated layer in backprop alghoritm
-            let ΔE_ΔA = l.Out.Row(0) - outputs
-            let ΔA_ΔN = l.Activation.f' (l.Net.Row(0))
+            let ΔE_ΔA = l.Out - Y
+            let ΔA_ΔN =  l.Net |> mapRows l.Activation.f'
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
             BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
         | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) 
         | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //last hidden layer (n_l - 1), right before outputs OR for hidden layer (n_l - 2...)
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
-            let Δᴸ = caclGrads (l.Out.Row(0)) δᴸᴾ
+            let Δᴸ = caclGrads l.Out δᴸᴾ
             BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })                    
         | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ}))             
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ})) ->
             // calc gradient for first hidden layer (n_1) OR one layer network case (n_1)
-            let Δᴸ = caclGrads (l.Inputs.Row(0)) δᴸᴾ
+            let Δᴸ = caclGrads l.Inputs δᴸᴾ
             BackpropResultInput({ Gradient = Δᴸ})
         | _ ->
            failwith "not supported"
@@ -229,17 +228,18 @@ let private _backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (the
     )
 
 let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
-    //TODO : forward require inputs without bias
-    let thetasCount = shape.thetasCount()
-    let ys = chunkOutputs x.RowCount y
-    let gradSum = 
-        x.EnumerateRows()
-        |> Stream.ofSeq
-        |> Stream.mapi(fun i f ->
-            _backprop (ys.Row i) f shape theta |> flatMxs
-        )
-        |> Stream.fold (fun acc v -> acc + v) (zeros thetasCount)
-    gradSum / float x.RowCount
+    let Y = chunkOutputs x.RowCount y
+    // grads for each sample (per layer)
+    //TODO: improve concat withou mapping to array if possible
+    _backprop Y x shape theta    
+    |> Array.map(fun mx ->
+        // avg weighted grads per layer
+        mx.ColumnSums() / float mx.RowCount 
+        |> Vector.toArray      
+    )
+    |> Array.concat
+    |> DenseVector.ofArray
+
 
 ////
 
