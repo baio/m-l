@@ -10,12 +10,12 @@ open Nessos.Streams
 
 let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)  =     
     let shape = thetaShape.nnShape()    
+    let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
     let x = x.RemoveColumn(0)
     let fwd = forward x shape theta
-    let z = mxSubVec fwd  y
-    let ssum = (mxSubVec fwd  y).PointwisePower(2.) |> Matrix.sum
-    ssum / 2. * float x.RowCount
+    let ssum = (fwd - ys).PointwisePower(2.).RowSums().Sum()
+    ssum / (2. * float x.RowCount)
         
 let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector) =
     let x = x.RemoveColumn(0)
@@ -28,12 +28,11 @@ let predict (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (
 // number of classes, theta, x, y
 let accuracy (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (y: float Vector) (theta: float Vector) : float = 
     let ys = chunkOutputs x.RowCount y
-    let actual = 
-        predict mapOutput shape x theta 
+    let actual = predict mapOutput shape x theta 
     let correct = 
-        actual.EnumerateRows()
-        |> Seq.zip ys
-        |> Seq.map (ifeq 1 0)
-        |> Seq.sum
-
+        ys - actual //diff target - calcualted; [1; 1] - [1; 1] = [0; 0]
+        |> Matrix.sumRows // sum diff for each sample, if calculated = 0 then it should be 0.
+        |> Vector.map (fun f -> iif (f=0.) 1. 0.)
+        |> Vector.sum
+    
     float correct / float x.RowCount

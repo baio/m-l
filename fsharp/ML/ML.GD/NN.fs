@@ -245,7 +245,7 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
         x.EnumerateRows()
         |> Stream.ofSeq
         |> Stream.mapi(fun i f ->
-            _backprop ys.[i] f shape theta |> flatMxs
+            _backprop (ys.Row i) f shape theta |> flatMxs
         )
         |> Stream.fold (fun acc v -> acc + v) (zeros thetasCount)
     gradSum / float x.RowCount

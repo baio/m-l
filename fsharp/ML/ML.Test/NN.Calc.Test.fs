@@ -151,8 +151,8 @@ let ``Calc GD for Example NN must work``() =
     
     //TODO : Wee need output as Vector NOT as float !
     //There is no way set NN output as a Vector
-    let inputs = [vector([0.05; 0.10])] |> DenseMatrix.ofRows
-    let outputs = vector([0.01; 0.99])
+    let inputs = matrix [[0.05; 0.10]]
+    let outputs = vector [0.01; 0.99]
     
     let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
     

@@ -78,15 +78,14 @@ let encodeOneHot (classesNum: int) (labels: float Vector) =
 
 let chunkOutputs samplesNumber y =
     let chunkSize = (y |> Seq.length) / samplesNumber
-    y |> Seq.chunkBySize(chunkSize) |> Seq.map DenseVector.ofSeq |> Seq.toArray
+    y |> Seq.chunkBySize(chunkSize) |> DenseMatrix.ofRowSeq
         
 let permuteSamples (mx: _ Matrix) (vec: _ Vector) =
 
-    let chunk = chunkOutputs mx.RowCount vec
     //prepare vec for prmute [1; 2; 3; 4] -> [[1;2];[3;4]] and then permute rows
     let perm = new MathNet.Numerics.Permutation (permute mx.RowCount)
     let clonedMx = mx.Clone()        
-    let clonedVec = chunk |> DenseMatrix.ofRowSeq
+    let clonedVec = vec |> chunkOutputs mx.RowCount
     clonedMx.PermuteRows(perm)
     clonedVec.PermuteRows(perm)
     //flat permuted matrix output to vector again
@@ -100,5 +99,8 @@ let flatMx (mx: FMatrix) =
 let flatMxs (mxs: FMatrix array) =
     mxs |> Seq.collect flatMx |> DenseVector.ofSeq
 
+(*
 let mxSubVec (mx : FMatrix) (vec : FVector) = 
-    mx |> Matrix.mapCols (fun _ r -> r - vec)
+    mx |> Matrix.mapCols (fun _ r -> 
+        r - vec)
+*)
