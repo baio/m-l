@@ -78,16 +78,16 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
 /////////////////////////////////////////Forward
 
 type ForwardInputLayerResult = {
-    Inputs: FVector
+    Inputs: FMatrix
 }
 
 type ForwardHiddenLayerResult = {
     //same as `W`
     Weights: FMatrix
     //same as `z`
-    Net : FVector
+    Net : FMatrix
     //same as `a`
-    Out : FVector
+    Out : FMatrix
     //Same as `f'`
     Activation : ActivationFun
 }
@@ -98,11 +98,12 @@ type ForwardResult =
     | ForwardResultHidden of ForwardHiddenLayerResult
 
 // returns a, z
-let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FVector) =
-  let z = theta * (appendOne inputs)
-  (activation.f z), z
+let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FMatrix) =
+  let z = (appendOnes inputs).TransposeAndMultiply(theta)
+  // TODO activation must recieve matrix
+  (z |> mapRows activation.f), z
 
-let forward2 (inputs: FVector) layers =
+let forward2 (inputs: FMatrix) layers =
     layers
     |> Array.scan (fun acc (th, act) ->
         let layerInputs =
@@ -113,24 +114,14 @@ let forward2 (inputs: FVector) layers =
         ForwardResultHidden({ Weights = th; Net = net; Out = out; Activation = act })
     ) (ForwardResultInput({ Inputs = inputs }))
 
-let private _forward (inputs: FVector) (shape: NNShape) (theta: FVector) =
-    let outs =
-        reshapeNN shape theta
-        |> forward2 inputs
-    let res = outs.[outs.Length - 1]
-    match res with
-    | ForwardResultHidden({Out = out}) -> out
-    | _ -> failwith "Last layer must be hidden"
-
 let forward (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
-    inputs.EnumerateRows()
-    |> Stream.ofSeq
-    |> Stream.mapi(fun i row ->
-        _forward row shape theta |> Vector.toArray
-    )
-    |> Stream.toArray
-    |> DenseMatrix.ofRowSeq
+    reshapeNN shape theta |> (forward2 inputs)
 
+let forwardOutput (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
+    let fwds = forward inputs shape theta
+    match fwds.[fwds.Length - 1] with 
+    | ForwardResultHidden {Out = res} -> res
+    | _ -> failwith "Output layer must be hidden"
 
 ///////////////////////// Backprop
 
@@ -173,7 +164,7 @@ let private caclGrads aᴸ δᴸᴾ =
 let private caclHiddenDelta fwdLayer (wᴸᴾ: FMatrix) δᴸᴾ =
     let δᴸᴾ_mx = [δᴸᴾ] |> DenseMatrix.ofRowSeq
     let ΔE_ΔA = (δᴸᴾ_mx * wᴸᴾ.RemoveColumn(0)).Row(0)
-    let ΔA_ΔN = fwdLayer.Activation.f' fwdLayer.Net
+    let ΔA_ΔN = fwdLayer.Activation.f' (fwdLayer.Net.Row(0))
     ΔE_ΔA .* ΔA_ΔN
 
 //TODO : inputs must already contain bias (check FBiasVector)
@@ -206,27 +197,27 @@ let private _backprop (outputs: FVector) (inputs: FVector) (shape: NNShape) (the
 
     let layers = reshapeNN shape theta
 
-    let fwd = forward2 inputs layers
+    let fwd = forward2 ([inputs] |> DenseMatrix.ofRowSeq) layers
 
     Array.scanBack (fun v acc ->
         match v, acc with
         | (ForwardResultHidden(l), BackpropResultNone) ->
             // ouput layer net
             // this is first calculated layer in backprop alghoritm
-            let ΔE_ΔA = l.Out - outputs
-            let ΔA_ΔN = l.Activation.f' l.Net
+            let ΔE_ΔA = l.Out.Row(0) - outputs
+            let ΔA_ΔN = l.Activation.f' (l.Net.Row(0))
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
             BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
         | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) 
         | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //last hidden layer (n_l - 1), right before outputs OR for hidden layer (n_l - 2...)
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
-            let Δᴸ = caclGrads l.Out δᴸᴾ
+            let Δᴸ = caclGrads (l.Out.Row(0)) δᴸᴾ
             BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })                    
         | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ}))             
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ})) ->
             // calc gradient for first hidden layer (n_1) OR one layer network case (n_1)
-            let Δᴸ = caclGrads l.Inputs δᴸᴾ
+            let Δᴸ = caclGrads (l.Inputs.Row(0)) δᴸᴾ
             BackpropResultInput({ Gradient = Δᴸ})
         | _ ->
            failwith "not supported"

@@ -13,7 +13,7 @@ let NNCost (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVector)
     let ys = chunkOutputs x.RowCount y
     //TODO : forward require inputs without bias
     let x = x.RemoveColumn(0)
-    let fwd = forward x shape theta
+    let fwd = forwardOutput x shape theta
     let ssum = (fwd - ys).PointwisePower(2.).RowSums().Sum()
     ssum / (2. * float x.RowCount)
         
@@ -22,7 +22,7 @@ let NNGradient (thetaShape: ThetaShape) (x : FMatrix) (y : FVector) (theta: FVec
     backprop y x (thetaShape.nnShape()) theta: FVector
 
 let predict (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) (theta: float Vector) : FMatrix =         
-    forward x shape theta 
+    forwardOutput x shape theta 
     |> Matrix.mapRows (fun _ c -> mapOutput c)
         
 // number of classes, theta, x, y

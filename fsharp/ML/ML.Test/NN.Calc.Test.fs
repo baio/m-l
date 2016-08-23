@@ -36,7 +36,7 @@ let ``Calc 1 input -> 1 output must work``() =
             ]
     }
     
-    let actual = forward inputs shape theta
+    let actual = forwardOutput inputs shape theta
     let expected = matrix([[50.]]);
     
     actual |> should equal expected
@@ -56,7 +56,7 @@ let ``Calc XOR Layer1 must work``() =
             ]
     }
     
-    let actual = forward inputs shape theta
+    let actual = forwardOutput inputs shape theta
     let expected = matrix([[0.37; 0.74]]);
     
     (actual |> Matrix.map (fun m -> System.Math.Round(m, 2))) 
@@ -78,7 +78,7 @@ let ``Calc XOR must work``() =
             ]
     }
     
-    let actual = forward inputs shape theta
+    let actual = forwardOutput inputs shape theta
     let expected = matrix([[0.76]]);
     
     (actual |> Matrix.map (fun m -> System.Math.Round(m, 2)))
@@ -93,14 +93,15 @@ let ``Calc Example must work``() =
     let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
     
     let shape = {
-        Layers = [ 
-            { NodesNumber = 2; Activation = act }; 
-            { NodesNumber = 2; Activation = sigm }; 
-            { NodesNumber = 2; Activation = sigm }; 
-        ]
+        Layers = 
+            [ 
+                { NodesNumber = 2; Activation = act }; 
+                { NodesNumber = 2; Activation = sigm }; 
+                { NodesNumber = 2; Activation = sigm }; 
+            ]
     }
     
-    let actual = forward inputs shape theta
+    let actual = forwardOutput inputs shape theta
     let expected = matrix([[0.75; 0.77]]);
     
     (actual |> Matrix.map (fun m -> System.Math.Round(m, 2)))

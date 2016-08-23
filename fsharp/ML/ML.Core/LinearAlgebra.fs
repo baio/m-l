@@ -99,6 +99,8 @@ let flatMx (mx: FMatrix) =
 let flatMxs (mxs: FMatrix array) =
     mxs |> Seq.collect flatMx |> DenseVector.ofSeq
 
+let mapRows f (mx: FMatrix) =
+    mx |> Matrix.mapRows (fun i r -> f r)
 (*
 let mxSubVec (mx : FMatrix) (vec : FVector) = 
     mx |> Matrix.mapCols (fun _ r -> 
