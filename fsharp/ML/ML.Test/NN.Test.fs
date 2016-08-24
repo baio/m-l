@@ -22,7 +22,7 @@ let ``Reshape for 2 inputs -> 1 output must work``() =
     let actual = reshapeNN shape theta
     let expected = [| (matrix([ [0.; 1.; 2.] ]), act) |]
     
-    (actual  |> Array.map (fun f -> fst f)) |> should equal (expected |> Array.map (fun f -> fst f))
+    (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
 
 [<Fact>]
 let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
@@ -30,7 +30,8 @@ let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
     let theta = vector([0.; 1.; 2.; 3.;  4.; 5.; 6.; 7.;  8.; 9.; 10.])
     
     let shape = {
-        Layers = [ 
+        Layers = 
+        [ 
             { NodesNumber = 3; Activation = act }; 
             { NodesNumber = 2; Activation = act }; 
             { NodesNumber = 1; Activation = act }; 
@@ -44,7 +45,7 @@ let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
             (matrix([ [8.; 9.; 10.] ]), act)
         |]
     
-    (actual  |> Array.map (fun f -> fst f)) |> should equal (expected |> Array.map (fun f -> fst f))
+    (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
 
 [<Fact>]
 let ``Reshape XOR must work``() =
@@ -52,7 +53,8 @@ let ``Reshape XOR must work``() =
     let theta = vector([-10.; -30.; 20.; 20.; 20.; 20.; 10.; 20.; -20.])
     
     let shape = {
-        Layers = [ 
+        Layers = 
+        [ 
             { NodesNumber = 2; Activation = act }; 
             { NodesNumber = 2; Activation = act }; 
             { NodesNumber = 1; Activation = act }; 
@@ -66,7 +68,7 @@ let ``Reshape XOR must work``() =
             (matrix([ [10.; 20.; -20.] ]), act)
         |]
     
-    (actual  |> Array.map (fun f -> fst f)) |> should equal (expected |> Array.map (fun f -> fst f))
+    (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
 
 
 

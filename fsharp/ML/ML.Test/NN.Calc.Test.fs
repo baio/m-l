@@ -206,7 +206,7 @@ let ``Calc GD for Example NN must work``() =
 
     let th = gd.Theta |> Vector.map (fun f -> System.Math.Round(f, 6))
     
-    let actual = reshapeNN shape th |> Array.map fst |> Array.toList
+    let actual = reshapeNN shape th |> Array.map (fun f -> f.Thetas) |> Array.toList
 
     System.Diagnostics.Debug.WriteLine(sprintf "%A" expected)
     System.Diagnostics.Debug.WriteLine(sprintf "%A" actual)
@@ -218,8 +218,8 @@ let ``Calc GD for Example NN must work``() =
 let ``Calc Example grads must work with 2 samples``() =
     
     // XOR, Math from Artificial Network 
-    let inputs = matrix([[0.05; 0.10; 0.05; 0.10]])
-    let outputs = vector([0.01; 0.99])
+    let inputs = matrix([[0.05; 0.10]; [0.05; 0.10]])
+    let outputs = vector([0.01; 0.99; 0.01; 0.99])
     let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
     
     let shape = {
@@ -305,7 +305,6 @@ let ``XOR must work``() =
                 InitialTheta = None
             }
         )
-
     
     let gd = stochasticHyper |> SGDHyperParams |> gradientDescent glmModel prms x y
 

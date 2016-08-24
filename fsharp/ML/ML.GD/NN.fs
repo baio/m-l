@@ -15,9 +15,9 @@ type NNLayerShape = {
 
 type NNShape = {
         Layers: NNLayerShape list
-} with 
-    member 
-        this.thetasCount() = 
+} with
+    member
+        this.ThetasCount() =
             (0, 0)
             |> List.foldBack(fun layer (totalLinksCount, prevLayerNodesCount) ->
                 let layerLinksCount = (layer.NodesNumber + 1) * prevLayerNodesCount
@@ -25,17 +25,31 @@ type NNShape = {
             ) this.Layers
             |> fst
 
-type NNLayerType =
-    | Initial
-    // Int number of nodes in input layer
-    | Input of int
-    // Int number of nodes in input layer, thetas tail
-    | Hidden of int * FVector * (FMatrix * ActivationFun)
-    | Output of FMatrix * ActivationFun
+type NNLayer = {
+    Thetas: FMatrix
+    Activation: ActivationFun
+}
 
-// Given shape of NN and long vector of thetas, returns for each hidden layer : matrix of thetas + activation func - for each layer
-// where rows from matrix containing one theta vector for each Node in the layer (including bias)
-let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) array =
+/////////////////////////////////////// Reshape
+
+type NNLayerReshapeInput = {
+    NodesNumber: int
+}
+
+type NNLayerReshapeHidden = {
+    NodesNumber: int
+    Thetas: FMatrix
+    ThetasTail: FVector
+    Activation: ActivationFun
+}
+
+type NNLayerReshape =
+    | NNLayerReshapeNone
+    | NNLayerReshapeInput of NNLayerReshapeInput
+    | NNLayerReshapeHidden of NNLayerReshapeHidden
+    | NNLayerReshapeOutput of NNLayer
+
+let reshapeNN (shape: NNShape) (theta: FVector)  =
 
     let makeHidden (theta: FVector) pervLayerNodesNumber (layer: NNLayerShape) =
         // +1 for bias
@@ -43,39 +57,43 @@ let reshapeNN (shape: NNShape) (theta: FVector) : (FMatrix * ActivationFun) arra
         let mx = reshape (layer.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
         if theta.Count = layerThetasNumber then
             // this is output layer
-            Output(mx, layer.Activation)
+            NNLayerReshapeOutput({Thetas = mx; Activation = layer.Activation})
         elif theta.Count > layerThetasNumber then
-            Hidden(layer.NodesNumber, theta.[layerThetasNumber..],  (mx, layer.Activation))
+            NNLayerReshapeHidden(
+                {
+                    NodesNumber = layer.NodesNumber;
+                    ThetasTail = theta.[layerThetasNumber..];
+                    Thetas = mx;
+                    Activation =  layer.Activation
+                })
         else
             failwith "Number of thetas doesn't corresponds shape of NN"
 
     shape.Layers
     |> Stream.ofList
-    |> Stream.scan (fun acc v ->
+    |> Stream.scan (fun st l ->
         // calculate how many nodes was in pervious layer
-        // if this is first layer then use same number of thetas as nodes number
-        match acc with
-        | Initial ->
-            Input(v.NodesNumber)
-        | Input (nnumber) ->
-            makeHidden theta nnumber v
-        | Hidden (nnumber, theta, _) ->
-            makeHidden theta nnumber v
-        | Output _ ->
+        match st with
+        | NNLayerReshapeNone ->
+            // if this is first layer then use same number of thetas as nodes number
+            NNLayerReshapeInput({ NodesNumber = l.NodesNumber })
+        | NNLayerReshapeInput ({ NodesNumber = pervNodesNumber }) ->
+            makeHidden theta pervNodesNumber l
+        | NNLayerReshapeHidden ({ NodesNumber = pervNodesNumber; ThetasTail = thetasTail }) ->
+            makeHidden thetasTail pervNodesNumber l
+        | NNLayerReshapeOutput _ ->
             failwith "Output must be latest layer"
-    ) Initial
-    |> Stream.choose (fun res ->
-        match res with
-        | Hidden(_, _, res) ->
-            Some(res)
-        | Output(a, b) ->
-            Some(a, b)
+    ) NNLayerReshapeNone
+    |> Stream.choose (function
+        | NNLayerReshapeHidden({Thetas = thetas; Activation = activation})
+        | NNLayerReshapeOutput({Thetas = thetas; Activation = activation}) ->
+            Some({Thetas = thetas; Activation = activation} : NNLayer)
         | _ ->
-            Option.None
+            None
     )
     |> Stream.toArray
 
-/////////////////////////////////////////Forward
+///////////////////////////////////////// Forward
 
 type ForwardInputLayerResult = {
     Inputs: FMatrix
@@ -105,13 +123,13 @@ let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FMatr
 
 let forward2 (inputs: FMatrix) layers =
     layers
-    |> Array.scan (fun acc (th, act) ->
+    |> Array.scan (fun st ({Thetas = layerTheta; Activation = layerActivation} : NNLayer) ->
         let layerInputs =
-            match acc with
+            match st with
             | ForwardResultInput ({Inputs = inputs}) -> inputs
             | ForwardResultHidden({Out = inputs}) -> inputs
-        let out, net = calcLayerForward th act layerInputs
-        ForwardResultHidden({ Weights = th; Net = net; Out = out; Activation = act })
+        let out, net = calcLayerForward layerTheta layerActivation layerInputs
+        ForwardResultHidden({ Weights = layerTheta; Net = net; Out = out; Activation = layerActivation })
     ) (ForwardResultInput({ Inputs = inputs }))
 
 let forward (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
@@ -119,7 +137,7 @@ let forward (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
 
 let forwardOutput (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
     let fwds = forward inputs shape theta
-    match fwds.[fwds.Length - 1] with 
+    match fwds.[fwds.Length - 1] with
     | ForwardResultHidden {Out = res} -> res
     | _ -> failwith "Output layer must be hidden"
 
@@ -159,11 +177,11 @@ type BackpropResult =
 let private caclGrads (aᴸ: FMatrix) (δᴸᴾ: FMatrix) =
     let aᴸ = aᴸ |> appendOnes
     let δᴸᴾ = δᴸᴾ.Transpose()
-    δᴸᴾ * aᴸ 
+    δᴸᴾ * aᴸ
 
 let private caclHiddenDelta fwdLayer (wᴸᴾ: FMatrix) δᴸᴾ =
     let ΔE_ΔA = δᴸᴾ * wᴸᴾ.RemoveColumn(0)
-    let ΔA_ΔN = fwdLayer.Net |> mapRows fwdLayer.Activation.f' 
+    let ΔA_ΔN = fwdLayer.Net |> mapRows fwdLayer.Activation.f'
     ΔE_ΔA .* ΔA_ΔN
 
 //TODO : inputs must already contain bias (check FBiasVector)
@@ -207,13 +225,13 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
             let ΔA_ΔN =  l.Net |> mapRows l.Activation.f'
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
             BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
-        | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ})) 
+        | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ}))
         | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //last hidden layer (n_l - 1), right before outputs OR for hidden layer (n_l - 2...)
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
             let Δᴸ = caclGrads l.Out δᴸᴾ
-            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })                    
-        | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ}))             
+            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
+        | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ}))
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ})) ->
             // calc gradient for first hidden layer (n_1) OR one layer network case (n_1)
             let Δᴸ = caclGrads l.Inputs δᴸᴾ
@@ -231,12 +249,11 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     let Y = chunkOutputs x.RowCount y
     // grads for each sample (per layer)
     //TODO: improve concat withou mapping to array if possible
-    let bp = _backprop Y x shape theta    
-    bp
-    |> Array.map(fun mx ->
+    let bp = _backprop Y x shape theta
+    bp|> Array.map(fun mx ->
         // avg weighted grads per layer
-        //mx.ColumnSums() / float mx.RowCount|> Vector.toArray      
-        mx |> flatMx |> Vector.toArray
+        //mx.ColumnSums() / float mx.RowCount|> Vector.toArray        
+        mx |> Matrix.map(fun m -> m / float x.RowCount) |> flatMx |> Vector.toArray
     )
     |> Array.concat
     |> DenseVector.ofArray
@@ -244,8 +261,8 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
 
 ////
 
-let NNCost _ (x : float Matrix) (y : float Vector) (theta: float Vector)  =     
-    ((x * theta - y).PointwisePower(2.) |> Vector.sum) / (2. * float x.RowCount) 
-        
+let NNCost _ (x : float Matrix) (y : float Vector) (theta: float Vector)  =
+    ((x * theta - y).PointwisePower(2.) |> Vector.sum) / (2. * float x.RowCount)
+
 let NNGradient _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
     x.Transpose() * (x * theta - y) / float x.RowCount

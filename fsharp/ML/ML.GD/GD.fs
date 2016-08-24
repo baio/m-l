@@ -16,11 +16,11 @@ type IterativeTrainModelParams = {
     ConvergeMode : ConvergeMode
 }
 
-type GradientDescentIter<'iter> = 
-    {   
+type GradientDescentIter<'iter> =
+    {
         Theta: float Vector
-        Params : 'iter 
-    }         
+        Params : 'iter
+    }
 
 type CalcGradientParams<'hyper> = {
     HyperParams : 'hyper
@@ -34,14 +34,14 @@ type IterParamsUpdate<'iter> = GradientDescentIter<'iter> -> GradientDescentIter
 type IterParamsProvider<'iter> = {
     initial: Unit -> GradientDescentIter<'iter>
     update: GradientDescentIter<'iter> -> GradientDescentIter<'iter>
-} 
+}
 
-let inline createIterParamsProvider (initIter: GradientDescentIter<'iter>) = 
+let inline createIterParamsProvider (initIter: GradientDescentIter<'iter>) =
     {
         initial = (fun () -> initIter)
-        update = (fun (iter) -> iter)         
+        update = (fun (iter) -> iter)
     }
-    
+
 type ModelTrainResultType = Converged | EpochCountAchieved | NaN
 type ModelTrainResult = { ResultType : ModelTrainResultType; Theta: float Vector; Errors: float list }
 type ClacGradientFunc<'iter, 'hyper> = CalcGradientParams<'hyper> -> GradientDescentIter<'iter> -> GradientDescentIter<'iter>
@@ -55,13 +55,13 @@ let getModelShapeAndTheta (model: GLMModel) (featuresNumber: int) =
         ThetaShapeVector, (featuresNumber + 1 |> zeros), m
     | GLMNNModel({ Base = m; Shape = shape; InitialTheta = th}) ->
 #if DEBUG
-        let theta = 
-            match th with 
+        let theta =
+            match th with
             | Some th -> th
-            | None -> shape.thetasCount() |> rndvec
-#else 
+            | None -> shape.ThetasCount() |> rndvec
+#else
         let theta = shape.thetasCount() |> rndvec
-#endif        
+#endif
         ThetaShapeNN(shape), theta, m
     | GLMSoftmaxModel m ->
         let sz = featuresNumber + 1, m.ClassesNumber
@@ -110,7 +110,7 @@ let internal GD<'iter, 'hyper>
                 { ResultType = EpochCountAchieved; Theta = theta; Errors = errors }
             else
                 let updatedIterPrms = calcGradient calcGradientPrms iter
-                //If graient is plus thwn we need to move down to achive function min                
+                //If graient is plus thwn we need to move down to achive function min
                 iterate updatedIterPrms (error::errors)
 
         iterate initialIter []
