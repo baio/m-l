@@ -219,7 +219,7 @@ let ``Calc Example grads must work with 2 samples``() =
     
     // XOR, Math from Artificial Network 
     let inputs = matrix([[0.05; 0.10]; [0.05; 0.10]])
-    let outputs = vector([0.01; 0.99; 0.01; 0.99])
+    let outputs = vector([0.01; 0.01; 0.99; 0.99])
     let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
     
     let shape = {

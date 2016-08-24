@@ -35,11 +35,11 @@ let nn_mnist() =
     //let inputs, outputs  = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
 
     let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
-
+    
     let outputs = outputs |> vector |> encodeOneHot 10 |> flatMx 
     let inputs = matrix inputs
     let inputs, normPrms = norm inputs
-
+       
     let model = {
         Cost = NNCost
         Gradient = NNGradient
@@ -85,23 +85,23 @@ let nn_mnist() =
 
     let minbatchHyper : SGDHyperParams = {
         Alpha = 0.5
-        BatchSize = 100
+        BatchSize = inputs.RowCount
     }
 
     let NAGHyper : NAGHyperParams = {        
         Alpha = 0.01
-        BatchSize = 100
+        BatchSize = inputs.RowCount
         Gamma = 0.5
     }
 
     let AdagradHyper : AdagradHyperParams = {        
         Alpha = 0.01
-        BatchSize = 100
+        BatchSize = inputs.RowCount
         Epsilon = 1E-8
     }
 
     let AdadeltaHyper : AdadeltaHyperParams = {        
-        BatchSize = 100
+        BatchSize = inputs.RowCount
         Epsilon = 1E-8
         Rho = 0.6
     }
@@ -132,7 +132,7 @@ let nn_mnist() =
 
     
     
-    (*
+    
     let perf = Benchmark.Run (fun () ->
         let train = minbatchHyper |> SGDHyperParams |> gd
         trainResults <- ("miniBatch", train)::trainResults
@@ -160,9 +160,8 @@ let nn_mnist() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
-    *)
     
-
+    
     let mapOutput = (fun (f: FVector) -> 
         let encoded = zeros 10
         encoded.[f.MaximumIndex()] <- 1.

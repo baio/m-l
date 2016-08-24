@@ -58,6 +58,7 @@
     <Content Include="packages.config" />
     <Compile Include="NN.Test.fs" />
     <Compile Include="NN.Calc.Test.fs" />
+    <Compile Include="NN.Utils.fs" />
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>

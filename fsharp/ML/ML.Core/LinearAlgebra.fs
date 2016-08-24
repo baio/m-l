@@ -68,7 +68,10 @@ let repmatRow (cnt: int) (mx : _ Matrix) =
 let encodeOneHot (classesNum: int) (labels: float Vector) = 
     List.init labels.Count (fun r -> 
         List.init classesNum (fun c -> 
-            if labels.[r] = float c then 1. else 0.
+            if labels.[r] - 1. = float c then 
+                1. 
+             else 
+                0.
         )
     )
     |> matrix 
@@ -78,7 +81,7 @@ let encodeOneHot (classesNum: int) (labels: float Vector) =
 
 let chunkOutputs samplesNumber y =
     let chunkSize = (y |> Seq.length) / samplesNumber
-    y |> Seq.chunkBySize(chunkSize) |> DenseMatrix.ofRowSeq
+    y |> reshape (samplesNumber, chunkSize)
         
 let permuteSamples (mx: _ Matrix) (vec: _ Vector) =
 
