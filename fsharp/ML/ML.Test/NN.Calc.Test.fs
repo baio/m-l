@@ -214,6 +214,45 @@ let ``Calc GD for Example NN must work``() =
     actual |> should equal expected
 
 
+[<Fact>]
+let ``Calc Example grads must work with 2 samples``() =
+    
+    // XOR, Math from Artificial Network 
+    let inputs = matrix([[0.05; 0.10; 0.05; 0.10]])
+    let outputs = vector([0.01; 0.99])
+    let theta = vector([0.35; 0.35; 0.15; 0.25; 0.20; 0.30;  0.6; 0.6; 0.4; 0.5; 0.45; 0.55])
+    
+    let shape = {
+        Layers = 
+            [ 
+                { NodesNumber = 2; Activation = act }; 
+                { NodesNumber = 2; Activation = sigm }; 
+                { NodesNumber = 2; Activation = sigm }; 
+            ]
+    }
+    
+    let actual = backprop outputs inputs shape theta
+
+    let expected = 
+        [
+
+            0.0087713546894869366
+            0.0099542547052172015
+            0.00043856773447434685
+            0.0004977127352608601
+            0.0008771354689486937
+            0.0009954254705217202
+
+            0.13849856162855698
+            -0.038098236516556229
+            0.082167040564230784
+            -0.022602540477475067
+            0.082667627847533259
+            -0.022740242215978219
+        ] 
+
+    actual |> should equal expected
+
 //[<Fact>]
 let ``XOR must work``() =
 
