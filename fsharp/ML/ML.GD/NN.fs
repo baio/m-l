@@ -259,10 +259,3 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     |> DenseVector.ofArray
 
 
-////
-
-let NNCost _ (x : float Matrix) (y : float Vector) (theta: float Vector)  =
-    ((x * theta - y).PointwisePower(2.) |> Vector.sum) / (2. * float x.RowCount)
-
-let NNGradient _ (x : float Matrix) (y : float Vector) (theta: float Vector) =
-    x.Transpose() * (x * theta - y) / float x.RowCount
