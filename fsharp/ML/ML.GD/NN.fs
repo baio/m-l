@@ -156,10 +156,10 @@ type BackpropResult =
     | BackpropResultHidden of BackpropHiddenLayerResult
     | BackpropResultInput of BackpropInputLayerResult
 
-let private caclGrads aᴸ δᴸᴾ =
-    let aᴸ = aᴸ |> appendOnes
-    let δᴸᴾ = δᴸᴾ|> appendOnes
-    δᴸᴾ * aᴸ
+let private caclGrads (aᴸ: FMatrix) (δᴸᴾ: FMatrix) =
+    let aᴸ = aᴸ //|> appendOnes
+    let δᴸᴾ = δᴸᴾ //|> appendOnset
+    δᴸᴾ * aᴸ.Transpose()
 
 let private caclHiddenDelta fwdLayer (wᴸᴾ: FMatrix) δᴸᴾ =
     let ΔE_ΔA = δᴸᴾ * wᴸᴾ.RemoveColumn(0)
@@ -231,7 +231,8 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     let Y = chunkOutputs x.RowCount y
     // grads for each sample (per layer)
     //TODO: improve concat withou mapping to array if possible
-    _backprop Y x shape theta    
+    let bp = _backprop Y x shape theta    
+    bp
     |> Array.map(fun mx ->
         // avg weighted grads per layer
         mx.ColumnSums() / float mx.RowCount 
