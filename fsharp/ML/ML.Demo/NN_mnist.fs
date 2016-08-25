@@ -162,12 +162,7 @@ let nn_mnist() =
     printfn "Adadelta perf : %A" perf
     
     
-    let mapOutput = (fun (f: FVector) -> 
-        let encoded = zeros 10
-        encoded.[f.MaximumIndex()] <- 1.
-        encoded
-    )
-    let acc = accuracy mapOutput shape inputs outputs
+    let acc = accuracy oneHot shape inputs outputs
 
     trainResults
     |> List.filter (fun (_, f) -> f.Errors.Length > 0)

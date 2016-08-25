@@ -67,6 +67,12 @@ let repmatRow (cnt: int) (mx : _ Matrix) =
     |> matrix
 
 
+let oneHot (vec: FVector) = 
+    let z = zeros vec.Count
+    z.[vec.MaximumIndex()] <- 1.
+    z
+
+
 let encodeOneHot (classesNum: int) (labels: float Vector) = 
     List.init labels.Count (fun r -> 
         List.init classesNum (fun c -> 
