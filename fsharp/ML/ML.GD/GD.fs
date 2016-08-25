@@ -4,6 +4,7 @@
 open ML.Core.LinearAlgebra
 open GLM
 open MathNet.Numerics.LinearAlgebra
+open ML.NN
 
 type ConvergeMode =
     //calculate till number of epochs achieved
@@ -58,7 +59,7 @@ let getModelShapeAndTheta (model: GLMModel) (featuresNumber: int) =
         let theta =
             match th with
             | Some th -> th
-            | None -> shape.ThetasCount() |> rndvec
+            | None -> shape |> getInitialTheta
 #else
         let theta = shape.thetasCount() |> rndvec
 #endif

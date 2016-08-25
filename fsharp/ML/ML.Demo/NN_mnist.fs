@@ -170,6 +170,7 @@ let nn_mnist() =
     let acc = accuracy mapOutput shape inputs outputs
 
     trainResults
+    |> List.filter (fun (_, f) -> f.Errors.Length > 0)
     |> List.sortBy (fun (_, res) -> res.Errors.[0])
     |> List.map (fun (label, res) ->
          (sprintf "%s %f : %f (%i)" label (acc res.Theta) res.Errors.[0] res.Errors.Length), res.Errors 

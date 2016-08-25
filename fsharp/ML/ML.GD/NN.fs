@@ -250,12 +250,32 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     // grads for each sample (per layer)
     //TODO: improve concat withou mapping to array if possible
     let bp = _backprop Y x shape theta
-    bp|> Array.map(fun mx ->
+    bp
+    |> Array.collect(fun mx ->
         // avg weighted grads per layer
-        //mx.ColumnSums() / float mx.RowCount|> Vector.toArray        
+        //mx.ColumnSums() / float mx.RowCount|> Vector.toArray
         mx |> Matrix.map(fun m -> m / float x.RowCount) |> flatMx |> Vector.toArray
     )
-    |> Array.concat
     |> DenseVector.ofArray
 
+//////////////// Theta initailization
+
+let private calcLayerTheta L_in L_out =
+    let epsilon = System.Math.Sqrt(6.) / System.Math.Sqrt(float L_in + float L_out)
+    let r = rndvec ((L_in + 1) * L_out)
+    r * 2. * epsilon - epsilon |> Vector.toList
+
+//Get initial theta randomized
+let getInitialTheta (shape: NNShape) =
+    shape.Layers
+    |> List.mapFold (fun st l_out  ->
+        let res =
+            match st with
+            | None -> []
+            | Some l_in -> calcLayerTheta l_in l_out.NodesNumber 
+        res, Some l_out.NodesNumber
+    ) None
+    |> fst
+    |> List.concat
+    |> vector
 

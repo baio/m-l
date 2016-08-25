@@ -16,9 +16,11 @@ let spliceVector start count (vr: _ Vector) =
 
 let zeros cnt = DenseVector.zero<float> cnt
 
-let rndvec cnt = 
+let rndvec2 next cnt  = 
     let rnd = new System.Random() 
-    DenseVector.init cnt (fun _ -> (nextGaussianStd rnd) )
+    DenseVector.init cnt (fun _ -> (next rnd) )
+
+let rndvec cnt = rndvec2 nextGaussianStd cnt
 
 let empty() = DenseVector.create 1 0.
 let emptyM() = DenseMatrix.create 1 1 0.
@@ -104,8 +106,3 @@ let flatMxs (mxs: FMatrix array) =
 
 let mapRows f (mx: FMatrix) =
     mx |> Matrix.mapRows (fun i r -> f r)
-(*
-let mxSubVec (mx : FMatrix) (vec : FVector) = 
-    mx |> Matrix.mapCols (fun _ r -> 
-        r - vec)
-*)
