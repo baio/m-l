@@ -1,6 +1,11 @@
 ﻿module ML.Core.Readers
 
+//#I "../../packages/Deedle"
+//
+
+
 open Utils
+open ML.Core.LinearAlgebra
 open Nessos.Streams
 
 let readLines (filePath:string) = seq {
@@ -65,13 +70,14 @@ let mapStream cernel (stream : float list Stream) =
     |> Stream.map
         (fun m -> m |> List.mapi (fun i e -> cernel i e)) 
     
-let meanList rowsNumber lst = lst |> List.map (fun m -> m / rowsNumber)
+(*
+let meanList (rowsNumber: int) lst = lst |> List.map (fun m -> m / float rowsNumber)
 
 let meanSumStream rowsNumber colsNumber stream = 
     stream |> sumStream colsNumber |> meanList rowsNumber
 
 //given stream of columns return mean and std dev for each column
-let stdDevStream rowsNumber colsNumber (stream : float list Stream) =       
+let stdDevStream (rowsNumber: int) colsNumber (stream : float list Stream) =       
     let mss = meanSumStream rowsNumber colsNumber
     //Work out the Mean (the simple average of the numbers)
     let mu = stream |> mss
@@ -83,7 +89,7 @@ let stdDevStream rowsNumber colsNumber (stream : float list Stream) =
     mu, sqsum |> List.map (fun m -> System.Math.Sqrt m)
 
 //given stream of columns return normalized columns plus mean and std dev for each column (normalized, (mu, std))
-let normStream rowsNumber colsNumber (stream : float list Stream) =       
+let normStream (rowsNumber: int) colsNumber (stream : float list Stream) =       
     let mu, std = stream |> stdDevStream rowsNumber colsNumber
     let nrm = stream |> mapStream (fun i e -> (e - mu.[i]) / std.[i])
     nrm, (mu, std)
@@ -95,30 +101,51 @@ let normStream rowsNumber colsNumber (stream : float list Stream) =
 //It is slow but, consume least memory
 //TODO : test
 //TODO : write first line with comment #RowsNum, NormMu, NormStdDev
-let normalizeFile rowsNumber normIndexes unnormIndex pathIn pathOut = 
-    
-    let takeByIndexes (s : _ seq) =
-        List.init (normIndexes |> List.length)  (fun i -> s |> Seq.nth normIndexes.[i])
 
-    use sw = new System.IO.StreamWriter (path = pathOut)
+let normalizeStream (rowsNumber: int) normIndexes unnormIndex (streamIn : string Stream) = 
+
+    let takeByIndexes (s : _ seq) =
+        List.init (normIndexes |> List.length)  (fun i -> s |> Seq.item normIndexes.[i])
 
     let rows = 
-        readLines pathIn
-        |> Stream.ofSeq
+        streamIn
         |> Stream.map (fun m ->
             let spts = m.Split(',') 
-            spts.[unnormIndex], spts|> takeByIndexes |> List.map (fun m -> System.Double.Parse(m)) 
+            let nromzd = 
+                spts
+                |> takeByIndexes 
+                |> List.map System.Double.Parse
+            spts.[unnormIndex], nromzd
         )
 
-    let y = rows |> Stream.map (fun m -> fst m)
-    let x, norm = rows |> Stream.map (fun m -> snd m) |> normStream rowsNumber normIndexes.Length
+    let y = rows |> Stream.map fst
+    let x, norm = rows |> Stream.map snd |> normStream rowsNumber normIndexes.Length
 
     x 
     |> Stream.zipWith (fun a b -> a, b) y
-    |> Stream.iter (fun (y, x) ->
-        y::(x |> List.map (fun f -> sprintf "%f" f))
-        |> String.concat ";"
-        |> sw.WriteLine
+    |> Stream.map (fun (y, x) ->
+        y::(x |> List.map (fun f -> sprintf "%f" f)) |> String.concat ","
     )
+*)
 
-    //TODO : write meta file
+
+(*
+let normalizeFile rowsNumber normIndexes unnormIndex pathIn pathOut = 
+
+    let takeByIndexes (s : _ seq) =
+        List.init (normIndexes |> List.length)  (fun i -> s |> Seq.item normIndexes.[i])
+    
+    let mapLine line = 
+        line.Split(',')
+        |>
+
+
+    //use sw = new System.IO.StreamWriter (path = pathOut)
+        
+    readLines pathIn
+    |> Stream.ofSeq
+    |> normalizeStream rowsNumber normIndexes unnormIndex
+    |> Stream.iter sw.WriteLine
+*)
+
+

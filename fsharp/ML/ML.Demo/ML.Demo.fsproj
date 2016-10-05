@@ -57,6 +57,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="IO.fs" />
     <Compile Include="Linear.fs" />
     <Compile Include="DLinear.fs" />
     <Compile Include="Logistic.fs" />
@@ -91,6 +92,10 @@
       <Project>{0d6571af-3459-4357-8928-789ca1063889}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <Reference Include="Deedle">
+      <HintPath>..\packages\Deedle.1.2.5\lib\net40\Deedle.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
       <Private>True</Private>
@@ -118,6 +123,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <Import Project="..\packages\MathNet.Numerics.MKL.Win.2.0.0\build\MathNet.Numerics.MKL.Win.targets" Condition="Exists('..\packages\MathNet.Numerics.MKL.Win.2.0.0\build\MathNet.Numerics.MKL.Win.targets')" />

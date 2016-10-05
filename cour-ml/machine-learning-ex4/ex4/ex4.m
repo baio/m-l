@@ -29,6 +29,7 @@ num_labels = 10;          % 10 labels, from 1 to 10
 %  You will be working with a dataset that contains handwritten digits.
 %
 
+
 % Load Training Data
 fprintf('Loading and Visualizing Data ...\n')
 
@@ -189,6 +190,9 @@ options = optimset('MaxIter', 50);
 %  You should also try different values of lambda
 lambda = 1;
 
+c = clock;
+disp(datestr(datenum(c(1),c(2),c(3),c(4),c(5),c(6))));
+
 % Create "short hand" for the cost function to be minimized
 costFunction = @(p) nnCostFunction(p, ...
                                    input_layer_size, ...
@@ -205,6 +209,9 @@ Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
 
 Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
                  num_labels, (hidden_layer_size + 1));
+
+c = clock;
+disp(datestr(datenum(c(1),c(2),c(3),c(4),c(5),c(6))));
 
 fprintf('Program paused. Press enter to continue.\n');
 pause;

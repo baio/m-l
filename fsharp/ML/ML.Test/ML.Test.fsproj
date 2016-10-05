@@ -58,7 +58,8 @@
     <Content Include="packages.config" />
     <Compile Include="NN.Test.fs" />
     <Compile Include="NN.Calc.Test.fs" />
-    <Compile Include="NN.Utils.fs" />
+    <Compile Include="NN.Utils.Tests.fs" />
+    <Compile Include="Core.IO.Tests.fs" />
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +99,10 @@
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Streams">
+      <HintPath>..\packages\Streams.0.4.1\lib\net45\Streams.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

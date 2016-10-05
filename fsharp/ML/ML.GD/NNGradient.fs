@@ -31,7 +31,7 @@ let accuracy (mapOutput: FVector -> FVector) (shape: NNShape) (x: float Matrix) 
     let actual = predict mapOutput shape x theta 
     let correct = 
         ys - actual //diff target - calcualted; [1; 1] - [1; 1] = [0; 0]
-        |> Matrix.sumRows // sum diff for each sample, if calculated = 0 then it should be 0.
+        |> Matrix.sumRows // sum diff for each sample, if calculated = 0 then it should be 1.
         |> Vector.map (fun f -> iif (f=0.) 1. 0.)
         |> Vector.sum
     

@@ -9,6 +9,7 @@ open DLogistic
 open DSoftmax
 open NN_XOR
 open NN_mnist
+open IO
 
 [<EntryPoint>]
 let main argv = 
@@ -23,7 +24,8 @@ let main argv =
     //DLogistic() |> ignore
     //DSoftmax() |> ignore
     //nn_xor()
-    nn_mnist()
+    //nn_mnist()
+    IO()
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code

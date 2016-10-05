@@ -112,3 +112,6 @@ let flatMxs (mxs: FMatrix array) =
 
 let mapRows f (mx: FMatrix) =
     mx |> Matrix.mapRows (fun i r -> f r)
+
+let normalizeMx (mx: FMatrix) = 
+    mx.NormalizeColumns(2.)
