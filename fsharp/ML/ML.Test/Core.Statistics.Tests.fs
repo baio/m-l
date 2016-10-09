@@ -64,3 +64,22 @@ let ``Calc std dev s 1. 3. should work``() =
     let actual = calcStdDevS d 
     
     actual |> should equal 1.4142135623730951
+
+
+[<Fact>]
+let ``Calc std dev p 0. 0. should work``() =
+
+    let d = (distr 0.) ++ (distr 0.)
+
+    let actual = calcStdDevP d 
+    
+    actual |> should equal 0.
+
+[<Fact>]
+let ``Calc std dev s 0. 0. should work``() =
+
+    let d = (distr 0.) ++ (distr 0.)
+
+    let actual = calcStdDevS d 
+    
+    actual |> should equal 0.
