@@ -23,9 +23,10 @@ let main argv =
     //DLinear() |> ignore
     //DLogistic() |> ignore
     //DSoftmax() |> ignore
-    nn_xor()
-    //nn_mnist()
-    //IO()
+    //nn_xor()
+    nn_mnist()
+    //normalizeCsv "c:/dev/.data/mnist/mnist_train.csv" "c:/dev/.data/mnist/mnist_train_norm.csv" [0]
+    //normalizeCsv "../../for_norm_test.csv" "../../for_norm_test_out.csv" [0]
 
     System.Console.ReadLine() |> ignore
     0 // return an integer exit code

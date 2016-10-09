@@ -70,6 +70,8 @@
     <None Include="App.config" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
+    <None Include="for_norm_test.csv" />
+    <None Include="for_norm_test_out.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ML.Core\ML.Core.fsproj">

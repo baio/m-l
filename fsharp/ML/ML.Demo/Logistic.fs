@@ -4,6 +4,7 @@ module Logistic
 
 open ML.Core.Readers
 open ML.Core.Utils
+open ML.Core.LinearAlgebra
 open ML.GD.GLM
 open ML.GD.LogisticRegression
 

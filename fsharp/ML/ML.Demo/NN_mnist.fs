@@ -31,14 +31,22 @@ open ML.Statistics.Regressions
 open ML.Statistics.Charting
 
 let nn_mnist() = 
-            
-    //let inputs, outputs  = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
+           
+    printfn "Start reading"             
+    let inputs, outputs  = readCSV2 @"c:/dev/.data/mnist/mnist_train.csv" false [|1..784|] 0 5000
 
-    let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
+    //let inputs, outputs  = readCSV2 @"c:/dev/.data/nmist_1.csv" false [|1..400|] 0 5000
+    //let inputs, outputs = readCSV2 @"c:/dev/.data/mnist/mnist_train_norm.csv" true [|1..784|] 0 5000
+
+    printfn "Reading is done"             
     
     let outputs = outputs |> vector |> encodeOneHot 10 |> flatMx 
     let inputs = matrix inputs
-    let inputs, normPrms = norm inputs
+    //let inputs1, normPrms1 = norm inputs
+    //let inputs2, normPrms2 = norm3 inputs
+    //let inputs, _ = norm inputs
+
+    //printfn "%A %A" inputs.[]
        
     let model = {
         Cost = NNCost
@@ -55,10 +63,10 @@ let nn_mnist() =
         {
             Layers = 
                 [ 
-                    //{ NodesNumber = 784; Activation = act }; 
-                    // { NodesNumber = 30; Activation = sigm }; 
-                    { NodesNumber = 400; Activation = act }; 
-                    { NodesNumber = 25; Activation = sigm }; 
+                    { NodesNumber = 784; Activation = act }; 
+                    { NodesNumber = 50; Activation = sigm }; 
+                    //{ NodesNumber = 400; Activation = act }; 
+                    //{ NodesNumber = 25; Activation = sigm }; 
                     { NodesNumber = 10; Activation = sigm }; 
                 ]
         }
@@ -74,7 +82,7 @@ let nn_mnist() =
 
     ///
     let stochasticHyper : SGDHyperParams = {
-        Alpha = 0.5
+        Alpha = 0.05
         BatchSize = 1
     }
 
@@ -113,6 +121,7 @@ let nn_mnist() =
     let mutable trainResults = [] 
 
 
+    
     let perf = Benchmark.Run (fun () ->
         let train = batchHyper |> SGDHyperParams |> gd
         trainResults <- ("batch",train)::trainResults
@@ -120,19 +129,8 @@ let nn_mnist() =
     )
     printfn "batch perf : %A" perf
 
+    printfn "Start clalc"
 
-    (*
-    let perf = Benchmark.Run (fun () ->
-        let train = stochasticHyper |> SGDHyperParams |> gd
-        trainResults <- ("stochastic", train)::trainResults
-        printfn "stochastic result : %A" train
-    )    
-    printfn "stochastic perf : %A" perf
-    *)
-
-    
-    
-    
     let perf = Benchmark.Run (fun () ->
         let train = minbatchHyper |> SGDHyperParams |> gd
         trainResults <- ("miniBatch", train)::trainResults
@@ -160,8 +158,7 @@ let nn_mnist() =
         printfn "Adadelta result : %A" train
     )    
     printfn "Adadelta perf : %A" perf
-    
-    
+        
     let acc = accuracy oneHot shape inputs outputs
 
     trainResults

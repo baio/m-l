@@ -1,33 +1,10 @@
 ﻿module ML.Core.Utils
 
+open Deedle
 open MathNet.Numerics.Statistics
 open MathNet.Numerics.LinearAlgebra
 open System
-
-type NormParams = { Mu : float Vector ; Std : float Vector }
-
-//normailze with (a - mean / std)
-let norm (mx: float Matrix) : float Matrix * NormParams = 
     
-    let mu, std = 
-        mx.EnumerateColumns()
-        |> Seq.map (fun col -> 
-            col.Mean(), col.StandardDeviation()
-        )
-        |> Seq.toList
-        |> List.unzip
-                   
-    mx |> Matrix.mapCols (fun i vec ->
-        if std.[i] <> 0. then
-            (vec - mu.[i]) / std.[i]
-        else 
-            vec - mu.[i]
-    ), { Mu = vector mu; Std = vector std }
-
-let norm2 (prms: NormParams) (mx: float Matrix)  : float Matrix = 
-    DenseMatrix.initRows mx.RowCount (fun i ->
-        (mx.Row(i) - prms.Mu) ./ prms.Std
-   )
 
 //Generate ranges { [0..4], [4..8], [8..9]
 //Given: rgLength = 4, seqLength = 10

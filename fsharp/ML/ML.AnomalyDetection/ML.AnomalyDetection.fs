@@ -8,7 +8,7 @@ open Deedle
 
 type AnomalyModel = { mu: float[]; std : float[] }
 
-let inline toArray (series: Series<'a, 'b>) = series |> Series.valuesAll |> Seq.choose(fun f -> f) |> Seq.toArray
+let inline toArray (series: Series<'a, 'b>) = series |> Series.values |> Seq.toArray
     
 let calcGauss mu std x = 
     (1. / Math.Sqrt(2. * Math.PI) * std) * Math.Exp(-1. * Math.Pow((x - mu), 2.) / (2. * Math.Pow(std, 2.)))
@@ -32,6 +32,6 @@ let calcP (model: AnomalyModel) (mx: FMatrix) =
 //return vector of elements where for each matrix row true is anomaly and false is not
 let findAnomalies (model: AnomalyModel) (mx: FMatrix) (epsilon: float) =
     calcP model mx
-    |> Seq.map(fun f -> f >= epsilon)    
+    |> Seq.map(fun f -> f <= epsilon)    
 
 

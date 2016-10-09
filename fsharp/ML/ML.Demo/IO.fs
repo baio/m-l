@@ -1,27 +1,30 @@
 ﻿module IO
 
+open ML.Core.LinearAlgebra
 open ML.Core.Readers
 open ML.Core.Utils
-
+open MathNet.Numerics.LinearAlgebra
 open Deedle
 
-let IO() = 
-    let iris = Frame.ReadCsv("c:/dev/.data/mnist/mnist_train.csv")
-    //let iris = Frame.ReadCsv("c:/dev/.data/iris.csv")
-    let keys = iris.ColumnKeys |> Seq.toArray
-    let x = iris.Columns.[keys.[1..784]]
+let getCols cols pred = 
+    cols
+    |> Seq.mapi (fun i m -> i, m)
+    |> Seq.filter(fun (i, _) -> pred i)
+    |> Seq.map snd
 
-    let iris = None
 
-    let mu = x |> Stats.mean 
-    let std = x |> Stats.stdDev
-       
-    let norm = 
-      x 
-      |> Frame.mapRowValues (fun r -> (r.As<float>() - mu) / std)
-      |> Frame.ofRows
+let normalizeCsv inFile outFile ignoreCols = 
+    
+    let isIgnoreCol i = ignoreCols |> (List.contains i >> not)
+    let data = Frame.ReadCsv(path = inFile, hasHeaders = false)    
+    let getDataCols = getCols data.ColumnKeys
+    let normCols = getDataCols isIgnoreCol
+    let notNormCols = getDataCols (isIgnoreCol >> not)
+   
+    let mu, std, normData = data.Columns.[normCols] |> normFrame
+    let notNormData = data.Columns.[notNormCols] |> Frame.mapCols(fun _ s -> s.As<float>())
 
-    let x = None
+    let resFrame = notNormData + normData
+    resFrame.SaveCsv(path = outFile)
 
-    printfn "%A" norm
 
