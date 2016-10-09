@@ -57,6 +57,7 @@
     <Compile Include="Readers.fs" />
     <Content Include="packages.config" />
     <Compile Include="Statistics.fs" />
+    <Compile Include="Normalization.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Deedle">

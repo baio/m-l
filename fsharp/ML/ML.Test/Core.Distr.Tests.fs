@@ -1,4 +1,4 @@
-﻿module ML.Core.Statistics.Tests
+﻿module ML.Core.Distr.Tests
 
 open Xunit
 open FsUnit

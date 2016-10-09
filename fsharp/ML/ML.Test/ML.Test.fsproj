@@ -56,12 +56,13 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
+    <Compile Include="Core.Norm.Tests.fs" />
     <Compile Include="NN.Test.fs" />
     <Compile Include="NN.Calc.Test.fs" />
     <Compile Include="NN.Utils.Tests.fs" />
     <Compile Include="Core.IO.Tests.fs" />
-    <Compile Include="Core.Statistics.Tests.fs" />
     <Content Include="App.config" />
+    <Compile Include="Core.Distr.Tests.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsCheck">
