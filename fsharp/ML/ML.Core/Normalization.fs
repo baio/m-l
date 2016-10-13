@@ -1,8 +1,6 @@
 ﻿module ML.Core.Normalization
 
-type Batch = float seq seq
+open Statistics
 
-type NormModel = { Mu : float ; Std : float }
-
-let normalize v model = (v - model.Mu) / model.Std
+let normalize model v = (v - model.Mu) / model.Std
 

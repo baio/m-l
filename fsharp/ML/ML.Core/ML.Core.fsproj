@@ -58,6 +58,7 @@
     <Content Include="packages.config" />
     <Compile Include="Statistics.fs" />
     <Compile Include="Normalization.fs" />
+    <Compile Include="Batch.Statistics.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Deedle">

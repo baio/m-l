@@ -46,3 +46,4 @@ type NormModel = { Mu : float ; Std : float }
 let calcNormModelS d = { Mu = calcAvg d; Std = calcStdDevS d } 
 
 let calcNormModelP d = { Mu = calcAvg d; Std = calcStdDevP d } 
+
