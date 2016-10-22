@@ -31,8 +31,8 @@ let ``Calc 1 input -> 1 output must work``() =
     let shape = {
         Layers = 
             [ 
-                { NodesNumber = 1; Activation = act }; 
-                { NodesNumber = 1; Activation = act }; 
+                NNFullLayerShape({ NodesNumber = 1; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 1; Activation = act }); 
             ]
     }
     
@@ -51,8 +51,8 @@ let ``Calc XOR Layer1 must work``() =
     let shape = {
         Layers = 
             [ 
-                { NodesNumber = 2; Activation = act }; 
-                { NodesNumber = 2; Activation = sigm }; 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
             ]
     }
     
@@ -72,9 +72,9 @@ let ``Calc XOR must work``() =
     let shape = {
         Layers = 
             [ 
-                { NodesNumber = 2; Activation = act }; 
-                { NodesNumber = 2; Activation = sigm }; 
-                { NodesNumber = 1; Activation = sigm }; 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
+                NNFullLayerShape({ NodesNumber = 1; Activation = sigm }); 
             ]
     }
     
@@ -95,9 +95,9 @@ let ``Calc Example must work``() =
     let shape = {
         Layers = 
             [ 
-                { NodesNumber = 2; Activation = act }; 
-                { NodesNumber = 2; Activation = sigm }; 
-                { NodesNumber = 2; Activation = sigm }; 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
             ]
     }
     
@@ -119,9 +119,9 @@ let ``Calc Example grads must work``() =
     let shape = {
         Layers = 
             [ 
-                { NodesNumber = 2; Activation = act }; 
-                { NodesNumber = 2; Activation = sigm }; 
-                { NodesNumber = 2; Activation = sigm }; 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
             ]
     }
     
@@ -176,9 +176,9 @@ let ``Calc GD for Example NN must work``() =
         {
             Layers = 
                 [ 
-                    { NodesNumber = 2; Activation = act }; 
-                    { NodesNumber = 2; Activation = sigm }; 
-                    { NodesNumber = 2; Activation = sigm }; 
+                    NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                    NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
+                    NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
                 ]
         }
 
@@ -225,9 +225,9 @@ let ``Calc Example grads must work with 2 samples``() =
     let shape = {
         Layers = 
             [ 
-                { NodesNumber = 2; Activation = act }; 
-                { NodesNumber = 2; Activation = sigm }; 
-                { NodesNumber = 2; Activation = sigm }; 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
             ]
     }
     
@@ -291,9 +291,9 @@ let ``XOR must work``() =
         {
             Layers = 
                 [ 
-                    { NodesNumber = 2; Activation = act }; 
-                    { NodesNumber = 2; Activation = sigm }; 
-                    { NodesNumber = 1; Activation = sigm }; 
+                    NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                    NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
+                    NNFullLayerShape({ NodesNumber = 1; Activation = sigm }); 
                 ]
         }
 

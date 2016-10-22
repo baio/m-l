@@ -63,9 +63,9 @@ let nn_xor() =
         {
             Layers = 
                 [ 
-                    { NodesNumber = 2; Activation = act }; 
-                    { NodesNumber = 2; Activation = sigm }; 
-                    { NodesNumber = 1; Activation = sigm }; 
+                    NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                    NNFullLayerShape({ NodesNumber = 2; Activation = sigm }); 
+                    NNFullLayerShape({ NodesNumber = 1; Activation = sigm }); 
                 ]
         }
 

@@ -63,11 +63,11 @@ let nn_mnist() =
         {
             Layers = 
                 [ 
-                    { NodesNumber = 784; Activation = act }; 
-                    { NodesNumber = 50; Activation = sigm }; 
+                    NNFullLayerShape({ NodesNumber = 784; Activation = act }); 
+                    NNFullLayerShape({ NodesNumber = 50; Activation = sigm }); 
                     //{ NodesNumber = 400; Activation = act }; 
                     //{ NodesNumber = 25; Activation = sigm }; 
-                    { NodesNumber = 10; Activation = sigm }; 
+                    NNFullLayerShape({ NodesNumber = 10; Activation = sigm }); 
                 ]
         }
 

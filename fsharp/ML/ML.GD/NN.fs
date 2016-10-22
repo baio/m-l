@@ -8,18 +8,54 @@ open ML.Core.LinearAlgebra
 
 type ActivationFun = { f: FVector -> FVector; f' : FVector -> FVector }
 
-type NNLayerShape = {
+(**
+    ## Define fully connected layer
+**)
+type NNFullLayerShape = {
     NodesNumber: int
     Activation: ActivationFun
 }
+
+(**
+    ## Define embedded layer (dense representation)
+**)
+type NNEmbeddedLayerShape = {
+    NodesNumber: int
+    Activation: ActivationFun
+}
+
+type NNLayerShape = 
+    | NNFullLayerShape of NNFullLayerShape
+    | NNEmbeddedLayerShape of NNEmbeddedLayerShape
+with
+    
+    member
+        (**
+            Get total number of weights (with biases)
+        **)
+        this.NodesNumber with get() =
+            match this with
+                | NNFullLayerShape l -> l.NodesNumber
+                | NNEmbeddedLayerShape l -> l.NodesNumber
+    
+    member
+        this.Activation with get() =
+            match this with
+                | NNFullLayerShape l -> l.Activation
+                | NNEmbeddedLayerShape l -> l.Activation
+                
+                
 
 type NNShape = {
         Layers: NNLayerShape list
 } with
     member
+        (**
+            Get total number of weights (with biases) 
+        **)
         this.ThetasCount() =
             (0, 0)
-            |> List.foldBack(fun layer (totalLinksCount, prevLayerNodesCount) ->
+            |> List.foldBack(fun (layer: NNLayerShape) (totalLinksCount, prevLayerNodesCount) ->
                 let layerLinksCount = (layer.NodesNumber + 1) * prevLayerNodesCount
                 (totalLinksCount + layerLinksCount), layer.NodesNumber
             ) this.Layers
@@ -49,6 +85,9 @@ type NNLayerReshape =
     | NNLayerReshapeHidden of NNLayerReshapeHidden
     | NNLayerReshapeOutput of NNLayer
 
+(**
+    ## Convert Shaped Network into flattened vector representation 
+**)
 let reshapeNN (shape: NNShape) (theta: FVector)  =
 
     let makeHidden (theta: FVector) pervLayerNodesNumber (layer: NNLayerShape) =
