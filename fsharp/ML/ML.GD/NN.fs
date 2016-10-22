@@ -18,15 +18,23 @@ type NNFullLayerShape = {
 
 (**
     ## Define embedded layer (dense representation)
+    Nodes on this layer [j1, j2, j3, j4]
+    Nodes from pervious layer [i1, i2, i3, i4, i5, i6]         
+    BlocksNumber = 2
+    NodesInBlockNumber = 2
+    Connections:
+    [i1, i2, i3] fully connected to [j1, j2]
+    [i4, i5, i6] fully connected to [j3, j4]
 **)
-type NNEmbeddedLayerShape = {
-    NodesNumber: int
+type NNEmbedLayerShape = {
+    BlocksNumber: int
+    NodesInBlockNumber: int
     Activation: ActivationFun
 }
 
 type NNLayerShape = 
     | NNFullLayerShape of NNFullLayerShape
-    | NNEmbeddedLayerShape of NNEmbeddedLayerShape
+    | NNEmbedLayerShape of NNEmbedLayerShape
 with
     
     member
@@ -36,13 +44,13 @@ with
         this.NodesNumber with get() =
             match this with
                 | NNFullLayerShape l -> l.NodesNumber
-                | NNEmbeddedLayerShape l -> l.NodesNumber
+                | NNEmbedLayerShape l -> l.BlocksNumber * l.NodesInBlockNumber
     
     member
         this.Activation with get() =
             match this with
                 | NNFullLayerShape l -> l.Activation
-                | NNEmbeddedLayerShape l -> l.Activation
+                | NNEmbedLayerShape l -> l.Activation
                 
                 
 
@@ -62,7 +70,7 @@ type NNShape = {
             |> fst
 
 type NNLayer = {
-    Thetas: FMatrix
+    Thetas: FMatrix list
     Activation: ActivationFun
 }
 
@@ -74,7 +82,7 @@ type NNLayerReshapeInput = {
 
 type NNLayerReshapeHidden = {
     NodesNumber: int
-    Thetas: FMatrix
+    Thetas: FMatrix list
     ThetasTail: FVector
     Activation: ActivationFun
 }
@@ -96,13 +104,13 @@ let reshapeNN (shape: NNShape) (theta: FVector)  =
         let mx = reshape (layer.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
         if theta.Count = layerThetasNumber then
             // this is output layer
-            NNLayerReshapeOutput({Thetas = mx; Activation = layer.Activation})
+            NNLayerReshapeOutput({Thetas = [mx]; Activation = layer.Activation})
         elif theta.Count > layerThetasNumber then
             NNLayerReshapeHidden(
                 {
                     NodesNumber = layer.NodesNumber;
                     ThetasTail = theta.[layerThetasNumber..];
-                    Thetas = mx;
+                    Thetas = [mx];
                     Activation =  layer.Activation
                 })
         else
@@ -167,8 +175,8 @@ let forward2 (inputs: FMatrix) layers =
             match st with
             | ForwardResultInput ({Inputs = inputs}) -> inputs
             | ForwardResultHidden({Out = inputs}) -> inputs
-        let out, net = calcLayerForward layerTheta layerActivation layerInputs
-        ForwardResultHidden({ Weights = layerTheta; Net = net; Out = out; Activation = layerActivation })
+        let out, net = calcLayerForward layerTheta.[0] layerActivation layerInputs
+        ForwardResultHidden({ Weights = layerTheta.[0]; Net = net; Out = out; Activation = layerActivation })
     ) (ForwardResultInput({ Inputs = inputs }))
 
 let forward (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
