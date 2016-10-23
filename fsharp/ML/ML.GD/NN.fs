@@ -169,7 +169,7 @@ type ForwardInputLayerResult = {
 
 type ForwardHiddenLayerResult = {
     //same as `W`
-    Weights: FMatrix
+    Weights: FMatrix list
     //same as `z`
     Net : FMatrix
     //same as `a`
@@ -213,7 +213,7 @@ let forward2 (inputs: FMatrix) layers =
         | [theta] ->
             // fully connected layer
             let out, net = calcLayerForward theta layerActivation layerInputs
-            ForwardResultHidden({ Weights = theta; Net = net; Out = out; Activation = layerActivation })
+            ForwardResultHidden({ Weights = [theta]; Net = net; Out = out; Activation = layerActivation })
         | thetas ->
             // embed layer
             let chunkedInputs = layerInputs |> chunkColumns thetas.Length
@@ -227,7 +227,7 @@ let forward2 (inputs: FMatrix) layers =
             ) (0, None)
             |> function
                 | _, Some(out, net) ->
-                    ForwardResultHidden({ Weights = emptyM(); Net = net; Out = out; Activation = layerActivation })
+                    ForwardResultHidden({ Weights = thetas; Net = net; Out = out; Activation = layerActivation })
                 | _, None ->
                     failwith "Layer data inconsistent"
 
@@ -325,13 +325,13 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
             let ΔE_ΔA = l.Out - Y
             let ΔA_ΔN =  l.Net |> mapRows l.Activation.f'
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
-            BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
+            BackpropResultOutput({ Weights = l.Weights.[0]; Delta = δᴸ })
         | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ}))
         | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //last hidden layer (n_l - 1), right before outputs OR for hidden layer (n_l - 2...)
             let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
             let Δᴸ = caclGrads l.Out δᴸᴾ
-            BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
+            BackpropResultHidden({ Weights = l.Weights.[0]; Delta =  δᴸ; Gradient = Δᴸ })
         | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ}))
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ})) ->
             // calc gradient for first hidden layer (n_1) OR one layer network case (n_1)
