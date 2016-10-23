@@ -164,3 +164,9 @@ let mapRows f (mx: FMatrix) =
 
 let normalizeMx (mx: FMatrix) = 
     mx.NormalizeColumns(2.)
+
+let chunkColumns chunkSize (mx : FMatrix) =
+    mx |> Matrix.toColArrays |> Array.chunkBySize chunkSize |> Array.map DenseMatrix.ofColumnSeq
+    
+let appendColumns (mx1 : FMatrix) (mx2 : FMatrix) =
+    DenseMatrix.append([mx1; mx2])

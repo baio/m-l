@@ -183,21 +183,54 @@ type ForwardResult =
     | ForwardResultInput of ForwardInputLayerResult // inputs
     | ForwardResultHidden of ForwardHiddenLayerResult
 
-// returns a, z
+(**
+   ## Given weights, activation function and inputs calculates activated and preactivated outputs
+
+   ### Returns tulpe
+   + First ulpe element
+    contains Matrix where each row corresponds to each input and each column - activated output of this input calculated for each layer's node
+   + Second tulpe element 
+    contains Matrix where each row corresponds to each input and each column - preactivated output of this input calculated for each layer's node
+**)
 let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FMatrix) =
+  // precativated output
   let z = (appendOnes inputs).TransposeAndMultiply(theta)
-  // TODO activation must recieve matrix
+  // activated + prectivated output
   (z |> mapRows activation.f), z
 
+(**
+   ### Given inputs and network layers claculate forward propagatin results
+**)
 let forward2 (inputs: FMatrix) layers =
+    //    
     layers
     |> Array.scan (fun st ({Thetas = layerTheta; Activation = layerActivation} : NNLayer) ->
         let layerInputs =
             match st with
             | ForwardResultInput ({Inputs = inputs}) -> inputs
             | ForwardResultHidden({Out = inputs}) -> inputs
-        let out, net = calcLayerForward layerTheta.[0] layerActivation layerInputs
-        ForwardResultHidden({ Weights = layerTheta.[0]; Net = net; Out = out; Activation = layerActivation })
+        match layerTheta with
+        | [theta] ->
+            // fully connected layer
+            let out, net = calcLayerForward theta layerActivation layerInputs
+            ForwardResultHidden({ Weights = theta; Net = net; Out = out; Activation = layerActivation })
+        | thetas ->
+            // embed layer
+            let chunkedInputs = layerInputs |> chunkColumns thetas.Length
+            thetas
+            |> List.fold (fun (i, st) theta ->                
+                let blockInputs = chunkedInputs.[i]
+                let lout, lnet = calcLayerForward theta layerActivation blockInputs
+                match st with
+                | Some (out, net) -> i + 1, Some((appendColumns out lout), (appendColumns net lnet))
+                | None -> 1, Some(lout, lnet)
+            ) (0, None)
+            |> function
+                | _, Some(out, net) ->
+                    ForwardResultHidden({ Weights = emptyM(); Net = net; Out = out; Activation = layerActivation })
+                | _, None ->
+                    failwith "Layer data inconsistent"
+
     ) (ForwardResultInput({ Inputs = inputs }))
 
 let forward (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
