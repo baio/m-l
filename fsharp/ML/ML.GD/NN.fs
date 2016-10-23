@@ -3,6 +3,7 @@
 open MathNet.Numerics.LinearAlgebra
 open Nessos.Streams
 open ML.Core.LinearAlgebra
+open ML.Core.Utils
 
 ///////////////////////// NN Shape
 
@@ -124,7 +125,7 @@ let makeHidden (theta: FVector) pervLayerNodesNumber (layer: NNLayerShape) =
                     // no bias
                     let pervLayerNodesInBlockNumber = pervLayerNodesNumber / layer.BlocksNumber
                     let thetasNumber = pervLayerNodesInBlockNumber * layer.NodesInBlockNumber
-                    let thetaIndexFrom = i * (layer.NodesInBlockNumber + 1)
+                    let thetaIndexFrom = i * thetasNumber
                     let thetaIndexTo = thetaIndexFrom + thetasNumber - 1
                     reshape (layer.NodesInBlockNumber, pervLayerNodesInBlockNumber) theta.[thetaIndexFrom..thetaIndexTo]
                 ) 
@@ -327,9 +328,9 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
 
 //////////////// Theta initailization
 
-let private calcLayerTheta L_in L_out =
+let private calcInitialLayerTheta useBias L_in L_out =
     let epsilon = System.Math.Sqrt(6.) / System.Math.Sqrt(float L_in + float L_out)
-    let r = rndvec ((L_in + 1) * L_out)
+    let r = rndvec ((L_in + (iif useBias 1 0)) * L_out)
     r * 2. * epsilon - epsilon |> Vector.toList
 
 //Get initial theta randomized
@@ -339,7 +340,14 @@ let getInitialTheta (shape: NNShape) =
         let res =
             match st with
             | None -> []
-            | Some l_in -> calcLayerTheta l_in l_out.NodesNumber 
+            | Some l_in -> 
+                match l_out with
+                | NNEmbedLayerShape l ->                    
+                    calcInitialLayerTheta false (l_in / l.BlocksNumber) l.NodesInBlockNumber 
+                    |> List.replicate l.BlocksNumber
+                    |> List.collect (fun f -> f)
+                | _ ->
+                    calcInitialLayerTheta true l_in l_out.NodesNumber 
         res, Some l_out.NodesNumber
     ) None
     |> fst

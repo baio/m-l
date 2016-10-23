@@ -106,7 +106,7 @@ let ``Create embed hidden layer [6] -> [1, 1, 1]``() =
 [<Fact>]
 let ``Create embed hidden layer [4] -> [2, 2]``() =
 
-    let theta = vector([0.; 1.; 2.; 3.; 4.; 5.; 6.; 7.;])
+    let theta = vector([0.; 2.; 1.; 3.; 4.; 6.; 5.; 7.;])
 
     let layer =
         NNEmbedLayerShape(
@@ -120,7 +120,7 @@ let ``Create embed hidden layer [4] -> [2, 2]``() =
     let actual = makeHidden theta 4 layer
 
     let (NNLayerReshapeOutput({Thetas = actualThetas})) = actual
-    let expectedThetas = [ matrix([[0.; 1.; 2.; 3.]]); matrix([[ 4.; 5.; 6.; 7.]]); ]
+    let expectedThetas = [ matrix([[0.; 1.;];[2.; 3.]]); matrix([[ 4.; 5.;];[6.; 7.]]); ]
 
     System.Diagnostics.Debug.WriteLine(sprintf "%A" actualThetas)
     System.Diagnostics.Debug.WriteLine(sprintf "%A" expectedThetas)
