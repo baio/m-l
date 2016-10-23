@@ -20,9 +20,9 @@ let ``Reshape for 2 inputs -> 1 output must work``() =
     }
     
     let actual = reshapeNN shape theta
-    let expected = [| (matrix([ [0.; 1.; 2.] ]), act) |]
+    let expected = [| ({ Thetas = [ matrix([ [0.; 1.; 2.] ])] ; Activation = act } : NNLayer) |]
     
-    (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
+    actual.[0].Thetas |> should equal expected.[0].Thetas
 
 [<Fact>]
 let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
@@ -41,8 +41,8 @@ let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
     let actual = reshapeNN shape theta
     let expected = 
         [| 
-            (matrix([ [0.; 2.; 4.; 6.]; [1.; 3.; 5.; 7.]]), act);
-            (matrix([ [8.; 9.; 10.] ]), act)
+            ([matrix([ [0.; 2.; 4.; 6.]; [1.; 3.; 5.; 7.]])], act);
+            ([matrix([ [8.; 9.; 10.] ])], act)
         |]
     
     (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
@@ -64,8 +64,8 @@ let ``Reshape XOR must work``() =
     let actual = reshapeNN shape theta
     let expected = 
         [| 
-            (matrix([ [-10.; 20.; 20.;]; [-30.; 20.; 20.;] ]), act);
-            (matrix([ [10.; 20.; -20.] ]), act)
+            ([matrix([ [-10.; 20.; 20.;]; [-30.; 20.; 20.;] ])], act);
+            ([matrix([ [10.; 20.; -20.] ])], act)
         |]
     
     (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))

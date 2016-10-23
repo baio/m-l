@@ -77,6 +77,9 @@ let zerosMatrix (rows, cols) =
 let flat (mx: _ Matrix) =
     vector(mx.Enumerate() |> Seq.toList)  
 
+(**
+Reshape vector into [rows * cols] matrix
+**)
 let reshape (rows, cols) (vec: _ Vector)  = 
     let mutable cnt = -1
     DenseMatrix.init rows cols (fun i j -> 

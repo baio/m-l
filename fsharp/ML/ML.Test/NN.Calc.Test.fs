@@ -192,14 +192,14 @@ let ``Calc GD for Example NN must work``() =
         )
 
     let expected = [
-        [
+        [[
             [0.345614;  0.149781;  0.199561]
             [0.345023;  0.249751;  0.299502]
-        ] |> DenseMatrix.ofRowList
-        [
+        ] |> DenseMatrix.ofRowList]
+        [[
             [0.530751;  0.358916;  0.408666]
             [0.619049;  0.511301;   0.56137]
-        ] |> DenseMatrix.ofRowList
+        ] |> DenseMatrix.ofRowList]
     ]
 
     let gd = stochasticHyper |> SGDHyperParams |> gradientDescent glmModel prms inputs outputs 

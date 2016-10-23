@@ -93,28 +93,46 @@ type NNLayerReshape =
     | NNLayerReshapeHidden of NNLayerReshapeHidden
     | NNLayerReshapeOutput of NNLayer
 
+let private createReshapeLayer (theta: FVector) nodesNumber layerThetasNumber thetas activation = 
+    if theta.Count = layerThetasNumber then
+        // this is output layer
+        NNLayerReshapeOutput({Thetas = thetas; Activation = activation})
+    elif theta.Count > layerThetasNumber then
+        NNLayerReshapeHidden(
+            {
+                NodesNumber = nodesNumber;
+                ThetasTail = theta.[layerThetasNumber..];
+                Thetas = thetas;
+                Activation =  activation
+            })
+    else
+        failwith "Number of thetas doesn't corresponds shape of NN"
+
+
+let makeHidden (theta: FVector) pervLayerNodesNumber (layer: NNLayerShape) =
+    match layer with
+        | NNFullLayerShape layer ->
+            // +1 for bias
+            let layerThetasNumber = (pervLayerNodesNumber + 1) * layer.NodesNumber
+            let mx = reshape (layer.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
+            createReshapeLayer theta layer.NodesNumber layerThetasNumber [mx] layer.Activation
+        | NNEmbedLayerShape layer ->
+            let thetas = 
+                List.init layer.BlocksNumber (fun i -> 
+                    if pervLayerNodesNumber % layer.BlocksNumber <> 0 then 
+                        failwith "NodesNumber in pervious layer must be devidaed by BlocksNumber as integer"                        
+                    // no bias
+                    let pervLayerNodesInBlockNumber = pervLayerNodesNumber / layer.BlocksNumber
+                    let thetasNumber = pervLayerNodesInBlockNumber * layer.NodesInBlockNumber
+                    reshape (layer.NodesInBlockNumber, pervLayerNodesInBlockNumber) theta.[(i * layer.NodesInBlockNumber)..thetasNumber - 1]
+                ) 
+            let layerThetasNumber = thetas |> List.map (fun m -> m.RowCount * m.ColumnCount) |>List.sum
+            createReshapeLayer theta (layer.BlocksNumber * layer.NodesInBlockNumber) layerThetasNumber thetas layer.Activation
+
 (**
     ## Convert Shaped Network into flattened vector representation 
 **)
 let reshapeNN (shape: NNShape) (theta: FVector)  =
-
-    let makeHidden (theta: FVector) pervLayerNodesNumber (layer: NNLayerShape) =
-        // +1 for bias
-        let layerThetasNumber = (pervLayerNodesNumber + 1) * layer.NodesNumber
-        let mx = reshape (layer.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
-        if theta.Count = layerThetasNumber then
-            // this is output layer
-            NNLayerReshapeOutput({Thetas = [mx]; Activation = layer.Activation})
-        elif theta.Count > layerThetasNumber then
-            NNLayerReshapeHidden(
-                {
-                    NodesNumber = layer.NodesNumber;
-                    ThetasTail = theta.[layerThetasNumber..];
-                    Thetas = [mx];
-                    Activation =  layer.Activation
-                })
-        else
-            failwith "Number of thetas doesn't corresponds shape of NN"
 
     shape.Layers
     |> Stream.ofList
