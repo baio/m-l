@@ -124,7 +124,9 @@ let makeHidden (theta: FVector) pervLayerNodesNumber (layer: NNLayerShape) =
                     // no bias
                     let pervLayerNodesInBlockNumber = pervLayerNodesNumber / layer.BlocksNumber
                     let thetasNumber = pervLayerNodesInBlockNumber * layer.NodesInBlockNumber
-                    reshape (layer.NodesInBlockNumber, pervLayerNodesInBlockNumber) theta.[(i * layer.NodesInBlockNumber)..thetasNumber - 1]
+                    let thetaIndexFrom = i * (layer.NodesInBlockNumber + 1)
+                    let thetaIndexTo = thetaIndexFrom + thetasNumber - 1
+                    reshape (layer.NodesInBlockNumber, pervLayerNodesInBlockNumber) theta.[thetaIndexFrom..thetaIndexTo]
                 ) 
             let layerThetasNumber = thetas |> List.map (fun m -> m.RowCount * m.ColumnCount) |>List.sum
             createReshapeLayer theta (layer.BlocksNumber * layer.NodesInBlockNumber) layerThetasNumber thetas layer.Activation
