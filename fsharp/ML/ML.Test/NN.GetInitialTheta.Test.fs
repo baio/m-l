@@ -1,4 +1,4 @@
-﻿module ML.NN.GetInitialTheta
+﻿module ML.NN.GetInitialTheta.Test
 
 open Xunit
 open FsUnit

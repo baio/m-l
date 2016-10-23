@@ -192,9 +192,11 @@ type ForwardResult =
    + Second tulpe element 
     contains Matrix where each row corresponds to each input and each column - preactivated output of this input calculated for each layer's node
 **)
-let calcLayerForward (theta: FMatrix) (activation: ActivationFun) (inputs: FMatrix) =
+let calcLayerForward useBias (theta: FMatrix) (activation: ActivationFun) (inputs: FMatrix) =
+  //add bias to inputs if required
+  let binputs = iif useBias (appendOnes inputs) inputs
   // precativated output
-  let z = (appendOnes inputs).TransposeAndMultiply(theta)
+  let z = binputs.TransposeAndMultiply(theta)
   // activated + prectivated output
   (z |> mapRows activation.f), z
 
@@ -212,7 +214,7 @@ let forward2 (inputs: FMatrix) layers =
         match layerTheta with
         | [theta] ->
             // fully connected layer
-            let out, net = calcLayerForward theta layerActivation layerInputs
+            let out, net = calcLayerForward true theta layerActivation layerInputs
             ForwardResultHidden({ Weights = [theta]; Net = net; Out = out; Activation = layerActivation })
         | thetas ->
             // embed layer
@@ -220,7 +222,7 @@ let forward2 (inputs: FMatrix) layers =
             thetas
             |> List.fold (fun (i, st) theta ->                
                 let blockInputs = chunkedInputs.[i]
-                let lout, lnet = calcLayerForward theta layerActivation blockInputs
+                let lout, lnet = calcLayerForward false theta layerActivation blockInputs
                 match st with
                 | Some (out, net) -> i + 1, Some((appendColumns out lout), (appendColumns net lnet))
                 | None -> 1, Some(lout, lnet)
