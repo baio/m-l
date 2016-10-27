@@ -256,12 +256,12 @@ let forwardOutput (inputs: FMatrix) (shape: NNShape) (theta: FVector) =
 
 
 type BackpropOutputLayerResult = {
-    Weights : FMatrix
+    Weights : FMatrix list
     Delta : FMatrix // delats for each sample in batch
 }
 
 type BackpropHiddenLayerResult = {
-    Weights : FMatrix
+    Weights : FMatrix list
     Gradient : FMatrix
     Delta : FMatrix // delats for each sample in batch
 }
@@ -327,18 +327,37 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
             let ΔE_ΔA = l.Out - Y
             let ΔA_ΔN =  l.Net |> mapRows l.Activation.f'
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
-            BackpropResultOutput({ Weights = l.Weights.[0]; Delta = δᴸ })
+            BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
         | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ}))
         | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
             //last hidden layer (n_l - 1), right before outputs OR for hidden layer (n_l - 2...)
-            let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
-            let Δᴸ = caclGrads l.Out δᴸᴾ
-            BackpropResultHidden({ Weights = l.Weights.[0]; Delta =  δᴸ; Gradient = Δᴸ })
-        | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ}))
-        | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ})) ->
+            match wᴸᴾ with
+            | [wᴸᴾ] -> 
+                let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
+                let Δᴸ = caclGrads l.Out δᴸᴾ
+                BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
+            | _ -> failwith "not implemented"            
+        | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ; Weights = wᴸᴾ}))
+        | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ; Weights = wᴸᴾ})) ->
             // calc gradient for first hidden layer (n_1) OR one layer network case (n_1)
-            let Δᴸ = caclGrads l.Inputs δᴸᴾ
-            BackpropResultInput({ Gradient = Δᴸ})
+            match wᴸᴾ with
+            | [wᴸᴾ] -> 
+                let Δᴸ = caclGrads l.Inputs δᴸᴾ
+                BackpropResultInput({ Gradient = Δᴸ})
+            | _ -> 
+                let blocksNumber = wᴸᴾ |> List.length
+                let chunkedDeltas = δᴸᴾ |> chunkColumns2 blocksNumber
+                let chunkedInputs = l.Inputs |> chunkColumns2 blocksNumber
+                let Δᴸ = 
+                    Array.map2 caclGrads chunkedDeltas chunkedInputs
+                    |> foldByColumns (fun vecs ->                    
+                        let vecsLength = vecs |> Seq.length |> float
+                        let vecLength = vecs |> Seq.item 0 |> Vector.length
+                        vecs
+                        |> Seq.fold (+) (zeros vecLength)
+                        |> fun x -> x / vecsLength
+                    ) 
+                BackpropResultInput({ Gradient = Δᴸ})
         | _ ->
            failwith "not supported"
     ) fwd BackpropResultNone
@@ -347,7 +366,6 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
         | BackpropResultInput({ Gradient = Δ }) -> Some(Δ)
         | _ -> None
     )
-
 let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     let Y = chunkOutputs x.RowCount y
     // grads for each sample (per layer)
@@ -356,7 +374,6 @@ let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     bp
     |> Array.collect(fun mx ->
         // avg weighted grads per layer
-        //mx.ColumnSums() / float mx.RowCount|> Vector.toArray
         mx |> Matrix.map(fun m -> m / float x.RowCount) |> flatMx |> Vector.toArray
     )
     |> DenseVector.ofArray

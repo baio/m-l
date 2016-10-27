@@ -59,6 +59,7 @@
     <Compile Include="Statistics.fs" />
     <Compile Include="Normalization.fs" />
     <Compile Include="Batch.Statistics.fs" />
+    <None Include="core.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Deedle">

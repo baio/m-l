@@ -13,6 +13,7 @@ let act = {f = f; f' = f}
 [<Fact>]
 let ``Create embed hidden layer [2] -> [1]``() =
 
+
     let theta = vector([0.; 1.;])
 
     let layer =

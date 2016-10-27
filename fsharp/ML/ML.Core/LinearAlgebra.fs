@@ -167,6 +167,18 @@ let normalizeMx (mx: FMatrix) =
 
 let chunkColumns chunkSize (mx : FMatrix) =
     mx |> Matrix.toColArrays |> Array.chunkBySize chunkSize |> Array.map DenseMatrix.ofColumnSeq
+
+let chunkColumns2 chunksNumber (mx : FMatrix) =
+    chunkColumns (mx.ColumnCount / chunksNumber) mx
     
 let appendColumns (mx1 : FMatrix) (mx2 : FMatrix) =
     DenseMatrix.append([mx1; mx2])
+
+let foldByColumns f (mxs: FMatrix seq) =
+    mxs 
+    |> Seq.item 0
+    |> Matrix.mapCols(fun i _ -> 
+      mxs 
+      |> Seq.map(fun mx -> mx.Column(i))  
+      |> f
+    ) 
