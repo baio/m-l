@@ -29,30 +29,9 @@ let norm (mx: FMatrix) =
     let mu, std, frame = mx |> mx2frame |> normFrame   
     frame |> frame2mx, { Mu = mu |> ser2vec; Std = std |> ser2vec}
 
-(*
-let norm (mx: float Matrix) : float Matrix * NormParams = 
-    
-    let mu, std = 
-        mx.EnumerateColumns()
-        |> Seq.map (fun col -> 
-            col.Mean(), col.StandardDeviation()
-        )
-        |> Seq.toList
-        |> List.unzip
-                   
-    mx |> Matrix.mapCols (fun i vec ->
-        if std.[i] <> 0. then
-            (vec - mu.[i]) / std.[i]
-        else 
-            vec - mu.[i]
-    ), { Mu = vector mu; Std = vector std }
 
-let norm2 (prms: NormParams) (mx: float Matrix)  : float Matrix = 
-    DenseMatrix.initRows mx.RowCount (fun i ->
-        (mx.Row(i) - prms.Mu) ./ prms.Std
-   )
-*)
-
+let mxMap2 (f: (float -> float -> float)) (mx1: FMatrix) (mx2: FMatrix) = 
+    mx1.Map2((fun x1 x2 -> (f x1 x2)), mx2)
 
 let spliceRows start count (mx: _ Matrix) = 
     mx.SubMatrix(start, count, 0, mx.ColumnCount)

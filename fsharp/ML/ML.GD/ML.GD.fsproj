@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="NN.fs" />
+    <Compile Include="NN.GradientCheck.fs" />
     <Compile Include="GLM.fs" />
     <Compile Include="LinearRegression.fs" />
     <Compile Include="LogisticRegression.fs" />
