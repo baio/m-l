@@ -7,11 +7,10 @@ open ML.NN
 
 let private _J (t: FMatrix) (y: FMatrix) = (t - y).PointwisePower(2.) / 2.
 
-let calcGradient (target: FVector) (inputs: FVector) shape (theta: FVector) epsilon = 
+let gradCheck (target: FVector) (inputs: FVector) shape (theta: FVector) epsilon = 
     let imx = DenseMatrix.ofRowSeq [inputs]
     let tmx = DenseMatrix.ofRowSeq [target]
     theta |> Vector.mapi (fun c col ->
-        System.Diagnostics.Debug.WriteLine(sprintf "%A" c)
         let ltheta = theta.MapIndexed(fun i x -> iif (i = c) (x + epsilon) x)
         let rtheta = theta.MapIndexed(fun i x -> iif (i = c) (x - epsilon) x)
         let res1 = forwardOutput imx shape ltheta |> _J tmx

@@ -54,7 +54,7 @@ let ``calc backprop and grad check``() =
 
     System.Diagnostics.Debug.WriteLine(sprintf "%A" x)
 
-    let grad = calcGradient y (x.Row 0) shape theta 1E-4
+    let grad = gradCheck y (x.Row 0) shape theta 1E-4
     
     let actual = backprop y x shape theta
     let expected = vector [1.5; 1.5; 27.5; 27.5; 11.; 11.; 110.]
