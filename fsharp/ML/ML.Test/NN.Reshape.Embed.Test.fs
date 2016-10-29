@@ -1,4 +1,4 @@
-﻿module ML.NN.ReshapeNN
+﻿module ML.NN.Reshape.Embed
 
 open Xunit
 open FsUnit

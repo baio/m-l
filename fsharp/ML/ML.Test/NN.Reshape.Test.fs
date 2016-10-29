@@ -1,4 +1,4 @@
-﻿module ML.NN.Test
+﻿module ML.NN.Reshape.Test
 
 open Xunit
 open FsUnit

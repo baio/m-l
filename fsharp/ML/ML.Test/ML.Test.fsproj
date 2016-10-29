@@ -58,14 +58,15 @@
     <Content Include="packages.config" />
     <Compile Include="NN.Backprop.Embed.Test.fs" />
     <Compile Include="Core.Batch.Statistics.Tests.fs" />
-    <Compile Include="NN.Test.fs" />
+    <Compile Include="NN.Reshape.Test.fs" />
+    <Compile Include="NN.Reshape.Embed.Test.fs" />
     <Compile Include="NN.Calc.Test.fs" />
+    <Compile Include="NN.Backprop.Test.fs" />
     <Compile Include="NN.Utils.Tests.fs" />
     <Compile Include="Core.IO.Tests.fs" />
     <Compile Include="NN.Forward.Test.fs" />
     <Content Include="App.config" />
     <Compile Include="Core.Distr.Tests.fs" />
-    <Compile Include="NN.ReshapeNN.Test.fs" />
     <Compile Include="NN.GetInitialTheta.Test.fs" />
   </ItemGroup>
   <ItemGroup>

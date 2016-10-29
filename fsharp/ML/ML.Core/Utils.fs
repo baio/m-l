@@ -4,7 +4,8 @@ open Deedle
 open MathNet.Numerics.Statistics
 open MathNet.Numerics.LinearAlgebra
 open System
-    
+
+let inline dprintf<'a> = sprintf "%A" >> System.Diagnostics.Debug.WriteLine    
 
 //Generate ranges { [0..4], [4..8], [8..9]
 //Given: rgLength = 4, seqLength = 10
