@@ -3,50 +3,33 @@
 open Xunit
 open FsUnit
 open ML.NN
+open ML.NN.Backprop
 open MathNet.Numerics.LinearAlgebra
-
 open ML.Core.LinearAlgebra
+open ML.Core.Utils
 
 let f a = a
-let act = {f = f; f' = f}
-
-[<Fact>]
-let ``embed@2,1 [1 1 1 1] -> (1; 2; 3; 4) -> [3, 7]``() =
-
-    let shape = {
-        Layers = [
-            NNFullLayerShape({NodesNumber = 4; Activation = act});
-            NNEmbedLayerShape({BlocksNumber = 2; NodesInBlockNumber = 1; Activation = act});
-        ]
-    }
-
-    let inputs = matrix [[1.;1.;1.;1.]] 
-    let thetas = vector [1.;2.;3.;4.]
-
-    let actual = forwardOutput inputs shape thetas
-    let expected = matrix [[3.; 7.]]
-
-    actual |> should equal expected
-
+let f' (a: FVector) = ones a.Count
+let act = {f = f; f' = f'}
 
 
 [<Fact>]
-let ``embed@2,2 [1 1 2 2] -> (1; 2; 3; 4) -> [[3, 7], [6, 14]]``() =
+let ``forward: [1; 1;] -> (0; 1; 2; 0; 1; 2) -> [1; 1;] -> (0, 1, 2) -> {x}``() =
 
+    let x = matrix([[1.; 1.]])
+    let theta = vector([0.; 1.; 2.; 0.; 1.; 2.; 0.; 1.; 2.])
+    
     let shape = {
-        Layers = [
-            NNFullLayerShape({NodesNumber = 4; Activation = act});
-            NNEmbedLayerShape({BlocksNumber = 2; NodesInBlockNumber = 2; Activation = act});
-        ]
+        Layers = 
+            [ 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 1; Activation = act }); 
+            ]
     }
+    
+    let fwd = forward x shape theta |> Seq.toArray
 
-    let inputs = [[1.;1.;2.;2.]] |> DenseMatrix.ofRowList
-    let thetas = vector [1.;3.;2.;4.;1.;3.;2.;4.]
-
-    System.Diagnostics.Debug.WriteLine(sprintf "%A" inputs)
-
-    let actual = forwardOutput inputs shape thetas
-    let expected = matrix [[3.; 7.;6.; 14.]]
-
-    actual |> should equal expected
-
+    dprintf fwd
+    
+    fwd |> should equal fwd

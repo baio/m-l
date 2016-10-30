@@ -322,15 +322,16 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
     Array.scanBack (fun v acc ->
         match v, acc with
         | (ForwardResultHidden(l), BackpropResultNone) ->
-            // ouput layer net
+            // ouput layer
             // this is first calculated layer in backprop alghoritm
+            // just calc δᴸ
             let ΔE_ΔA = l.Out - Y
             let ΔA_ΔN =  l.Net |> mapRows l.Activation.f'
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
             BackpropResultOutput({ Weights = l.Weights; Delta = δᴸ })
         | (ForwardResultHidden(l), BackpropResultOutput({Weights = wᴸᴾ; Delta = δᴸᴾ}))
         | (ForwardResultHidden(l), BackpropResultHidden ({Weights = wᴸᴾ; Delta = δᴸᴾ})) ->
-            //last hidden layer (n_l - 1), right before outputs OR for hidden layer (n_l - 2...)
+            //hidden layers (h_l-1, h_l-2...)
             match wᴸᴾ with
             | [wᴸᴾ] -> 
                 let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
@@ -339,7 +340,7 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
             | _ -> failwith "not implemented"            
         | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ; Weights = wᴸᴾ}))
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ; Weights = wᴸᴾ})) ->
-            // calc gradient for first hidden layer (n_1) OR one layer network case (n_1)
+            // calc gradient for first hidden layer (n_1)
             match wᴸᴾ with
             | [wᴸᴾ] -> 
                 let Δᴸ = caclGrads l.Inputs δᴸᴾ

@@ -16,7 +16,11 @@ let ``Reshape for 2 inputs -> 1 output must work``() =
     let theta = vector([0.; 1.; 2.])
     
     let shape = {
-        Layers = [ NNFullLayerShape({ NodesNumber = 2; Activation = act }); NNFullLayerShape({ NodesNumber = 1; Activation = act }); ]
+        Layers = 
+            [ 
+                NNFullLayerShape({ NodesNumber = 2; Activation = act }); 
+                NNFullLayerShape({ NodesNumber = 1; Activation = act }); 
+            ]
     }
     
     let actual = reshapeNN shape theta
