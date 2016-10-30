@@ -157,7 +157,7 @@ let foldByColumns f (mxs: FMatrix seq) =
     mxs 
     |> Seq.item 0
     |> Matrix.mapCols(fun i _ -> 
-      mxs 
-      |> Seq.map(fun mx -> mx.Column(i))  
-      |> f
+        mxs 
+        |> Seq.map(fun mx -> mx.Column(i))  
+        |> f
     ) 

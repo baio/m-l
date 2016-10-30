@@ -277,8 +277,8 @@ type BackpropResult =
     | BackpropResultHidden of BackpropHiddenLayerResult
     | BackpropResultInput of BackpropInputLayerResult
 
-let private caclGrads (aᴸ: FMatrix) (δᴸᴾ: FMatrix) =
-    let aᴸ = aᴸ |> appendOnes
+let private caclGrads useBias (aᴸ: FMatrix) (δᴸᴾ: FMatrix) =
+    let aᴸ = iif useBias (aᴸ |> appendOnes) aᴸ
     let δᴸᴾ = δᴸᴾ.Transpose()
     δᴸᴾ * aᴸ
 
@@ -335,7 +335,7 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
             match wᴸᴾ with
             | [wᴸᴾ] -> 
                 let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
-                let Δᴸ = caclGrads l.Out δᴸᴾ
+                let Δᴸ = caclGrads true l.Out δᴸᴾ
                 BackpropResultHidden({ Weights = l.Weights; Delta =  δᴸ; Gradient = Δᴸ })
             | _ -> failwith "not implemented"            
         | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ; Weights = wᴸᴾ}))
@@ -343,21 +343,34 @@ let private _backprop (Y: FMatrix) (X: FMatrix) (shape: NNShape) (theta: FVector
             // calc gradient for first hidden layer (n_1)
             match wᴸᴾ with
             | [wᴸᴾ] -> 
-                let Δᴸ = caclGrads l.Inputs δᴸᴾ
+                let Δᴸ = caclGrads true l.Inputs δᴸᴾ
                 BackpropResultInput({ Gradient = Δᴸ})
             | _ -> 
                 let blocksNumber = wᴸᴾ |> List.length
+                // array of matrix sigmas for each emabed layer
                 let chunkedDeltas = δᴸᴾ |> chunkColumns2 blocksNumber
+                // array of matrix inputs for each emabed layer
                 let chunkedInputs = l.Inputs |> chunkColumns2 blocksNumber
-                let Δᴸ = 
-                    Array.map2 caclGrads chunkedDeltas chunkedInputs
-                    |> foldByColumns (fun vecs ->                    
-                        let vecsLength = vecs |> Seq.length |> float
-                        let vecLength = vecs |> Seq.item 0 |> Vector.length
-                        vecs
+                let Δᴸ_shared = 
+                    Array.map2 (caclGrads false) chunkedInputs chunkedDeltas
+                    |> foldByColumns (fun gradsByEmbedLayer ->                   
+                        //calc mean of the related grads in different embed blocks, and set them for each embed layer the same
+                        // [Δw1; Δw2]  - first embed layer gards
+                        // [Δw3; Δw4]  - snd embed layer grads
+                        // then shared gards for Δw1 and Δw3 (since they must be the same) Δw1 = Δw3 = (Δw1 + Δw3) / 2                         
+                        
+                        // Equal number of embed layers                            
+                        let embedBlocksNumber = gradsByEmbedLayer |> Seq.length |> float     
+                        // Equal to number of weights between pervious layer and a single embed layer 
+                        let vecLength = gradsByEmbedLayer |> Seq.item 0 |> Vector.length
+                        
+                        gradsByEmbedLayer
                         |> Seq.fold (+) (zeros vecLength)
-                        |> fun x -> x / vecsLength
+                        |> fun x -> x / embedBlocksNumber
                     ) 
+                
+                // Share these grads along all embed layers    
+                let Δᴸ =  Δᴸ_shared |> repmatCol blocksNumber
                 BackpropResultInput({ Gradient = Δᴸ})
         | _ ->
            failwith "not supported"
