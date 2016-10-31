@@ -1,6 +1,6 @@
 ﻿module ML.NN.Utils.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open MathNet.Numerics.LinearAlgebra
 open NUnit.Framework.Constraints
@@ -26,7 +26,7 @@ let vround i = Vector.toSeq >> rounds i >> DenseVector.ofSeq
 let vr8 () = vround 8
 let vr9 () = vround 9
 
-[<Fact>]
+[<TestCase>]
 let ``Chunk outputs must work``() =
 
     let mx = matrix [[0.; 1.]; [1.; 0.]; [7.; 3.;]]
@@ -35,7 +35,7 @@ let ``Chunk outputs must work``() =
     actual |> should equal mx
 
 
-[<Fact>]
+[<TestCase>]
 let ``Norm should work``() =
 
     let mx = [[1.; 2.]; [3.; 4.]] |> DenseMatrix.ofRowList
@@ -45,7 +45,7 @@ let ``Norm should work``() =
     actual |> should equal expected
 
 
-[<Fact>]
+[<TestCase>]
 let ``Norm with 0 std should work``() =
     let mx = [[1.; 2.]; [1.; 2.]] |> DenseMatrix.ofRowList
     let actual, prms = mx |> norm
@@ -54,7 +54,7 @@ let ``Norm with 0 std should work``() =
     prms |> should equal expectedPrms
     actual |> should equal expected
 
-[<Fact>]
+[<TestCase>]
 let ``Normalize list of rows``() =
     let x = [
         0  ;0  ;0  ;0

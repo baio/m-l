@@ -1,6 +1,6 @@
 ﻿module ML.NN.Backprop.Embed.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open ML.NN
 open ML.GradientCheck
@@ -13,7 +13,7 @@ let f a = a
 let f' a = a |> Vector.length |> ones
 let act = {f = f; f' = f'}
 
-[<Fact>]
+[<TestCase>]
 let ``backprop : [1;2;3;4] -> <embed(2,1)>([1;1] [1;1]) -> [h1; h2] -> (0;1;1) -> {5}``() =
 
     let shape = {
@@ -38,7 +38,7 @@ let ``backprop : [1;2;3;4] -> <embed(2,1)>([1;1] [1;1]) -> [h1; h2] -> (0;1;1) -
     bkprp |> should equal grad
 
 
-//[<Fact>]
+//[<TestCase>]
 let ``calc backprop and grad check``() =
 
     let shape = {

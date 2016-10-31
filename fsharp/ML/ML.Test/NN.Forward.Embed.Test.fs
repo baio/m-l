@@ -1,6 +1,6 @@
 ﻿module ML.NN.Forward.Embed.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open ML.NN
 open MathNet.Numerics.LinearAlgebra
@@ -10,7 +10,7 @@ open ML.Core.LinearAlgebra
 let f a = a
 let act = {f = f; f' = f}
 
-[<Fact>]
+[<TestCase>]
 let ``forward : [1; 1; 1; 1;] -> <embed(2,1)>([1; 2;] [3; 4]) -> {3, 7}``() =
 
     let shape = {
@@ -29,7 +29,7 @@ let ``forward : [1; 1; 1; 1;] -> <embed(2,1)>([1; 2;] [3; 4]) -> {3, 7}``() =
 
     actual |> should equal expected
 
-[<Fact>]
+[<TestCase>]
 let ``forawrd : [1; 1; 2; 2;] -> <embed(2,2)>([1; 2; 3; 4;] [1; 2; 3; 4;]) -> {[3, 7], [6, 14]}``() =
 
     let shape = {

@@ -1,6 +1,6 @@
 ﻿module ML.NN.Clac.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open MathNet.Numerics.LinearAlgebra
 
@@ -22,7 +22,7 @@ let f a = a
 let act = {f = f; f' = f}
 let sigm = { f= sigmoid;  f' = sigmoid'} 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc 1 input -> 1 output must work``() =
     
     let inputs = matrix([[2.]])
@@ -41,7 +41,7 @@ let ``Calc 1 input -> 1 output must work``() =
     
     actual |> should equal expected
 
-[<Fact>]
+[<TestCase>]
 let ``Calc XOR Layer1 must work``() =
     
     // XOR, Math from Artificial Network 
@@ -62,7 +62,7 @@ let ``Calc XOR Layer1 must work``() =
     (actual |> Matrix.map (fun m -> System.Math.Round(m, 2))) 
     |> should equal expected
 
-[<Fact>]
+[<TestCase>]
 let ``Calc XOR must work``() =
     
     // XOR, Math from Artificial Network 
@@ -85,7 +85,7 @@ let ``Calc XOR must work``() =
     |> should equal expected
 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc Example must work``() =
     
     // XOR, Math from Artificial Network 
@@ -108,7 +108,7 @@ let ``Calc Example must work``() =
     |> should equal expected
 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc Example grads must work``() =
     
     // XOR, Math from Artificial Network 
@@ -147,7 +147,7 @@ let ``Calc Example grads must work``() =
 
     actual |> should equal expected
 
-[<Fact>]
+[<TestCase>]
 let ``Calc GD for Example NN must work``() =
     
     //TODO : Wee need output as Vector NOT as float !
@@ -214,7 +214,7 @@ let ``Calc GD for Example NN must work``() =
     actual |> should equal expected
 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc Example grads must work with 2 samples``() =
     
     // XOR, Math from Artificial Network 
@@ -253,7 +253,7 @@ let ``Calc Example grads must work with 2 samples``() =
 
     actual |> should equal expected
 
-//[<Fact>]
+//[<TestCase>]
 let ``XOR must work``() =
 
     let rnd = new System.Random()

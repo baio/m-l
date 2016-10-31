@@ -1,6 +1,6 @@
 ﻿module ML.NN.GetInitialTheta.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open ML.NN
 open MathNet.Numerics.LinearAlgebra
@@ -10,7 +10,7 @@ open ML.Core.LinearAlgebra
 let f a = a
 let act = {f = f; f' = f}
 
-[<Fact>]
+[<TestCase>]
 let ``gen initial theta for embed [4] -> [1, 1]``() =
 
     let shape = {
@@ -27,7 +27,7 @@ let ``gen initial theta for embed [4] -> [1, 1]``() =
 
 
 
-[<Fact>]
+[<TestCase>]
 let ``gen initial theta for embed [4] -> [2, 2]``() =
 
     let shape = {

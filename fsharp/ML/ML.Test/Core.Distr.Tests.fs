@@ -1,35 +1,34 @@
 ﻿module ML.Core.Distr.Tests
 
-open Xunit
 open FsUnit
 open MathNet.Numerics.LinearAlgebra
-open NUnit.Framework.Constraints
+open NUnit.Framework
 open ML.Core.Statistics
 open ML.Core.LinearAlgebra
 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc avg 1. 3. should work``() =
 
     let d = (distr 1.) ++ (distr 3.)
 
     calcAvg d |> should equal 2.
 
-[<Fact>]
+[<TestCase>]
 let ``Calc avg 2. 5. should work``() =
 
     let d = (distr 2.) ++ (distr 5.)
 
     calcAvg d |> should equal 3.5
 
-[<Fact>]
+[<TestCase>]
 let ``Calc avg 0. 0. should work``() =
 
     let d = (distr 0.) ++ (distr 0.)
 
     calcAvg d |> should equal 0.
 
-[<Fact>]
+[<TestCase>]
 let ``Calc var p 1. 3. should work``() =
 
     let d = (distr 1.) ++ (distr 3.)
@@ -38,7 +37,7 @@ let ``Calc var p 1. 3. should work``() =
     
     actual |> should equal 1.
 
-[<Fact>]
+[<TestCase>]
 let ``Calc var s 1. 3. should work``() =
 
     let d = (distr 1.) ++ (distr 3.)
@@ -47,7 +46,7 @@ let ``Calc var s 1. 3. should work``() =
     
     actual |> should equal 2.
 
-[<Fact>]
+[<TestCase>]
 let ``Calc std dev p 1. 3. should work``() =
 
     let d = (distr 1.) ++ (distr 3.)
@@ -56,7 +55,7 @@ let ``Calc std dev p 1. 3. should work``() =
     
     actual |> should equal 1.
 
-[<Fact>]
+[<TestCase>]
 let ``Calc std dev s 1. 3. should work``() =
 
     let d = (distr 1.) ++ (distr 3.)
@@ -66,7 +65,7 @@ let ``Calc std dev s 1. 3. should work``() =
     actual |> should equal 1.4142135623730951
 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc std dev p 0. 0. should work``() =
 
     let d = (distr 0.) ++ (distr 0.)
@@ -75,7 +74,7 @@ let ``Calc std dev p 0. 0. should work``() =
     
     actual |> should equal 0.
 
-[<Fact>]
+[<TestCase>]
 let ``Calc std dev s 0. 0. should work``() =
 
     let d = (distr 0.) ++ (distr 0.)

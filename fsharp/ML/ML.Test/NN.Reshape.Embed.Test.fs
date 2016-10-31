@@ -1,6 +1,6 @@
 ﻿module ML.NN.Reshape.Embed
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open ML.NN
 open MathNet.Numerics.LinearAlgebra
@@ -10,7 +10,7 @@ open ML.Core.LinearAlgebra
 let f a = a
 let act = {f = f; f' = f}
 
-[<Fact>]
+[<TestCase>]
 let ``Create embed hidden layer [2] -> [1]``() =
 
 
@@ -38,7 +38,7 @@ let ``Create embed hidden layer [2] -> [1]``() =
 
     actualThetas |> should equal [ DenseMatrix.ofRowList([[0.; 1.]]) ]
 
-[<Fact>]
+[<TestCase>]
 let ``Create embed hidden layer [2] -> [2]``() =
 
     let theta = vector([0.; 1.; 2.; 3.])
@@ -58,7 +58,7 @@ let ``Create embed hidden layer [2] -> [2]``() =
 
     actualThetas |> should equal [ matrix([[0.; 2.];[ 1.; 3.]]) ]
 
-[<Fact>]
+[<TestCase>]
 let ``Create embed hidden layer [4] -> [1, 1]``() =
 
     let theta = vector([0.; 1.; 2.; 3.])
@@ -79,7 +79,7 @@ let ``Create embed hidden layer [4] -> [1, 1]``() =
     actualThetas |> should equal [ matrix([[0.; 1.]]); matrix([[ 2.; 3.]]) ]
 
 
-[<Fact>]
+[<TestCase>]
 let ``Create embed hidden layer [6] -> [1, 1, 1]``() =
 
     let theta = vector([0.; 1.; 2.; 3.; 4.; 5.;])
@@ -104,7 +104,7 @@ let ``Create embed hidden layer [6] -> [1, 1, 1]``() =
     actualThetas |> should equal expectedThetas
 
 
-[<Fact>]
+[<TestCase>]
 let ``Create embed hidden layer [4] -> [2, 2]``() =
 
     let theta = vector([0.; 2.; 1.; 3.; 4.; 6.; 5.; 7.;])

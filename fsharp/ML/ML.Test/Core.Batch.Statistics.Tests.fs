@@ -1,13 +1,13 @@
 ﻿module ML.Core.Norm.Tests
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open ML.Core.Statistics
 open ML.Core.Normalization
 open ML.Core.Batch.Statistics
 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc norm p model ``() =
 
     let actual = [ [1.;2.]; [3.;4.] ] |> batchOfList |> calcBtachNormModelP
@@ -17,7 +17,7 @@ let ``Calc norm p model ``() =
     actual |> should equal expected
 
 
-[<Fact>]
+[<TestCase>]
 let ``Calc norm s model ``() =
 
     let actual = [ [1.;2.]; [3.;4.] ] |> batchOfList |> calcBtachNormModelS
@@ -29,7 +29,7 @@ let ``Calc norm s model ``() =
     actual |> should equal expected
     
 
-[<Fact>]
+[<TestCase>]
 let ``Normalize p model ``() =
 
     let actual = [ [1.;2.]; [3.;4.] ] |> batchOfList |> normalizeBatchP 

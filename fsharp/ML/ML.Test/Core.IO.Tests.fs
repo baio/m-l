@@ -1,6 +1,6 @@
 ﻿module Core.IO.Tests
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 
 open MathNet.Numerics.LinearAlgebra
@@ -8,7 +8,7 @@ open Nessos.Streams
 open ML.Core.Readers
 open ML.Core.LinearAlgebra
 
-//[<Fact>]
+//[<TestCase>]
 let ``Normalize stream must workd``() =
     
         

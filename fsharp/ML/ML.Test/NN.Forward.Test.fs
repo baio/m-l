@@ -1,6 +1,6 @@
 ﻿module ML.NN.Forward.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open ML.NN
 open ML.NN.Backprop
@@ -13,7 +13,7 @@ let f' (a: FVector) = ones a.Count
 let act = {f = f; f' = f'}
 
 
-[<Fact>]
+[<TestCase>]
 let ``forward: [1; 1;] -> (0; 1; 2; 0; 1; 2) -> [1; 1;] -> (0, 1, 2) -> {x}``() =
 
     let x = matrix([[1.; 1.]])

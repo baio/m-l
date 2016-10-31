@@ -1,6 +1,6 @@
 ﻿module ML.NN.Reshape.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open MathNet.Numerics.LinearAlgebra
 
@@ -10,7 +10,7 @@ let f a = a
 let act = {f = f; f' = f}
 
 
-[<Fact>]
+[<TestCase>]
 let ``Reshape for 2 inputs -> 1 output must work``() =
     
     let theta = vector([0.; 1.; 2.])
@@ -28,7 +28,7 @@ let ``Reshape for 2 inputs -> 1 output must work``() =
     
     actual.[0].Thetas |> should equal expected.[0].Thetas
 
-[<Fact>]
+[<TestCase>]
 let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
     
     let theta = vector([0.; 1.; 2.; 3.;  4.; 5.; 6.; 7.;  8.; 9.; 10.])
@@ -51,7 +51,7 @@ let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
     
     (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
 
-[<Fact>]
+[<TestCase>]
 let ``Reshape XOR must work``() =
     
     let theta = vector([-10.; -30.; 20.; 20.; 20.; 20.; 10.; 20.; -20.])

@@ -1,6 +1,6 @@
 ﻿module ML.NN.Backprop.Test
 
-open Xunit
+open NUnit.Framework
 open FsUnit
 open MathNet.Numerics.LinearAlgebra
 
@@ -29,7 +29,7 @@ let sigm = { f= sigmoid;  f' = sigmoid'}
 // TODO : Get rid of input layer in NNShape 
 // TODO : Define use bias explicitly for each layer
 
-//[<Fact>]
+//[<TestCase>]
 let ``backprop + gradcheck => [1;1] -> (0;1;1) -> {5}``() =
     
     let x = matrix([[1.; 1.]])
@@ -54,7 +54,7 @@ let ``backprop + gradcheck => [1;1] -> (0;1;1) -> {5}``() =
 
     bkprp |> should equal chk
 
-//[<Fact>]
+//[<TestCase>]
 let ``backprop + gradcheck => [1;1] -> (0;1;1;0;1;1) -> [1;1] -> (0;1;1)  -> {5}``() =
     
     let x = matrix([[1.; 1.]])
