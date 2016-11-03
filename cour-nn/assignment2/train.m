@@ -107,7 +107,7 @@ for epoch = 1:epochs
     % (d) embed_to_hid_weights_gradient = embedding_layer_state;
 
     % FILL IN CODE. Replace the line below by one of the options.
-    hid_bias_gradient = back_propagated_deriv_1;
+    hid_bias_gradient = sum(back_propagated_deriv_1, 2);
     % Options
     % (a) hid_bias_gradient = sum(back_propagated_deriv_1, 2);
     % (b) hid_bias_gradient = sum(back_propagated_deriv_1, 1);

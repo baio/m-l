@@ -20,6 +20,8 @@ open ML.GD.GradientDescent
 open ML.GD.GD
 open ML.GD.SGD
 
+open NN.Tests.NUnit.Utils
+
 let f a = a
 let f' (a: FVector) = ones a.Count
 let act = {f = f; f' = f'}
@@ -29,8 +31,8 @@ let sigm = { f= sigmoid;  f' = sigmoid'}
 // TODO : Get rid of input layer in NNShape 
 // TODO : Define use bias explicitly for each layer
 
-//[<TestCase>]
-let ``backprop + gradcheck => [1;1] -> (0;1;1) -> {5}``() =
+[<TestCase>]
+let ``backprop : [1;1] -> (0;1;1) -> {5}``() =
     
     let x = matrix([[1.; 1.]])
     let y = vector([5.])
@@ -46,13 +48,13 @@ let ``backprop + gradcheck => [1;1] -> (0;1;1) -> {5}``() =
             ]
     }
     
-    let bkprp = backprop y x shape theta
-    let chk = gradCheck y (x.Row 0) shape theta 1E-4
+    let bkprp = backprop y x shape theta |> Seq.toArray
+    let chk = gradCheck y (x.Row 0) shape theta 1E-4 |> Seq.toArray
 
     dprintf bkprp
     dprintf chk
 
-    bkprp |> should equal chk
+    bkprp |> should equal (chk +/- 1E-10)
 
 //[<TestCase>]
 let ``backprop + gradcheck => [1;1] -> (0;1;1;0;1;1) -> [1;1] -> (0;1;1)  -> {5}``() =

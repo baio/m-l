@@ -29,7 +29,7 @@ let ``forward: [1; 1;] -> (0; 1; 2; 0; 1; 2) -> [1; 1;] -> (0, 1, 2) -> {x}``() 
     }
     
     let fwd = forward x shape theta |> Seq.toArray
-
-    dprintf fwd
+    
+    //TODO    
     
     fwd |> should equal fwd

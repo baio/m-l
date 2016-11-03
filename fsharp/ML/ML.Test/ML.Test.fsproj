@@ -56,6 +56,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
     <Compile Include="Core.Batch.Statistics.Tests.fs" />
+    <Compile Include="NUnit.Utils.fs" />
     <Compile Include="NN.Reshape.Test.fs" />
     <Compile Include="NN.Reshape.Embed.Test.fs" />
     <Compile Include="NN.Backprop.Test.fs" />
