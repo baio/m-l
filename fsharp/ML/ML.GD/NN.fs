@@ -19,7 +19,7 @@ type NNFullLayerShape = {
 
 (**
     ## Define embedded layer (dense representation)
-    Nodes on this layer [j1, j2, j3, j4]
+    Nodes in this layer [j1, j2, j3, j4]
     Nodes from pervious layer [i1, i2, i3, i4, i5, i6]
     BlocksNumber = 2
     NodesInBlockNumber = 2
@@ -83,7 +83,7 @@ type NNLayerReshapeInput = {
 
 type NNLayerReshapeHidden = {
     Thetas: FMatrix
-    ThetasTail: FVector
+    ThetasTail: FVector option
     Shape: NNLayerShape
 }
 
@@ -91,8 +91,6 @@ type NNLayerReshape =
     | NNLayerReshapeNone
     | NNLayerReshapeInput of NNLayerReshapeInput
     | NNLayerReshapeHidden of NNLayerReshapeHidden
-    | NNLayerReshapeOutput of NNLayer
-
 
 let makeHidden (theta: FVector) pervLayerNodesNumber (layerShape: NNLayerShape) =
     match layerShape with
@@ -100,14 +98,14 @@ let makeHidden (theta: FVector) pervLayerNodesNumber (layerShape: NNLayerShape) 
             // +1 for bias
             let layerThetasNumber = (pervLayerNodesNumber + 1) * shape.NodesNumber
             let mx = reshape (shape.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
-            { Thetas = mx; ThetasTail = theta.[layerThetasNumber..]; Shape = layerShape }
+            { Thetas = mx; ThetasTail = ifopt (theta.Count > layerThetasNumber) (fun () -> theta.[layerThetasNumber..]); Shape = layerShape }
         | NNEmbedLayerShape shape ->
             if pervLayerNodesNumber % shape.BlocksNumber <> 0 then
                 failwith "NodesNumber in pervious layer must be devidaed by BlocksNumber as integer"
             // no bias
             let layerThetasNumber = (pervLayerNodesNumber / shape.BlocksNumber) * shape.NodesInBlockNumber
             let mx = reshape (shape.NodesInBlockNumber, pervLayerNodesNumber) theta.[..layerThetasNumber - 1]
-            { Thetas = mx; ThetasTail = theta.[layerThetasNumber..]; Shape = layerShape }
+            { Thetas = mx; ThetasTail = Some(theta.[layerThetasNumber..]); Shape = layerShape }
 
 (**
     ## Convert Shaped Network into flattened vector representation
@@ -121,19 +119,15 @@ let reshapeNN (shape: NNShape) (theta: FVector)  =
         // calculate how many nodes was in pervious layer
         match st with
         | NNLayerReshapeNone ->
-            // if this is first layer then use same number of thetas as nodes number
             NNLayerReshapeInput({ NodesNumber = l.NodesNumber })
         | NNLayerReshapeInput ({ NodesNumber = pervNodesNumber }) ->
             NNLayerReshapeHidden(makeHidden theta pervNodesNumber l)
-        | NNLayerReshapeHidden {ThetasTail = thetasTail; Shape = shape} ->
+        | NNLayerReshapeHidden {ThetasTail = Some(thetasTail); Shape = shape} ->
             NNLayerReshapeHidden(makeHidden thetasTail shape.NodesNumber l)
-        | NNLayerReshapeOutput _ ->
-            failwith "Output must be latest layer"
     ) NNLayerReshapeNone
     |> Stream.choose (fun l ->
         match l with
-        | NNLayerReshapeHidden { Thetas = thetas; Shape = shape }
-        | NNLayerReshapeOutput { Thetas = thetas; Shape = shape } ->
+        | NNLayerReshapeHidden { Thetas = thetas; Shape = shape } -> 
             Some({Thetas = thetas; Shape = shape} : NNLayer)
         | _ ->
             None
@@ -295,13 +289,13 @@ let private _backprop restrictFn (Y: FMatrix) (X: FMatrix) (shape: NNShape) (the
     let fwdResult = forward2 X layers
 
     //calc backprop result for the output layer
-    let outputLayerBackpropResult = 
-        match fwdResult |> Array.last with 
-        | ForwardResultHidden(l) -> 
+    let outputLayerBackpropResult =
+        match fwdResult |> Array.last with
+        | ForwardResultHidden(l) ->
             let ΔE_ΔA = l.Out - Y
             let ΔA_ΔN =  l.Net |> mapRows l.Shape.Activation.f'
             let δᴸ = ΔE_ΔA .* ΔA_ΔN
-            BackpropResultOutput({ Thetas = l.Thetas; Delta = δᴸ; })            
+            BackpropResultOutput({ Thetas = l.Thetas; Delta = δᴸ; })
         | _ -> failwith "Last layer in forard prop must be ForwardHiddenLayerResult"
 
     Array.scanBack (fun fwd pervBack ->
@@ -314,11 +308,11 @@ let private _backprop restrictFn (Y: FMatrix) (X: FMatrix) (shape: NNShape) (the
                 let δᴸ = caclHiddenDelta l wᴸᴾ δᴸᴾ
                 let Δᴸ = caclGrads true l.Out δᴸᴾ
                 BackpropResultHidden({ Thetas = l.Thetas; Delta =  δᴸ; Gradient = Δᴸ; Shape = l.Shape})
-            | NNEmbedLayerShape _ -> 
+            | NNEmbedLayerShape _ ->
                 failwith "No support for fully connected layer -> embed layer for hidden layers"
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ;})) ->
             let Δᴸ = caclGrads true l.Inputs δᴸᴾ
-            BackpropResultInput({ Gradient = Δᴸ })            
+            BackpropResultInput({ Gradient = Δᴸ })
         | (ForwardResultInput(l), BackpropResultHidden({Delta =  δᴸᴾ; Thetas = wᴸᴾ; Shape = shapeᴸᴾ})) ->
             match shapeᴸᴾ with
             | NNFullLayerShape _ ->
@@ -331,14 +325,14 @@ let private _backprop restrictFn (Y: FMatrix) (X: FMatrix) (shape: NNShape) (the
                 let chunkedInputs = l.Inputs |> chunkColumns2 blocksNumber
                 // gradients for each block
                 let Δᴸ = Array.map2 (caclGrads false) chunkedInputs chunkedDeltas |> List.ofArray
-                BackpropResultInput({ Gradient = BackpropGradientEmbed(Δᴸ) |> restrictFn })                
+                BackpropResultInput({ Gradient = BackpropGradientEmbed(Δᴸ) |> restrictFn })
         | _ ->
            failwith "not supported"
     ) fwdResult.[0..fwdResult.Length - 1] outputLayerBackpropResult
 
 
 let private backpropRestrictGrads grads =
-    match grads with 
+    match grads with
     | BackpropGradientEmbed embedGrads ->
         embedGrads
         |> foldByColumns (fun gradsByEmbedLayer ->
@@ -356,20 +350,20 @@ let private backpropRestrictGrads grads =
             |> Seq.fold (+) (zeros vecLength)
             |> fun x -> x / embedBlocksNumber
         )
-                    
+
 
 
 let backprop2 backpropRestrictGrads (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     let Y = chunkOutputs x.RowCount y
-    // grads for each sample (per layer)    
+    // grads for each sample (per layer)
     _backprop backpropRestrictGrads Y x shape theta
     |> Array.collect(fun res ->
         // avg weighted grads per layer
-        match res with 
+        match res with
         | BackpropResultHidden { Gradient = gradient }
         | BackpropResultInput { Gradient = gradient } ->
             gradient |> Matrix.map(fun m -> m / float x.RowCount) |> flatMx |> Vector.toArray
-        | _ -> 
+        | _ ->
             failwith "not expected"
     )
     |> DenseVector.ofArray
@@ -377,7 +371,7 @@ let backprop2 backpropRestrictGrads (y: FVector) (x: FMatrix) (shape: NNShape) (
 (*
     # Backprop and restrict gardients if necessary
 *)
-let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) = 
+let backprop (y: FVector) (x: FMatrix) (shape: NNShape) (theta: FVector) =
     backprop2 backpropRestrictGrads y x shape theta
 
 

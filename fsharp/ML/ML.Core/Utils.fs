@@ -49,7 +49,9 @@ let memoize f =
              res            
 
 
-let iif c a b = if c then a else b
+let inline ifopt c a = if c then Some(a()) else None
+
+let inline iif c a b = if c then a else b
 
 let ifeq ra rb (a, b) = 
     iif (a = b) ra rb
