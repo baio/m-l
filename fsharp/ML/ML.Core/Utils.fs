@@ -16,7 +16,6 @@ let genRanges rgLength seqLength =
                 yield i, if i + rgLength <= seqLength then rgLength else seqLength - i
     }
 
-
 let nextGaussian (mu : float) (sigma : float) (random: System.Random)  = 
     let u1 = random.NextDouble()
     let u2 = random.NextDouble()
@@ -54,4 +53,17 @@ let iif c a b = if c then a else b
 
 let ifeq ra rb (a, b) = 
     iif (a = b) ra rb
+
+let inline tulpe a b = a, b
+
+let inline tulpeFlip a b = b, a
+
+let inline split (str: string) =  str.Split(separator = [|' '|], options = StringSplitOptions.RemoveEmptyEntries)
+
+let inline split2 (sep: string) (str: string) =  str.Split(separator = [|sep|], options = StringSplitOptions.RemoveEmptyEntries)
+
+let inline toLower (str: string) =  str.ToLowerInvariant()
     
+let inline sparse cnt ix = List.init cnt (fun i -> iif (i = ix) 1 0 |> byte)
+
+let inline join (str: String) = String.concat

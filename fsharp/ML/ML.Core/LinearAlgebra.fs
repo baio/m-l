@@ -36,6 +36,12 @@ let mxMap2 (f: (float -> float -> float)) (mx1: FMatrix) (mx2: FMatrix) =
 let spliceRows start count (mx: _ Matrix) = 
     mx.SubMatrix(start, count, 0, mx.ColumnCount)
 
+let spliceCols start count (mx: _ Matrix) = 
+    mx.SubMatrix(0, mx.RowCount, start, count)
+
+let splitCols splitIndex (mx: _ Matrix) = 
+    (spliceCols 0 splitIndex mx), (spliceCols splitIndex (mx.ColumnCount - splitIndex) mx)
+
 let spliceVector start count (vr: _ Vector) = 
     vr.SubVector(start, count)
 
@@ -161,3 +167,9 @@ let foldByColumns f (mxs: FMatrix seq) =
         |> Seq.map(fun mx -> mx.Column(i))  
         |> f
     ) 
+
+    
+        
+
+    
+    

@@ -17,11 +17,19 @@ let readLines (filePath:string) = seq {
 let inline parseEntry entry =
     if entry = "" then 0. else System.Double.Parse(string entry)
 
+//TODO: rename readCSV4
+let readCSVFloats (filePath:string) isHeader =
+
+    readLines filePath
+    |> Seq.skip (if isHeader then 1 else 0)
+    |> Seq.map (split2 "," >> Seq.map(System.Double.Parse))
+    
+
 // raed csv, all columns contain decimal numbers
 let readCSV (filePath:string) isHeader (inputCols: int []) (outputCol: int) =
 
     let mapLine (str: string) =
-        let cols = str.Split([|','|])
+        let cols = str |> split2 ","
         let outs = seq { for i in inputCols -> parseEntry cols.[i] } |> Seq.toList
         outs, System.Double.Parse(cols.[outputCol])
 

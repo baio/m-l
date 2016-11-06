@@ -10,7 +10,10 @@ open ML.Core.LinearAlgebra
 let f a = a
 let act = {f = f; f' = f}
 
-[<TestCase>]
+// TODO : we should calcualte gardients universaly
+// We should initializae / update weights distinctly for each type of layer
+
+//[<TestCase>]
 let ``forward : [1; 1; 1; 1;] -> <embed(2,1)>([1; 2;] [3; 4]) -> {3, 7}``() =
 
     let shape = {
@@ -29,7 +32,7 @@ let ``forward : [1; 1; 1; 1;] -> <embed(2,1)>([1; 2;] [3; 4]) -> {3, 7}``() =
 
     actual |> should equal expected
 
-[<TestCase>]
+//[<TestCase>]
 let ``forawrd : [1; 1; 2; 2;] -> <embed(2,2)>([1; 2; 3; 4;] [1; 2; 3; 4;]) -> {[3, 7], [6, 14]}``() =
 
     let shape = {

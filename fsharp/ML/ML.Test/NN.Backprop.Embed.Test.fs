@@ -37,7 +37,7 @@ let ``backprop : [1;2;3;4] -> <embed(2,1)>([1;1] [1;1]) -> [h1; h2] -> (0;1;1) -
     dprintf bkprp
     dprintf grad
 
-    bkprp |> should equal (grad +/- 0.5)
+    bkprp |> should equal (grad +/- 1E-10)
 
 
 

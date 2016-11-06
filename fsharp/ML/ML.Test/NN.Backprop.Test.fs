@@ -56,7 +56,7 @@ let ``backprop : [1;1] -> (0;1;1) -> {5}``() =
 
     bkprp |> should equal (chk +/- 1E-10)
 
-//[<TestCase>]
+[<TestCase>]
 let ``backprop + gradcheck => [1;1] -> (0;1;1;0;1;1) -> [1;1] -> (0;1;1)  -> {5}``() =
     
     let x = matrix([[1.; 1.]])
@@ -78,4 +78,4 @@ let ``backprop + gradcheck => [1;1] -> (0;1;1;0;1;1) -> [1;1] -> (0;1;1)  -> {5}
     dprintf bkprp
     dprintf chk
 
-    bkprp |> should equal chk
+    bkprp |> should equal (chk +/- 1E-10)

@@ -16,8 +16,8 @@ end
 
 % SET HYPERPARAMETERS HERE.
 batchsize = 100;  % Mini-batch size.
-learning_rate = 0.1;  % Learning rate; default = 0.1.
-momentum = 0.9;  % Momentum; default = 0.9.
+learning_rate = 10.0;  % Learning rate; default = 0.1.
+momentum = 0.5;  % Momentum; default = 0.9.
 numhid1 = 50;  % Dimensionality of embedding space; default = 50.
 numhid2 = 200;  % Number of units in hidden layer; default = 200.
 init_wt = 0.01;  % Standard deviation of the normal distribution
@@ -80,9 +80,9 @@ for epoch = 1:epochs
     count =  count + 1;
     this_chunk_CE = this_chunk_CE + (CE - this_chunk_CE) / count;
     trainset_CE = trainset_CE + (CE - trainset_CE) / m;
-    fprintf(1, '\rBatch %d Train CE %.3f', m, this_chunk_CE);
+    %fprintf(1, '\rBatch %d Train CE %.3f', m, this_chunk_CE);
     if mod(m, show_training_CE_after) == 0
-      fprintf(1, '\n');
+      %fprintf(1, '\n');
       count = 0;
       this_chunk_CE = 0;
     end

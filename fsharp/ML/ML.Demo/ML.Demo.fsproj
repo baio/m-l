@@ -66,12 +66,14 @@
     <Compile Include="DSoftmax.fs" />
     <Compile Include="NN_XOR.fs" />
     <Compile Include="NN_mnist.fs" />
+    <Compile Include="WordEmbed.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
     <None Include="README.MD" />
     <None Include="for_norm_test.csv" />
     <None Include="for_norm_test_out.csv" />
+    <Content Include="word_embed_sentences.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ML.Core\ML.Core.fsproj">
