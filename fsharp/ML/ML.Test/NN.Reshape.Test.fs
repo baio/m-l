@@ -24,9 +24,9 @@ let ``Reshape for 2 inputs -> 1 output must work``() =
     }
     
     let actual = reshapeNN shape theta
-    let expected = [| ({ Thetas = [ matrix([ [0.; 1.; 2.] ])] ; Activation = act } : NNLayer) |]
+    let expected = matrix([ [0.; 1.; 2.] ]);
     
-    actual.[0].Thetas |> should equal expected.[0].Thetas
+    actual.[0].Thetas |> should equal expected
 
 [<TestCase>]
 let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
