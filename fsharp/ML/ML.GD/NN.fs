@@ -98,6 +98,7 @@ let makeHidden (theta: FVector) pervLayerNodesNumber (layerShape: NNLayerShape) 
             // +1 for bias
             let layerThetasNumber = (pervLayerNodesNumber + 1) * shape.NodesNumber
             let mx = reshape (shape.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
+            // TODO: Lazy
             { Thetas = mx; ThetasTail = ifopt (theta.Count > layerThetasNumber) (fun () -> theta.[layerThetasNumber..]); Shape = layerShape }
         | NNEmbedLayerShape shape ->
             if pervLayerNodesNumber % shape.BlocksNumber <> 0 then
@@ -309,7 +310,7 @@ let private _backprop restrictFn (Y: FMatrix) (X: FMatrix) (shape: NNShape) (the
                 let Δᴸ = caclGrads true l.Out δᴸᴾ
                 BackpropResultHidden({ Thetas = l.Thetas; Delta =  δᴸ; Gradient = Δᴸ; Shape = l.Shape})
             | NNEmbedLayerShape _ ->
-                failwith "No support for fully connected layer -> embed layer for hidden layers"
+                failwith "No support for fully connected layer -> embed layer for hidden alyers"
         | (ForwardResultInput(l), BackpropResultOutput ({Delta = δᴸᴾ;})) ->
             let Δᴸ = caclGrads true l.Inputs δᴸᴾ
             BackpropResultInput({ Gradient = Δᴸ })
@@ -328,7 +329,7 @@ let private _backprop restrictFn (Y: FMatrix) (X: FMatrix) (shape: NNShape) (the
                 BackpropResultInput({ Gradient = BackpropGradientEmbed(Δᴸ) |> restrictFn })
         | _ ->
            failwith "not supported"
-    ) fwdResult.[0..fwdResult.Length - 1] outputLayerBackpropResult
+    ) fwdResult.[0..fwdResult.Length - 2] outputLayerBackpropResult
 
 
 let private backpropRestrictGrads grads =
@@ -363,8 +364,7 @@ let backprop2 backpropRestrictGrads (y: FVector) (x: FMatrix) (shape: NNShape) (
         | BackpropResultHidden { Gradient = gradient }
         | BackpropResultInput { Gradient = gradient } ->
             gradient |> Matrix.map(fun m -> m / float x.RowCount) |> flatMx |> Vector.toArray
-        | _ ->
-            failwith "not expected"
+        | _ -> [||] //Skip output
     )
     |> DenseVector.ofArray
 

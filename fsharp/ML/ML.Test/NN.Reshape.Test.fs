@@ -5,6 +5,7 @@ open FsUnit
 open MathNet.Numerics.LinearAlgebra
 
 open ML.NN
+open ML.Core.Utils
 
 let f a = a
 let act = {f = f; f' = f}
@@ -45,11 +46,12 @@ let ``Reshape for 3 inputs -> 2 hidden -> 1 output must work``() =
     let actual = reshapeNN shape theta
     let expected = 
         [| 
-            ([matrix([ [0.; 2.; 4.; 6.]; [1.; 3.; 5.; 7.]])], act);
-            ([matrix([ [8.; 9.; 10.] ])], act)
+            matrix([ [0.; 2.; 4.; 6.]; [1.; 3.; 5.; 7.]])
+            matrix([ [8.; 9.; 10.] ])
         |]
     
-    (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
+    actual.[0].Thetas |> should equal expected.[0]
+    actual.[1].Thetas |> should equal expected.[1]
 
 [<TestCase>]
 let ``Reshape XOR must work``() =
@@ -68,11 +70,12 @@ let ``Reshape XOR must work``() =
     let actual = reshapeNN shape theta
     let expected = 
         [| 
-            ([matrix([ [-10.; 20.; 20.;]; [-30.; 20.; 20.;] ])], act);
-            ([matrix([ [10.; 20.; -20.] ])], act)
+            matrix([ [-10.; 20.; 20.;]; [-30.; 20.; 20.;] ])
+            matrix([ [10.; 20.; -20.] ])
         |]
     
-    (actual  |> Array.map (fun f -> f.Thetas)) |> should equal (expected |> Array.map (fun f -> fst f))
+    actual.[0].Thetas |> should equal expected.[0]
+    actual.[1].Thetas |> should equal expected.[1]
 
 
 
