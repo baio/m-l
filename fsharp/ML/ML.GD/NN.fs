@@ -93,20 +93,21 @@ type NNLayerReshape =
     | NNLayerReshapeHidden of NNLayerReshapeHidden
 
 let makeHidden (theta: FVector) pervLayerNodesNumber (layerShape: NNLayerShape) =
+    let thetasTail layerThetasNumber = ifopt (theta.Count > layerThetasNumber) (fun () -> theta.[layerThetasNumber..])
     match layerShape with
         | NNFullLayerShape shape ->
-            // +1 for bias
+            // +1 for bias, TODO: should be param
             let layerThetasNumber = (pervLayerNodesNumber + 1) * shape.NodesNumber
             let mx = reshape (shape.NodesNumber, (pervLayerNodesNumber + 1)) theta.[..layerThetasNumber - 1]
             // TODO: Lazy
-            { Thetas = mx; ThetasTail = ifopt (theta.Count > layerThetasNumber) (fun () -> theta.[layerThetasNumber..]); Shape = layerShape }
+            { Thetas = mx; ThetasTail = thetasTail layerThetasNumber; Shape = layerShape }
         | NNEmbedLayerShape shape ->
             if pervLayerNodesNumber % shape.BlocksNumber <> 0 then
                 failwith "NodesNumber in pervious layer must be devidaed by BlocksNumber as integer"
-            // no bias
-            let layerThetasNumber = (pervLayerNodesNumber / shape.BlocksNumber) * shape.NodesInBlockNumber
-            let mx = reshape (shape.NodesInBlockNumber, pervLayerNodesNumber) theta.[..layerThetasNumber - 1]
-            { Thetas = mx; ThetasTail = Some(theta.[layerThetasNumber..]); Shape = layerShape }
+            let nodesFromPervLayerNumber = pervLayerNodesNumber / shape.BlocksNumber
+            let layerThetasNumber = nodesFromPervLayerNumber * shape.NodesInBlockNumber
+            let mx = reshape (shape.NodesInBlockNumber, nodesFromPervLayerNumber) theta.[..layerThetasNumber - 1]
+            { Thetas = mx; ThetasTail = thetasTail layerThetasNumber; Shape = layerShape }
 
 (**
     ## Convert Shaped Network into flattened vector representation

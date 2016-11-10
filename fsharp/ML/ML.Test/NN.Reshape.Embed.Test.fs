@@ -25,9 +25,9 @@ let ``Create embed hidden layer [2] -> [1]``() =
             }
         )
 
-    let actual = makeHidden theta 2 (NNFullLayerShape({ NodesNumber = 2; Activation= act }))
+    let actual = makeHidden theta 2 layer
 
-    actual.Thetas |> should equal [ DenseMatrix.ofRowList([[0.; 1.]]) ]
+    actual.Thetas |> should equal (matrix [[0.; 1.]])
 
 [<TestCase>]
 let ``Create embed hidden layer [2] -> [2]``() =
@@ -45,12 +45,12 @@ let ``Create embed hidden layer [2] -> [2]``() =
 
     let actual = makeHidden theta 2 layer    
 
-    actual.Thetas |> should equal [ matrix([[0.; 2.];[ 1.; 3.]]) ]
+    actual.Thetas |> should equal (matrix([[0.; 2.];[1.;3.]]))
 
 [<TestCase>]
 let ``Create embed hidden layer [4] -> [1, 1]``() =
 
-    let theta = vector([0.; 1.; 2.; 3.])
+    let theta = vector([0.; 1.])
 
     let layer =
         NNEmbedLayerShape(
@@ -63,13 +63,13 @@ let ``Create embed hidden layer [4] -> [1, 1]``() =
 
     let actual = makeHidden theta 4 layer    
 
-    actual.Thetas |> should equal [ matrix([[0.; 1.]]); matrix([[ 2.; 3.]]) ]
+    actual.Thetas |> should equal (matrix([[0.; 1.]]))
 
 
 [<TestCase>]
 let ``Create embed hidden layer [0; 1; 2;] -> mx[0; 1; 2]``() =
 
-    let theta = vector([0.; 1.; 2.;])
+    let theta = vector([0.; 1.; 2.])
 
     let layer =
         NNEmbedLayerShape(
@@ -90,7 +90,7 @@ let ``Create embed hidden layer [0; 1; 2;] -> mx[0; 1; 2]``() =
 [<TestCase>]
 let ``Create embed hidden layer [4] -> [2, 2]``() =
 
-    let theta = vector([0.; 2.; 1.; 3.; 4.; 6.; 5.; 7.;])
+    let theta = vector([0.; 2.; 1.; 3.;])
 
     let layer =
         NNEmbedLayerShape(
